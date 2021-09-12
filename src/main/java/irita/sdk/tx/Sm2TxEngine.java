@@ -21,8 +21,6 @@ import java.math.BigInteger;
 public class Sm2TxEngine implements TxEngine {
     private KeyManager km;
     private String chainID;
-    // TODO
-    private final int gasLimit = 20000000; // TODO
 
     public Sm2TxEngine(KeyManager km, String chainID) {
         this.km = km;
@@ -66,7 +64,7 @@ public class Sm2TxEngine implements TxEngine {
                                 .setPublicKey(Any.pack(Keys.PubKey.newBuilder().setKey(ByteString.copyFrom(publicKeyEncoded)).build(), "/"))
                                 .setModeInfo(TxOuterClass.ModeInfo.newBuilder().setSingle(TxOuterClass.ModeInfo.Single.newBuilder().setMode(Signing.SignMode.SIGN_MODE_DIRECT)))
                                 .setSequence(account.getSequence()))
-                .setFee(TxOuterClass.Fee.newBuilder().setGasLimit(gasLimit).addAmount(CoinOuterClass.Coin.newBuilder().setAmount(baseTx.getFee().getAmount()).setDenom(baseTx.getFee().getDenom()))).build();
+                .setFee(TxOuterClass.Fee.newBuilder().setGasLimit(baseTx.getGas()).addAmount(CoinOuterClass.Coin.newBuilder().setAmount(baseTx.getFee().getAmount()).setDenom(baseTx.getFee().getDenom()))).build();
 
 
         TxOuterClass.SignDoc signDoc = TxOuterClass.SignDoc.newBuilder()

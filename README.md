@@ -1,6 +1,6 @@
-# irita-sdk-java
+# opb-sdk-java
 
-irita-sdk-java
+opb-sdk-java
 
 ## Key Manger管理
 
@@ -51,23 +51,24 @@ irita-sdk-java
         System.out.println(keystore);
 ```
 
-## 怎样使用irita-sdk-java（How to use irita-sdk-java）
+## 怎样使用opb-sdk-java（How to use opb-sdk-java）
 
-### 1 初始化IritaClient
+### 1 初始化OpbClient (连接文昌链)
 
 ```java
         String mnemonic = "opera vivid pride shallow brick crew found resist decade neck expect apple chalk belt sick author know try tank detail tree impact hand best";
         KeyManager km = KeyManagerFactory.createDefault();
         km.recover(mnemonic);
 
-        String nodeUri = "http://101.132.138.109:26657";
-        String grpcAddr = "http://101.132.138.109:9090";
-        String chainId = "irita";
+        // projectID: 填你的 projectID
+        String nodeUri = "https://opbt.bsngate.com:18602/api/projectID/rpc";
+        String grpcAddr = "opbt.bsngate.com:18603";
+        String chainId = "wenchangchain";
         ClientConfig clientConfig = new ClientConfig(nodeUri, grpcAddr, chainId);
-//        OpbConfig opbConfig = new OpbConfig("", "", "");
+        OpbConfig opbConfig = new OpbConfig(projectID, projectKey: 如果没有填null, km.getAddr());
         OpbConfig opbConfig = null;
 
-        client = new IritaClient(clientConfig, opbConfig, km);
+        OpbClient client = new OpbClient(clientConfig, opbConfig, km);
         assertEquals("iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3", km.getAddr());
 ```
 
@@ -76,6 +77,7 @@ irita-sdk-java
 ### 1. 新增一个denom（issue denom）
 
 ```java
+        BaseTx baseTx = new BaseTx(200000, new Fee("200000", "uirita"), BroadcastMode.Commit);
         String denomID = "denomid" + new Random().nextInt(1000);
         String denomName = "test_name" + new Random().nextInt(1000);
         String schema = "no shcema";
@@ -90,6 +92,7 @@ irita-sdk-java
 ### 2. 发行一个nft（mint nft）
 
 ```java
+        BaseTx baseTx = new BaseTx(200000, new Fee("200000", "uirita"), BroadcastMode.Commit);
         MintNFTRequest mintReq = new MintNFTRequest()
         .setDenom(denomID)
         .setId(nftID)
@@ -103,6 +106,7 @@ irita-sdk-java
 ### 3. 编辑/修改存在的nft（edit nft）
 
 ```java
+        BaseTx baseTx = new BaseTx(200000, new Fee("200000", "uirita"), BroadcastMode.Commit);
         String newName = "new_name";
         String newUri = "http://xx.com";
         String newData = "new_data";
@@ -118,6 +122,7 @@ irita-sdk-java
 ### 4. 销毁nft（burn nft）
 
 ```java
+        BaseTx baseTx = new BaseTx(200000, new Fee("200000", "uirita"), BroadcastMode.Commit);
         BurnNFTRequest burnNFTReq = new BurnNFTRequest()
                 .setDenom(denomID)
                 .setId(nftID);

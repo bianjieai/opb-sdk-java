@@ -1,15 +1,16 @@
 package irita.sdk.module.community_gov;
 
 import io.grpc.StatusRuntimeException;
-import irita.sdk.model.Fee;
 import irita.sdk.constant.ContractAddress;
 import irita.sdk.constant.ContractArg;
 import irita.sdk.constant.ContractMethod;
+import irita.sdk.constant.enums.BroadcastMode;
 import irita.sdk.constant.enums.DocType;
 import irita.sdk.constant.enums.Role;
 import irita.sdk.exception.ContractException;
 import irita.sdk.exception.IritaSDKException;
 import irita.sdk.model.BaseTx;
+import irita.sdk.model.Fee;
 import irita.sdk.model.ResultTx;
 import irita.sdk.module.wasm.ContractABI;
 import irita.sdk.module.wasm.WasmClient;
@@ -188,6 +189,6 @@ public class CommunityGovClient {
     }
 
     private BaseTx getComGovBaseTx() {
-        return new BaseTx(2000000, new Fee("120", "stake"));
+        return new BaseTx(2000000, new Fee("120", "stake"), BroadcastMode.Commit);
     }
 }

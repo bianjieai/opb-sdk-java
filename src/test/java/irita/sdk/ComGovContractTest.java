@@ -4,6 +4,7 @@ import irita.sdk.client.BaseClient;
 import irita.sdk.config.ClientConfig;
 import irita.sdk.config.OpbConfig;
 import irita.sdk.constant.ContractAddress;
+import irita.sdk.constant.enums.BroadcastMode;
 import irita.sdk.constant.enums.DocType;
 import irita.sdk.constant.enums.Role;
 import irita.sdk.exception.ContractException;
@@ -57,7 +58,7 @@ public class ComGovContractTest {
         // store contract
         StoreRequest storeReq = new StoreRequest();
         storeReq.setWasmFile("src/test/resources/community_governance.wasm");
-        BaseTx baseTx = new BaseTx(2000000, new Fee("120", "stake"));
+        BaseTx baseTx = new BaseTx(2000000, new Fee("120", "stake"), BroadcastMode.Commit);
 
         String codeId = wasmClient.store(storeReq, baseTx);
         assertTrue(StringUtils.isNotEmpty(codeId));

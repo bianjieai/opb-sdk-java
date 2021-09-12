@@ -28,11 +28,9 @@ public class GrpcFactory {
         name = removePrefix(name);
         Channel channel = ManagedChannelBuilder.forAddress(name, port).usePlaintext().build();
 
-        if (opbConfig != null) {
-            if (StringUtils.isNotEmpty(opbConfig.getProjectKey())) {
-                // TODO
-                channel = ClientInterceptors.intercept(channel, new GrpcClientInterceptor(opbConfig.getProjectKey()));
-            }
+        if (opbConfig != null && (StringUtils.isNotEmpty(opbConfig.getProjectKey()))) {
+            // TODO
+            channel = ClientInterceptors.intercept(channel, new GrpcClientInterceptor(opbConfig.getProjectKey()));
         }
         return channel;
     }

@@ -3,6 +3,7 @@ package irita.sdk;
 import irita.sdk.client.BaseClient;
 import irita.sdk.config.ClientConfig;
 import irita.sdk.config.OpbConfig;
+import irita.sdk.constant.enums.BroadcastMode;
 import irita.sdk.key.KeyManager;
 import irita.sdk.key.KeyManagerFactory;
 import irita.sdk.model.BaseTx;
@@ -48,7 +49,7 @@ public class WasmTest {
         StoreRequest req = new StoreRequest();
         req.setWasmFile("src/test/resources/test.wasm");
 
-        BaseTx baseTx = new BaseTx(2000000, new Fee("120", "stake"));
+        BaseTx baseTx = new BaseTx(2000000, new Fee("120", "stake"), BroadcastMode.Commit);
         String codeId = wasmClient.store(req, baseTx);
         assertTrue(StringUtils.isNotEmpty(codeId));
         System.out.println(codeId);
@@ -69,7 +70,7 @@ public class WasmTest {
         req.setCodeId(codeId);
         req.setInitMsg(initMsg);
         req.setLabel("test wasm");
-        BaseTx baseTx = new BaseTx(2000000, new Fee("120", "stake"));
+        BaseTx baseTx = new BaseTx(2000000, new Fee("120", "stake"),BroadcastMode.Commit);
 
         String contractAddress = wasmClient.instantiate(req, baseTx);
         assertTrue(StringUtils.isNotEmpty(contractAddress));
@@ -92,7 +93,7 @@ public class WasmTest {
         ContractABI execAbi = new ContractABI();
         execAbi.setArgs(args);
         execAbi.setMethod("vote");
-        BaseTx baseTx = new BaseTx(2000000, new Fee("120", "stake"));
+        BaseTx baseTx = new BaseTx(2000000, new Fee("120", "stake"),BroadcastMode.Commit);
 
         ResultTx resultTx = wasmClient.execute(contractAddress, execAbi, null, baseTx);
 

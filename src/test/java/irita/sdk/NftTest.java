@@ -3,6 +3,7 @@ package irita.sdk;
 import irita.sdk.client.IritaClient;
 import irita.sdk.config.ClientConfig;
 import irita.sdk.config.OpbConfig;
+import irita.sdk.constant.enums.BroadcastMode;
 import irita.sdk.key.KeyManager;
 import irita.sdk.key.KeyManagerFactory;
 import irita.sdk.model.BaseTx;
@@ -22,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class NftTest {
     private KeyManager km;
     private NftClient nftClient;
-    private BaseTx baseTx = new BaseTx(2000000, new Fee("0", "uirita"));
+    private BaseTx baseTx = new BaseTx(200000, new Fee("300000", "uirita"), BroadcastMode.Commit);
 
     @BeforeEach
     public void init() {

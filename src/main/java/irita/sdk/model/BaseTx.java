@@ -11,9 +11,10 @@ public class BaseTx {
     public BaseTx() {
     }
 
-    public BaseTx(int gas, Fee fee) {
+    public BaseTx(int gas, Fee fee, BroadcastMode mode) {
         this.gas = gas;
         this.fee = fee;
+        this.mode = mode;
     }
 
     public int getGas() {
