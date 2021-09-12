@@ -2,7 +2,6 @@ package irita.sdk.client;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import io.grpc.Channel;
-import io.grpc.ManagedChannel;
 import irita.sdk.config.ClientConfig;
 import irita.sdk.config.OpbConfig;
 import irita.sdk.exception.IritaSDKException;
@@ -12,6 +11,9 @@ import irita.sdk.model.BaseTx;
 import irita.sdk.model.ResultTx;
 import irita.sdk.tx.TxEngine;
 import irita.sdk.tx.TxEngineFactory;
+import irita.sdk.util.HashUtils;
+import org.bouncycastle.util.Strings;
+import org.bouncycastle.util.encoders.Hex;
 import proto.cosmos.auth.v1beta1.Auth;
 import proto.cosmos.auth.v1beta1.QueryGrpc;
 import proto.cosmos.auth.v1beta1.QueryOuterClass;
@@ -63,6 +65,16 @@ public class BaseClient {
         TxEngine txEngine = getTxEngine();
         byte[] txBytes = txEngine.buildAndSign(msg, baseTx, account);
         return rpcClient.broadcastTx(txBytes, baseTx.getMode());
+    }
+
+    public String buildTxHash(com.google.protobuf.GeneratedMessageV3 msg, BaseTx baseTx, Account account) {
+        if (account == null) {
+            account = queryAccount();
+        }
+        TxEngine txEngine = getTxEngine();
+        byte[] txBytes = txEngine.buildAndSign(msg, baseTx, account);
+        byte[] sum = HashUtils.sha256(txBytes);
+        return Strings.toUpperCase(Hex.toHexString(sum));
     }
 
     public Account queryAccount() {
