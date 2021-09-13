@@ -4,6 +4,15 @@ opb-sdk-java
 
 ## Key Manger管理
 
+### 0 新生成一个助记词（如果已有 私钥/keystore/助记词 忽略此步骤）
+
+```java
+        KeyManager km = KeyManagerFactory.createDefault();
+        km.add();
+        String mnemonic = km.getMnemonic();
+        System.out.println(mnemonic);
+```
+
 ### 1 恢复私钥
 
 #### 1.1 从助记词恢复（recover from mnemonic）
@@ -66,6 +75,23 @@ opb-sdk-java
         String chainId = "wenchangchain";
         ClientConfig clientConfig = new ClientConfig(nodeUri, grpcAddr, chainId);
         OpbConfig opbConfig = new OpbConfig(projectID, projectKey: 如果没有填null, km.getAddr());
+
+        OpbClient client = new OpbClient(clientConfig, opbConfig, km);
+        assertEquals("iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3", km.getAddr());
+```
+
+### 1 初始化OpbClient (连接测试网)
+
+```java
+        String mnemonic = "opera vivid pride shallow brick crew found resist decade neck expect apple chalk belt sick author know try tank detail tree impact hand best";
+        KeyManager km = KeyManagerFactory.createDefault();
+        km.recover(mnemonic);
+
+        // projectID: 填你的 projectID
+        String nodeUri = "http://47.100.192.234:26657";
+        String grpcAddr = "47.100.192.234:9090";
+        String chainId = "testing";
+        ClientConfig clientConfig = new ClientConfig(nodeUri, grpcAddr, chainId);
         OpbConfig opbConfig = null;
 
         OpbClient client = new OpbClient(clientConfig, opbConfig, km);

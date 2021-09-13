@@ -86,4 +86,12 @@ public class KeyManagerTest {
 
         assertEquals("iaa1sul8jyesxq5nuwstyj5lzzsdc2sedeehl365qk", km.getAddr());
     }
+
+    @Test
+    public void addNewKm() throws Exception {
+        KeyManager km = KeyManagerFactory.createDefault();
+        km.add();
+        String mnemonic = km.getMnemonic();
+        System.out.println(mnemonic);
+    }
 }
