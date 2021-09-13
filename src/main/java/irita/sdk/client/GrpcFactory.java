@@ -1,10 +1,11 @@
 package irita.sdk.client;
 
-import io.grpc.*;
+import io.grpc.Channel;
+import io.grpc.ClientInterceptors;
+import io.grpc.ManagedChannelBuilder;
 import irita.sdk.config.ClientConfig;
 import irita.sdk.config.OpbConfig;
 import irita.sdk.exception.IritaSDKException;
-import org.apache.commons.lang3.StringUtils;
 
 public class GrpcFactory {
     private static final String HTTP_PREFIX = "http://";
@@ -27,11 +28,7 @@ public class GrpcFactory {
     public static Channel createGrpcClient(String name, int port, OpbConfig opbConfig) {
         name = removePrefix(name);
         Channel channel = ManagedChannelBuilder.forAddress(name, port).usePlaintext().build();
-
-        if (opbConfig != null && (StringUtils.isNotEmpty(opbConfig.getProjectKey()))) {
-            // TODO
-            channel = ClientInterceptors.intercept(channel, new GrpcClientInterceptor(opbConfig.getProjectKey()));
-        }
+        channel = ClientInterceptors.intercept(channel, new GrpcBSNInterceptor(opbConfig));
         return channel;
     }
 
