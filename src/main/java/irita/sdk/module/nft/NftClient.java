@@ -17,6 +17,7 @@ import proto.nft.Tx;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class NftClient {
     private final BaseClient baseClient;
@@ -139,7 +140,7 @@ public class NftClient {
         Channel channel = baseClient.getGrpcClient();
         QueryOuterClass.QueryOwnerRequest req = QueryOuterClass.QueryOwnerRequest
                 .newBuilder()
-                .setDenomId(denomID)
+                .setDenomId(Optional.of(denomID).orElse(""))
                 .setOwner(owner)
                 .build();
 
