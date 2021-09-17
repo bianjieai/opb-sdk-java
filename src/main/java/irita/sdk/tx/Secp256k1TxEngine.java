@@ -5,14 +5,16 @@ import irita.sdk.model.Account;
 import irita.sdk.model.BaseTx;
 import proto.cosmos.tx.v1beta1.TxOuterClass;
 
+import java.util.List;
+
 public class Secp256k1TxEngine implements TxEngine {
     @Override
-    public TxOuterClass.TxBody buildTxBody(GeneratedMessageV3 msg) {
+    public TxOuterClass.TxBody buildTxBody(List<GeneratedMessageV3> msgs) {
         throw new RuntimeException("TODO");
     }
 
     @Override
-    public TxOuterClass.TxBody buildTxBodyWithMemo(GeneratedMessageV3 msg, String memo) {
+    public TxOuterClass.TxBody buildTxBodyWithMemo(List<GeneratedMessageV3> msgs, String memo) {
         throw new RuntimeException("TODO");
     }
 

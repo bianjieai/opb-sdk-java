@@ -1,6 +1,7 @@
 package irita.sdk.module.nft;
 
 
+import com.google.protobuf.GeneratedMessageV3;
 import io.grpc.Channel;
 import irita.sdk.client.BaseClient;
 import irita.sdk.model.Account;
@@ -16,6 +17,7 @@ import proto.nft.Tx;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class NftClient {
@@ -35,8 +37,8 @@ public class NftClient {
                 .setSchema(req.getSchema())
                 .setSender(account.getAddress())
                 .build();
-
-        return baseClient.buildAndSend(msg, baseTx, account);
+        List<GeneratedMessageV3> msgs = Collections.singletonList(msg);
+        return baseClient.buildAndSend(msgs, baseTx, account);
     }
 
     public ResultTx mintNft(MintNFTRequest req, BaseTx baseTx) throws IOException {
@@ -57,7 +59,8 @@ public class NftClient {
             builder.setRecipient(baseClient.getCurrentAddr());
         }
         Tx.MsgMintNFT msg = builder.build();
-        return baseClient.buildAndSend(msg, baseTx);
+        List<GeneratedMessageV3> msgs = Collections.singletonList(msg);
+        return baseClient.buildAndSend(msgs, baseTx);
     }
 
     public ResultTx editNft(EditNFTRequest req, BaseTx baseTx) throws IOException {
@@ -80,7 +83,8 @@ public class NftClient {
                 .setData(req.getData())
                 .setSender(baseClient.getCurrentAddr())
                 .build();
-        return baseClient.buildAndSend(msg, baseTx);
+        List<GeneratedMessageV3> msgs = Collections.singletonList(msg);
+        return baseClient.buildAndSend(msgs, baseTx);
     }
 
     public ResultTx transferNFt(TransferNFTRequest req, BaseTx baseTx) throws IOException {
@@ -109,7 +113,8 @@ public class NftClient {
             builder.setRecipient(recipient);
         }
         Tx.MsgTransferNFT msg = builder.build();
-        return baseClient.buildAndSend(msg, baseTx);
+        List<GeneratedMessageV3> msgs = Collections.singletonList(msg);
+        return baseClient.buildAndSend(msgs, baseTx);
     }
 
     public ResultTx burnNft(BurnNFTRequest req, BaseTx baseTx) throws IOException {
@@ -119,7 +124,8 @@ public class NftClient {
                 .setId(req.getId())
                 .setSender(baseClient.getCurrentAddr())
                 .build();
-        return baseClient.buildAndSend(msg, baseTx);
+        List<GeneratedMessageV3> msgs = Collections.singletonList(msg);
+        return baseClient.buildAndSend(msgs, baseTx);
     }
 
 
