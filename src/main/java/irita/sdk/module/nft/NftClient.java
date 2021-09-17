@@ -1,6 +1,7 @@
 package irita.sdk.module.nft;
 
 
+import com.google.protobuf.GeneratedMessageV3;
 import io.grpc.Channel;
 import irita.sdk.client.BaseClient;
 import irita.sdk.model.Account;
@@ -16,6 +17,7 @@ import proto.nft.Tx;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class NftClient {
@@ -35,8 +37,7 @@ public class NftClient {
                 .setSchema(req.getSchema())
                 .setSender(account.getAddress())
                 .build();
-        java.util.List<com.google.protobuf.GeneratedMessageV3> msgs = new java.util.ArrayList<>();
-        msgs.add(msg);
+        List<GeneratedMessageV3> msgs = Collections.singletonList(msg);
         return baseClient.buildAndSend(msgs, baseTx, account);
     }
 
@@ -58,8 +59,7 @@ public class NftClient {
             builder.setRecipient(baseClient.getCurrentAddr());
         }
         Tx.MsgMintNFT msg = builder.build();
-        java.util.List<com.google.protobuf.GeneratedMessageV3> msgs = new java.util.ArrayList<>();
-        msgs.add(msg);
+        List<GeneratedMessageV3> msgs = Collections.singletonList(msg);
         return baseClient.buildAndSend(msgs, baseTx);
     }
 
@@ -83,8 +83,7 @@ public class NftClient {
                 .setData(req.getData())
                 .setSender(baseClient.getCurrentAddr())
                 .build();
-        java.util.List<com.google.protobuf.GeneratedMessageV3> msgs = new java.util.ArrayList<>();
-        msgs.add(msg);
+        List<GeneratedMessageV3> msgs = Collections.singletonList(msg);
         return baseClient.buildAndSend(msgs, baseTx);
     }
 
@@ -114,8 +113,7 @@ public class NftClient {
             builder.setRecipient(recipient);
         }
         Tx.MsgTransferNFT msg = builder.build();
-        java.util.List<com.google.protobuf.GeneratedMessageV3> msgs = new java.util.ArrayList<>();
-        msgs.add(msg);
+        List<GeneratedMessageV3> msgs = Collections.singletonList(msg);
         return baseClient.buildAndSend(msgs, baseTx);
     }
 
@@ -126,8 +124,7 @@ public class NftClient {
                 .setId(req.getId())
                 .setSender(baseClient.getCurrentAddr())
                 .build();
-        java.util.List<com.google.protobuf.GeneratedMessageV3> msgs = new java.util.ArrayList<>();
-        msgs.add(msg);
+        List<GeneratedMessageV3> msgs = Collections.singletonList(msg);
         return baseClient.buildAndSend(msgs, baseTx);
     }
 

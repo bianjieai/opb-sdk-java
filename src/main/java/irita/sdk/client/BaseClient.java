@@ -1,5 +1,6 @@
 package irita.sdk.client;
 
+import com.google.protobuf.GeneratedMessageV3;
 import com.google.protobuf.InvalidProtocolBufferException;
 import io.grpc.Channel;
 import irita.sdk.config.ClientConfig;
@@ -19,6 +20,7 @@ import proto.cosmos.auth.v1beta1.QueryGrpc;
 import proto.cosmos.auth.v1beta1.QueryOuterClass;
 
 import java.io.IOException;
+import java.util.List;
 
 public class BaseClient {
     private ClientConfig clientConfig;
@@ -54,11 +56,11 @@ public class BaseClient {
         return grpcClient;
     }
 
-    public ResultTx buildAndSend(java.util.List<com.google.protobuf.GeneratedMessageV3> msgs, BaseTx baseTx) throws IOException {
+    public ResultTx buildAndSend(List<GeneratedMessageV3> msgs, BaseTx baseTx) throws IOException {
         return buildAndSend(msgs, baseTx, null);
     }
 
-    public ResultTx buildAndSend(java.util.List<com.google.protobuf.GeneratedMessageV3> msgs, BaseTx baseTx, Account account) throws IOException {
+    public ResultTx buildAndSend(List<GeneratedMessageV3> msgs, BaseTx baseTx, Account account) throws IOException {
         if (account == null) {
             account = queryAccount();
         }
@@ -67,7 +69,7 @@ public class BaseClient {
         return rpcClient.broadcastTx(txBytes, baseTx.getMode());
     }
 
-    public String buildTxHash(java.util.List<com.google.protobuf.GeneratedMessageV3> msgs, BaseTx baseTx, Account account) {
+    public String buildTxHash(List<GeneratedMessageV3> msgs, BaseTx baseTx, Account account) {
         if (account == null) {
             account = queryAccount();
         }
