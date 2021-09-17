@@ -35,8 +35,9 @@ public class NftClient {
                 .setSchema(req.getSchema())
                 .setSender(account.getAddress())
                 .build();
-
-        return baseClient.buildAndSend(msg, baseTx, account);
+        java.util.List<com.google.protobuf.GeneratedMessageV3> msgs = new java.util.ArrayList<>();
+        msgs.add(msg);
+        return baseClient.buildAndSend(msgs, baseTx, account);
     }
 
     public ResultTx mintNft(MintNFTRequest req, BaseTx baseTx) throws IOException {
@@ -57,7 +58,9 @@ public class NftClient {
             builder.setRecipient(baseClient.getCurrentAddr());
         }
         Tx.MsgMintNFT msg = builder.build();
-        return baseClient.buildAndSend(msg, baseTx);
+        java.util.List<com.google.protobuf.GeneratedMessageV3> msgs = new java.util.ArrayList<>();
+        msgs.add(msg);
+        return baseClient.buildAndSend(msgs, baseTx);
     }
 
     public ResultTx editNft(EditNFTRequest req, BaseTx baseTx) throws IOException {
@@ -80,7 +83,9 @@ public class NftClient {
                 .setData(req.getData())
                 .setSender(baseClient.getCurrentAddr())
                 .build();
-        return baseClient.buildAndSend(msg, baseTx);
+        java.util.List<com.google.protobuf.GeneratedMessageV3> msgs = new java.util.ArrayList<>();
+        msgs.add(msg);
+        return baseClient.buildAndSend(msgs, baseTx);
     }
 
     public ResultTx transferNFt(TransferNFTRequest req, BaseTx baseTx) throws IOException {
@@ -109,7 +114,9 @@ public class NftClient {
             builder.setRecipient(recipient);
         }
         Tx.MsgTransferNFT msg = builder.build();
-        return baseClient.buildAndSend(msg, baseTx);
+        java.util.List<com.google.protobuf.GeneratedMessageV3> msgs = new java.util.ArrayList<>();
+        msgs.add(msg);
+        return baseClient.buildAndSend(msgs, baseTx);
     }
 
     public ResultTx burnNft(BurnNFTRequest req, BaseTx baseTx) throws IOException {
@@ -119,7 +126,9 @@ public class NftClient {
                 .setId(req.getId())
                 .setSender(baseClient.getCurrentAddr())
                 .build();
-        return baseClient.buildAndSend(msg, baseTx);
+        java.util.List<com.google.protobuf.GeneratedMessageV3> msgs = new java.util.ArrayList<>();
+        msgs.add(msg);
+        return baseClient.buildAndSend(msgs, baseTx);
     }
 
 

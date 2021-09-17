@@ -54,25 +54,25 @@ public class BaseClient {
         return grpcClient;
     }
 
-    public ResultTx buildAndSend(com.google.protobuf.GeneratedMessageV3 msg, BaseTx baseTx) throws IOException {
-        return buildAndSend(msg, baseTx, null);
+    public ResultTx buildAndSend(java.util.List<com.google.protobuf.GeneratedMessageV3> msgs, BaseTx baseTx) throws IOException {
+        return buildAndSend(msgs, baseTx, null);
     }
 
-    public ResultTx buildAndSend(com.google.protobuf.GeneratedMessageV3 msg, BaseTx baseTx, Account account) throws IOException {
+    public ResultTx buildAndSend(java.util.List<com.google.protobuf.GeneratedMessageV3> msgs, BaseTx baseTx, Account account) throws IOException {
         if (account == null) {
             account = queryAccount();
         }
         TxEngine txEngine = getTxEngine();
-        byte[] txBytes = txEngine.buildAndSign(msg, baseTx, account);
+        byte[] txBytes = txEngine.buildAndSign(msgs, baseTx, account);
         return rpcClient.broadcastTx(txBytes, baseTx.getMode());
     }
 
-    public String buildTxHash(com.google.protobuf.GeneratedMessageV3 msg, BaseTx baseTx, Account account) {
+    public String buildTxHash(java.util.List<com.google.protobuf.GeneratedMessageV3> msgs, BaseTx baseTx, Account account) {
         if (account == null) {
             account = queryAccount();
         }
         TxEngine txEngine = getTxEngine();
-        byte[] txBytes = txEngine.buildAndSign(msg, baseTx, account);
+        byte[] txBytes = txEngine.buildAndSign(msgs, baseTx, account);
         byte[] sum = HashUtils.sha256(txBytes);
         return Strings.toUpperCase(Hex.toHexString(sum));
     }

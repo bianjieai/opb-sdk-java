@@ -51,8 +51,9 @@ public class WasmClient {
                 .setSource("")
                 .setBuilder("")
                 .build();
-
-        ResultTx resultTx = baseClient.buildAndSend(msg, baseTx, account);
+        java.util.List<com.google.protobuf.GeneratedMessageV3> msgs = new java.util.ArrayList<>();
+        msgs.add(msg);
+        ResultTx resultTx = baseClient.buildAndSend(msgs, baseTx, account);
         return resultTx.getEventValue(EventEnum.MESSAGE_CODE_ID);
     }
 
@@ -74,7 +75,9 @@ public class WasmClient {
         }
 
         Tx.MsgInstantiateContract msg = builder.build();
-        ResultTx resultTx = baseClient.buildAndSend(msg, baseTx, account);
+        java.util.List<com.google.protobuf.GeneratedMessageV3> msgs = new java.util.ArrayList<>();
+        msgs.add(msg);
+        ResultTx resultTx = baseClient.buildAndSend(msgs, baseTx, account);
         return resultTx.getEventValue(EventEnum.MESSAGE_CONTRACT_ADDRESS);
     }
 
@@ -96,7 +99,9 @@ public class WasmClient {
         }
 
         Tx.MsgExecuteContract msg = builder.build();
-        return baseClient.buildAndSend(msg, baseTx, account);
+        java.util.List<com.google.protobuf.GeneratedMessageV3> msgs = new java.util.ArrayList<>();
+        msgs.add(msg);
+        return baseClient.buildAndSend(msgs, baseTx, account);
     }
 
     public ResultTx migrate(String contractAddress, long newCodeID, byte[] msgByte, BaseTx baseTx) throws IOException {
@@ -107,8 +112,9 @@ public class WasmClient {
                 .setCodeId(newCodeID)
                 .setMigrateMsg(ByteString.copyFrom(msgByte))
                 .build();
-
-        return baseClient.buildAndSend(msg, baseTx, account);
+        java.util.List<com.google.protobuf.GeneratedMessageV3> msgs = new java.util.ArrayList<>();
+        msgs.add(msg);
+        return baseClient.buildAndSend(msgs, baseTx, account);
     }
 
     // return the contract information
