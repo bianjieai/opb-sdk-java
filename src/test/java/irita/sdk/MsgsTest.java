@@ -1,5 +1,6 @@
 package irita.sdk;
 
+import com.google.protobuf.GeneratedMessageV3;
 import irita.sdk.client.BaseClient;
 import irita.sdk.client.IritaClient;
 import irita.sdk.config.ClientConfig;
@@ -19,7 +20,9 @@ import proto.nft.Tx;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -75,7 +78,7 @@ public class MsgsTest {
                 .setSender(account.getAddress())
                 .build();
 
-        java.util.List<com.google.protobuf.GeneratedMessageV3> msgs = new java.util.ArrayList<>();
+        List<GeneratedMessageV3> msgs = new ArrayList<>();
         msgs.add(msg1);
         msgs.add(msg2);
         ResultTx resultTx = baseClient.buildAndSend(msgs, baseTx, account);
