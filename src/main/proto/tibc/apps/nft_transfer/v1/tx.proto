@@ -1,0 +1,33 @@
+ syntax = "proto3";
+ package tibc.apps.nft_transfer.v1;
+
+ option java_package = "proto.tibc.apps.nft_transfer.v1";
+
+ import "gogoproto/gogo.proto";
+
+// Msg defines the tibc/nftTransfer Msg service.
+ service Msg {
+  // NftTransfer defines a rpc handler method for MsgNftTransfer.
+  rpc NftTransfer(MsgNftTransfer) returns (MsgNftTransferResponse);
+}
+
+ message MsgNftTransfer {
+  option (gogoproto.equal)           = false;
+  option (gogoproto.goproto_getters) = false;
+
+  // the class to which the NFT to be transferred belongs
+  string class = 1;
+  // the nft id
+  string id = 2;
+  // the nft sender
+  string sender = 3;
+  // the nft receiver
+  string receiver = 4;
+  // target chain of transmission
+  string dest_chain = 5;
+  // relay chain during transmission
+  string realay_chain = 6;
+}
+
+// MsgTransferResponse defines the Msg/NftTransfer response type.
+ message MsgNftTransferResponse {}

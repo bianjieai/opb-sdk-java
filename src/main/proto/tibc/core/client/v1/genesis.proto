@@ -1,0 +1,48 @@
+syntax = "proto3";
+package tibc.core.client.v1;
+
+option java_package = "proto.tibc.core.client.v1";
+
+import "tibc/core/client/v1/client.proto";
+import "gogoproto/gogo.proto";
+
+// GenesisState defines the tibc client submodule's genesis state.
+message GenesisState {
+  // client states with their corresponding identifiers
+  repeated IdentifiedClientState clients = 1 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "IdentifiedClientStates"
+  ];
+  // consensus states from each client
+  repeated ClientConsensusStates clients_consensus = 2 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "ClientsConsensusStates"
+  ];
+  // metadata from each client
+  repeated IdentifiedGenesisMetadata clients_metadata = 3
+      [ (gogoproto.nullable) = false ];
+  // the chain name of the current chain
+  string native_chain_name = 5;
+
+  // IdentifiedRelayer defines a list of authorized relayers for the specified
+  // client.
+  repeated IdentifiedRelayers relayers = 6 [ (gogoproto.nullable) = false ];
+}
+
+// GenesisMetadata defines the genesis type for metadata that clients may return
+// with ExportMetadata
+message GenesisMetadata {
+  option (gogoproto.goproto_getters) = false;
+
+  // store key of metadata without chainName-prefix
+  bytes key = 1;
+  // metadata value
+  bytes value = 2;
+}
+
+// IdentifiedGenesisMetadata has the client metadata with the corresponding
+// chain name.
+message IdentifiedGenesisMetadata {
+  string chain_name = 1;
+  repeated GenesisMetadata metadata = 2 [ (gogoproto.nullable) = false ];
+}

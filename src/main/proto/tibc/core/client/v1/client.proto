@@ -1,0 +1,113 @@
+syntax = "proto3";
+package tibc.core.client.v1;
+
+option java_package = "proto.tibc.core.client.v1";
+
+import "gogoproto/gogo.proto";
+import "google/protobuf/any.proto";
+
+// IdentifiedClientState defines a client state with an additional client
+// identifier field.
+message IdentifiedClientState {
+  // client identifier
+  string chain_name = 1;
+  // client state
+  google.protobuf.Any client_state = 2;
+}
+
+// IdentifiedRelayer defines a list of authorized relayers for the specified
+// client.
+message IdentifiedRelayers {
+  // client identifier
+  string chain_name = 1;
+
+  // authorized relayer list
+  repeated string relayers = 2;
+}
+
+// ConsensusStateWithHeight defines a consensus state with an additional height
+// field.
+message ConsensusStateWithHeight {
+  // consensus state height
+  Height height = 1 [ (gogoproto.nullable) = false ];
+  // consensus state
+  google.protobuf.Any consensus_state = 2;
+}
+
+// ClientConsensusStates defines all the stored consensus states for a given
+// client.
+message ClientConsensusStates {
+  // client identifier
+  string chain_name = 1;
+  // consensus states and their heights associated with the client
+  repeated ConsensusStateWithHeight consensus_states = 2
+      [ (gogoproto.nullable) = false ];
+}
+
+// CreateClientProposal defines a overnance proposal to create an TIBC client
+message CreateClientProposal {
+  option (gogoproto.goproto_getters) = false;
+  // the title of the update proposal
+  string title = 1;
+  // the description of the proposal
+  string description = 2;
+  // the client identifier for the client to be updated if the proposal passes
+  string chain_name = 3;
+  // light client state
+  google.protobuf.Any client_state = 4;
+  // consensus state associated with the client that corresponds to a given
+  // height.
+  google.protobuf.Any consensus_state = 5;
+}
+
+// UpgradeClientProposal defines a overnance proposal to overide an TIBC client
+// state
+message UpgradeClientProposal {
+  option (gogoproto.goproto_getters) = false;
+  // the title of the update proposal
+  string title = 1;
+  // the description of the proposal
+  string description = 2;
+  // the client identifier for the client to be updated if the proposal passes
+  string chain_name = 3;
+  // client state
+  google.protobuf.Any client_state = 4;
+  // consensus state
+  google.protobuf.Any consensus_state = 5;
+}
+
+// RegisterRelayerProposal defines a overnance proposal to register some
+// relayers for updating a client state.
+message RegisterRelayerProposal {
+  option (gogoproto.goproto_getters) = false;
+  // the title of the update proposal
+  string title = 1;
+  // the description of the proposal
+  string description = 2;
+  // the client identifier for the client to be updated if the proposal passes
+  string chain_name = 3;
+  // relayer address list
+  repeated string relayers = 4;
+}
+
+// Height is a monotonically increasing data type
+// that can be compared against another Height for the purposes of updating and
+// freezing clients
+//
+// Normally the RevisionHeight is incremented at each height while keeping
+// RevisionNumber the same. However some consensus algorithms may choose to
+// reset the height in certain conditions e.g. hard forks, state-machine
+// breaking changes In these cases, the RevisionNumber is incremented so that
+// height continues to be monitonically increasing even as the RevisionHeight
+// gets reset
+message Height {
+  option (gogoproto.goproto_getters) = false;
+  option (gogoproto.goproto_stringer) = false;
+
+  // the revision that the client is currently on
+  uint64 revision_number = 1
+      [ (gogoproto.moretags) = "yaml:\"revision_number\"" ];
+  // the height within the given revision
+  uint64 revision_height = 2
+      [ (gogoproto.moretags) = "yaml:\"revision_height\"" ];
+}

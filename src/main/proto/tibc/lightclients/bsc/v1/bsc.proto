@@ -1,0 +1,85 @@
+syntax = "proto3";
+package tibc.lightclients.bsc.v1;
+
+option java_package = "proto.tibc.lightclients.bsc.v1";
+
+import "gogoproto/gogo.proto";
+import "tibc/core/client/v1/client.proto";
+
+// Header defines the bsc client consensus Header.
+message Header {
+  option (gogoproto.goproto_getters) = false;
+
+  bytes parent_hash = 1;
+  bytes uncle_hash = 2;
+  bytes coinbase = 3;
+  bytes root = 4;
+  bytes tx_hash = 5;
+  bytes receipt_hash = 6;
+  bytes bloom = 7;
+  uint64 difficulty = 8;
+  tibc.core.client.v1.Height height = 9 [ (gogoproto.nullable) = false ];
+  uint64 gas_limit = 10;
+  uint64 gas_used = 11;
+  uint64 time = 12;
+  bytes extra = 13;
+  bytes mix_digest = 14;
+  bytes nonce = 15;
+}
+
+// ClientState from bsc tracks the current validator set, latest height,
+// and a possible frozen height.
+message ClientState {
+  option (gogoproto.goproto_getters) = false;
+
+  Header header = 1 [ (gogoproto.nullable) = false ];
+  uint64 chain_id = 2;
+  uint64 epoch = 3;
+  uint64 block_inteval = 4;
+  repeated bytes validators = 5;
+  repeated Signer recent_signers = 6 [ (gogoproto.nullable) = false ];
+  bytes contract_address = 7;
+  uint64 trusting_period = 8;
+}
+
+message Signer {
+  tibc.core.client.v1.Height height = 1 [ (gogoproto.nullable) = false ];
+  bytes validator = 2;
+}
+
+message SignerSet {
+  repeated Signer signers = 1 [ (gogoproto.nullable) = false ];
+}
+
+message ValidatorSet { repeated bytes validators = 1; }
+
+// ConsensusState defines the consensus state from bsc.
+message ConsensusState {
+  option (gogoproto.goproto_getters) = false;
+
+  // timestamp that corresponds to the block height in which the ConsensusState
+  // was stored.
+  uint64 timestamp = 1;
+  tibc.core.client.v1.Height number = 2 [ (gogoproto.nullable) = false ];
+  bytes root = 3;
+}
+
+message StorageResult {
+  option (gogoproto.goproto_getters) = false;
+
+  string key = 1;
+  string value = 2;
+  repeated string proof = 3;
+}
+
+message Proof {
+  option (gogoproto.goproto_getters) = false;
+
+  string address = 1;
+  string balance = 2;
+  string code_hash = 3;
+  string nonce = 4;
+  string storage_hash = 5;
+  repeated string account_proof = 6;
+  repeated StorageResult storage_proof = 7;
+}

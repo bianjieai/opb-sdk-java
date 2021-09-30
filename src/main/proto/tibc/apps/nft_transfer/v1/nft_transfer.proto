@@ -1,0 +1,21 @@
+ syntax = "proto3";
+
+ package tibc.apps.nft_transfer.v1;
+ option java_package = "proto.tibc.apps.nft_transfer.v1";
+
+ import "gogoproto/gogo.proto";
+
+ message NonFungibleTokenPacketData {
+  // the class to which the NFT to be transferred belongs
+  string class = 1;
+  // the nft id
+  string id = 2;
+  // the address defined by NFT outside the chain
+  string uri = 3;
+  // the nft sender
+  string sender = 4;
+  // the nft receiver
+  string receiver = 5;
+  // identify whether it is far away from the source chain
+  bool away_from_origin = 6;
+}

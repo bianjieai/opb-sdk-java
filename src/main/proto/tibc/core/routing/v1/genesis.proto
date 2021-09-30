@@ -1,0 +1,9 @@
+syntax = "proto3";
+package tibc.core.routing.v1;
+
+option java_package = "proto.tibc.core.routing.v1";
+
+// GenesisState defines the tibc channel submodule's genesis state.
+message GenesisState {
+  repeated string  rules = 1;
+}

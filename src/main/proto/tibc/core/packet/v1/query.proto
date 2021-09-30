@@ -1,0 +1,232 @@
+syntax = "proto3";
+package tibc.core.packet.v1;
+
+import "tibc/core/client/v1/client.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
+import "tibc/core/packet/v1/packet.proto";
+import "google/api/annotations.proto";
+import "gogoproto/gogo.proto";
+
+option java_package = "proto.tibc.core.packet.v1";
+
+// Query provides defines the gRPC querier service
+service Query {
+  // PacketCommitment queries a stored packet commitment hash.
+  rpc PacketCommitment(QueryPacketCommitmentRequest) returns (QueryPacketCommitmentResponse) {
+    option (google.api.http).get =
+        "/tibc/core/packet/v1beta1/source_chains/{source_chain}/dest_chains/{dest_chain}/packet_commitments/{sequence}";
+  }
+
+  // PacketCommitments returns all the packet commitments hashes associated
+  rpc PacketCommitments(QueryPacketCommitmentsRequest) returns (QueryPacketCommitmentsResponse) {
+    option (google.api.http).get = "/tibc/core/packet/v1beta1/source_chains/{source_chain}/dest_chains/{dest_chain}/packet_commitments";
+  }
+
+  // PacketReceipt queries if a given packet sequence has been received on the queried chain
+  rpc PacketReceipt(QueryPacketReceiptRequest) returns (QueryPacketReceiptResponse) {
+    option (google.api.http).get =
+        "/tibc/core/packet/v1beta1/source_chains/{source_chain}/dest_chains/{dest_chain}/packet_receipts/{sequence}";
+  }
+
+  // PacketAcknowledgement queries a stored packet acknowledgement hash.
+  rpc PacketAcknowledgement(QueryPacketAcknowledgementRequest) returns (QueryPacketAcknowledgementResponse) {
+    option (google.api.http).get =
+        "/tibc/core/packet/v1beta1/source_chains/{source_chain}/dest_chains/{dest_chain}/packet_acks/{sequence}";
+  }
+
+  // PacketAcknowledgements returns all the packet acknowledgements associated
+  rpc PacketAcknowledgements(QueryPacketAcknowledgementsRequest) returns (QueryPacketAcknowledgementsResponse) {
+    option (google.api.http).get =
+        "/tibc/core/packet/v1beta1/source_chains/{source_chain}/dest_chains/{dest_chain}/packet_acknowledgements";
+  }
+
+  // UnreceivedPackets returns all the unreceived TIBC packets associated with sequences.
+  rpc UnreceivedPackets(QueryUnreceivedPacketsRequest) returns (QueryUnreceivedPacketsResponse) {
+    option (google.api.http).get = "/tibc/core/packet/v1beta1/source_chains/{source_chain}/dest_chains/{dest_chain}/packet_commitments/"
+                                   "{packet_commitment_sequences}/unreceived_packets";
+  }
+
+  // UnreceivedAcks returns all the unreceived TIBC acknowledgements associated with sequences.
+  rpc UnreceivedAcks(QueryUnreceivedAcksRequest) returns (QueryUnreceivedAcksResponse) {
+    option (google.api.http).get = "/tibc/core/packet/v1beta1/source_chains/{source_chain}/dest_chains/{dest_chain}/packet_commitments/"
+                                   "{packet_ack_sequences}/unreceived_acks";
+  }
+
+  // CleanPacketCommitment queries a stored packet commitment hash.
+  rpc CleanPacketCommitment(QueryCleanPacketCommitmentRequest) returns (QueryCleanPacketCommitmentResponse) {
+    option (google.api.http).get =
+        "/tibc/core/packet/v1beta1/source_chains/{source_chain}/dest_chains/{dest_chain}/clean_packet_commitments";
+  }
+}
+
+// QueryPacketCommitmentRequest is the request type for the
+// QueryPacketCommitment RPC method
+message QueryPacketCommitmentRequest {
+  // dest chain name
+  string dest_chain = 1;
+  // source chain name
+  string source_chain = 2;
+  // packet sequence
+  uint64 sequence = 3;
+}
+
+// QueryPacketCommitmentResponse defines the client query response for a packet
+// which also includes a proof and the height from which the proof was
+// retrieved
+message QueryPacketCommitmentResponse {
+  // packet associated with the request fields
+  bytes commitment = 1;
+  // merkle proof of existence
+  bytes proof = 2;
+  // height at which the proof was retrieved
+  tibc.core.client.v1.Height proof_height = 3 [(gogoproto.nullable) = false];
+}
+
+// QueryPacketCommitmentsRequest is the request type for the
+// Query/QueryPacketCommitments RPC method
+message QueryPacketCommitmentsRequest {
+  // dest chain name
+  string dest_chain = 1;
+  // source chain name
+  string source_chain = 2;
+  // pagination request
+  cosmos.base.query.v1beta1.PageRequest pagination = 3;
+}
+
+// QueryPacketCommitmentsResponse is the request type for the
+// Query/QueryPacketCommitments RPC method
+message QueryPacketCommitmentsResponse {
+  repeated tibc.core.packet.v1.PacketState commitments = 1;
+  // pagination response
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+  // query block height
+  tibc.core.client.v1.Height height = 3 [(gogoproto.nullable) = false];
+}
+
+// QueryPacketReceiptRequest is the request type for the
+// Query/PacketReceipt RPC method
+message QueryPacketReceiptRequest {
+  // dest chain name
+  string dest_chain = 1;
+  // source chain name
+  string source_chain = 2;
+  // packet sequence
+  uint64 sequence = 3;
+}
+
+// QueryPacketReceiptResponse defines the client query response for a packet receipt
+// which also includes a proof, and the height from which the proof was
+// retrieved
+message QueryPacketReceiptResponse {
+  // success flag for if receipt exists
+  bool received = 2;
+  // merkle proof of existence
+  bytes proof = 3;
+  // height at which the proof was retrieved
+  tibc.core.client.v1.Height proof_height = 4 [(gogoproto.nullable) = false];
+}
+
+// QueryPacketAcknowledgementRequest is the request type for the
+// Query/PacketAcknowledgement RPC method
+message QueryPacketAcknowledgementRequest {
+  // dest chain name
+  string dest_chain = 1;
+  // source chain name
+  string source_chain = 2;
+  // packet sequence
+  uint64 sequence = 3;
+}
+
+// QueryPacketAcknowledgementResponse defines the client query response for a
+// packet which also includes a proof and the height from which the
+// proof was retrieved
+message QueryPacketAcknowledgementResponse {
+  // packet associated with the request fields
+  bytes acknowledgement = 1;
+  // merkle proof of existence
+  bytes proof = 2;
+  // height at which the proof was retrieved
+  tibc.core.client.v1.Height proof_height = 3 [(gogoproto.nullable) = false];
+}
+
+// QueryPacketAcknowledgementsRequest is the request type for the
+// Query/QueryPacketCommitments RPC method
+message QueryPacketAcknowledgementsRequest {
+  // dest chain name
+  string dest_chain = 1;
+  // source chain name
+  string source_chain = 2;
+  // pagination request
+  cosmos.base.query.v1beta1.PageRequest pagination = 3;
+}
+
+// QueryPacketAcknowledgemetsResponse is the request type for the
+// Query/QueryPacketAcknowledgements RPC method
+message QueryPacketAcknowledgementsResponse {
+  repeated tibc.core.packet.v1.PacketState acknowledgements = 1;
+  // pagination response
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+  // query block height
+  tibc.core.client.v1.Height height = 3 [(gogoproto.nullable) = false];
+}
+
+// QueryUnreceivedPacketsRequest is the request type for the
+// Query/UnreceivedPackets RPC method
+message QueryUnreceivedPacketsRequest {
+  // dest chain name
+  string dest_chain = 1;
+  // source chain name
+  string source_chain = 2;
+  // list of packet sequences
+  repeated uint64 packet_commitment_sequences = 3;
+}
+
+// QueryUnreceivedPacketsResponse is the response type for the
+// Query/UnreceivedPacketCommitments RPC method
+message QueryUnreceivedPacketsResponse {
+  // list of unreceived packet sequences
+  repeated uint64 sequences = 1;
+  // query block height
+  tibc.core.client.v1.Height height = 2 [(gogoproto.nullable) = false];
+}
+
+// QueryUnreceivedAcks is the request type for the
+// Query/UnreceivedAcks RPC method
+message QueryUnreceivedAcksRequest {
+  // dest chain name
+  string dest_chain = 1;
+  // source chain name
+  string source_chain = 2;
+  // list of acknowledgement sequences
+  repeated uint64 packet_ack_sequences = 3;
+}
+
+// QueryUnreceivedAcksResponse is the response type for the
+// Query/UnreceivedAcks RPC method
+message QueryUnreceivedAcksResponse {
+  // list of unreceived acknowledgement sequences
+  repeated uint64 sequences = 1;
+  // query block height
+  tibc.core.client.v1.Height height = 2 [(gogoproto.nullable) = false];
+}
+
+// QueryCleanPacketCommitmentRequest is the request type for the
+// QueryCleanPacketCommitment RPC method
+message QueryCleanPacketCommitmentRequest {
+  // dest chain name
+  string dest_chain = 1;
+  // source chain name
+  string source_chain = 2;
+}
+
+// QueryCleanPacketCommitmentResponse defines the client query response for a packet
+// which also includes a proof and the height from which the proof was
+// retrieved
+message QueryCleanPacketCommitmentResponse {
+  // packet associated with the request fields
+  bytes commitment = 1;
+  // merkle proof of existence
+  bytes proof = 2;
+  // height at which the proof was retrieved
+  tibc.core.client.v1.Height proof_height = 3 [(gogoproto.nullable) = false];
+}
