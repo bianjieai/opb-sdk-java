@@ -2,6 +2,7 @@ package irita.sdk.tx;
 
 import com.google.protobuf.Any;
 import com.google.protobuf.ByteString;
+import com.google.protobuf.GeneratedMessageV3;
 import irita.sdk.exception.IritaSDKException;
 import irita.sdk.key.KeyManager;
 import irita.sdk.model.Account;
@@ -17,6 +18,7 @@ import proto.cosmos.tx.v1beta1.TxOuterClass;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.List;
 
 public class Sm2TxEngine implements TxEngine {
     private KeyManager km;
@@ -28,21 +30,33 @@ public class Sm2TxEngine implements TxEngine {
     }
 
     @Override
-    public TxOuterClass.TxBody buildTxBody(com.google.protobuf.GeneratedMessageV3 msg) {
-        return TxOuterClass.TxBody.newBuilder()
-                .addMessages(Any.pack(msg, "/"))
+    public TxOuterClass.TxBody buildTxBody(List<GeneratedMessageV3> msgs) {
+        if (msgs.size() == 0) {
+            throw new IritaSDKException("size of msgs should larger than 0");
+        }
+        TxOuterClass.TxBody.Builder builder = TxOuterClass.TxBody.newBuilder();
+        msgs.forEach(msg -> {
+            builder.addMessages(Any.pack(msg, "/"));
+        });
+        return builder
                 .setMemo("")
                 .setTimeoutHeight(0)
                 .build();
     }
 
     @Override
-    public TxOuterClass.TxBody buildTxBodyWithMemo(com.google.protobuf.GeneratedMessageV3 msg, String memo) {
+    public TxOuterClass.TxBody buildTxBodyWithMemo(List<GeneratedMessageV3> msgs, String memo) {
+        if (msgs.size() == 0) {
+            throw new IritaSDKException("size of msgs should larger than 0");
+        }
         if (memo == null) {
             memo = "";
         }
-        return TxOuterClass.TxBody.newBuilder()
-                .addMessages(Any.pack(msg, "/"))
+        TxOuterClass.TxBody.Builder builder = TxOuterClass.TxBody.newBuilder();
+        msgs.forEach(msg -> {
+            builder.addMessages(Any.pack(msg, "/"));
+        });
+        return builder
                 .setMemo(memo)
                 .setTimeoutHeight(0)
                 .build();

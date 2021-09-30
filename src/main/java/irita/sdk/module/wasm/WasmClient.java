@@ -2,6 +2,7 @@ package irita.sdk.module.wasm;
 
 import com.alibaba.fastjson.JSON;
 import com.google.protobuf.ByteString;
+import com.google.protobuf.GeneratedMessageV3;
 import io.grpc.Channel;
 import irita.sdk.client.BaseClient;
 import irita.sdk.constant.enums.EventEnum;
@@ -19,10 +20,7 @@ import proto.x.wasm.internal.types.Types;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class WasmClient {
     private final BaseClient baseClient;
@@ -51,8 +49,8 @@ public class WasmClient {
                 .setSource("")
                 .setBuilder("")
                 .build();
-
-        ResultTx resultTx = baseClient.buildAndSend(msg, baseTx, account);
+        List<GeneratedMessageV3> msgs = Collections.singletonList(msg);
+        ResultTx resultTx = baseClient.buildAndSend(msgs, baseTx, account);
         return resultTx.getEventValue(EventEnum.MESSAGE_CODE_ID);
     }
 
@@ -74,7 +72,8 @@ public class WasmClient {
         }
 
         Tx.MsgInstantiateContract msg = builder.build();
-        ResultTx resultTx = baseClient.buildAndSend(msg, baseTx, account);
+        List<GeneratedMessageV3> msgs = Collections.singletonList(msg);
+        ResultTx resultTx = baseClient.buildAndSend(msgs, baseTx, account);
         return resultTx.getEventValue(EventEnum.MESSAGE_CONTRACT_ADDRESS);
     }
 
@@ -96,7 +95,8 @@ public class WasmClient {
         }
 
         Tx.MsgExecuteContract msg = builder.build();
-        return baseClient.buildAndSend(msg, baseTx, account);
+        List<GeneratedMessageV3> msgs = Collections.singletonList(msg);
+        return baseClient.buildAndSend(msgs, baseTx, account);
     }
 
     public ResultTx migrate(String contractAddress, long newCodeID, byte[] msgByte, BaseTx baseTx) throws IOException {
@@ -107,8 +107,8 @@ public class WasmClient {
                 .setCodeId(newCodeID)
                 .setMigrateMsg(ByteString.copyFrom(msgByte))
                 .build();
-
-        return baseClient.buildAndSend(msg, baseTx, account);
+        List<GeneratedMessageV3> msgs = Collections.singletonList(msg);
+        return baseClient.buildAndSend(msgs, baseTx, account);
     }
 
     // return the contract information
