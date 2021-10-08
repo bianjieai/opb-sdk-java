@@ -13,7 +13,7 @@ public class TxEngineFactory {
             case SM2:
                 return new Sm2TxEngine(km, chainID);
             case SECP256K1:
-                return new Secp256k1TxEngine();
+                return new Secp256k1TxEngine(km, chainID);
             default:
                 throw new RuntimeException("panic");
         }

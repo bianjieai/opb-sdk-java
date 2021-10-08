@@ -31,17 +31,7 @@ public class Sm2TxEngine implements TxEngine {
 
     @Override
     public TxOuterClass.TxBody buildTxBody(List<GeneratedMessageV3> msgs) {
-        if (msgs.size() == 0) {
-            throw new IritaSDKException("size of msgs should larger than 0");
-        }
-        TxOuterClass.TxBody.Builder builder = TxOuterClass.TxBody.newBuilder();
-        msgs.forEach(msg -> {
-            builder.addMessages(Any.pack(msg, "/"));
-        });
-        return builder
-                .setMemo("")
-                .setTimeoutHeight(0)
-                .build();
+        return this.buildTxBodyWithMemo(msgs, null);
     }
 
     @Override

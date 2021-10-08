@@ -28,6 +28,7 @@ public class TibcClient {
                 .newBuilder()
                 .setClass_(class_)
                 .setId(id)
+                .setSender(account.getAddress())
                 .setReceiver(receiver)
                 .setDestChain(destChainName)
                 .setRealayChain(realayChainName)
