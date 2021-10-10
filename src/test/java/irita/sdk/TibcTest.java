@@ -10,17 +10,16 @@ import irita.sdk.key.KeyManagerFactory;
 import irita.sdk.model.BaseTx;
 import irita.sdk.model.Fee;
 import irita.sdk.model.ResultTx;
-import irita.sdk.module.nft.IssueDenomRequest;
+import irita.sdk.module.nft.MintNFTRequest;
 import irita.sdk.module.tibc.TibcClient;
-import org.bitcoin.NativeSecp256k1Util;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import proto.tibc.core.packet.v1.QueryOuterClass;
 
 import java.io.IOException;
-import java.util.Random;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TibcTest {
@@ -30,10 +29,9 @@ public class TibcTest {
     private BaseTx baseTx = new BaseTx(200000, new Fee("300000", "stake"), BroadcastMode.Commit);
 
     @BeforeEach
-    public void init() throws NativeSecp256k1Util.AssertFailException {
+    public void init() {
         String mnemonic = "genre stamp head slam drop chuckle patrol mushroom staff range bomb accuse donor bounce main ancient home guide account floor label trigger wife doctor";
         km = KeyManagerFactory.createKeyManger(AlgoEnum.SECP256K1);
-//        km = KeyManagerFactory.createKeyManger(AlgoEnum.SM2);
         km.recover(mnemonic);
 //        String keystore="-----BEGIN TENDERMINT PRIVATE KEY-----\n"+
 //                "salt: 183EF9B57DEF8EF8C3AD9D21DE672E1B\n"+
@@ -54,21 +52,22 @@ public class TibcTest {
         ClientConfig clientConfig = new ClientConfig(nodeUri, grpcAddr, chainId);
         OpbConfig opbConfig = null;
 
-        client = new IritaClient(clientConfig, opbConfig, km);
+        client = new IritaClient(clientConfig, opbConfig, km, AlgoEnum.SECP256K1);
         tibcClient = client.getTibcClient();
-        System.out.println(km.getAddr());
+        assertEquals("iaa1qvek4n2awq3zgpwqtr5tcp8mj6u2hpqf0r4x0l", km.getAddr());
     }
 
     @Test
     @Disabled
     public void testNftTransfer() throws IOException {
         String class_ = "denom01";
-        String id = "nft04";
+        String id = "nft26";
         String destName = "iris-test1";
         String rec = "iaa14u80vaseg99lxej9cvlmfz96xe8mvv6p6g469p";
 
         ResultTx resultTx = tibcClient.nftTransfer(class_, id, rec, destName, "", baseTx);
         assertNotNull(resultTx.getResult().getHash());
+        System.out.println(resultTx.getResult().getHash());
 
     }
 
@@ -80,20 +79,6 @@ public class TibcTest {
         long sequence = 2;
 
         QueryOuterClass.QueryPacketCommitmentResponse commitment = tibcClient.packetCommitment(destChain, sourceChain, sequence);
-        System.out.println(commitment.getProofHeight());
-    }
-
-    @Test
-    @Disabled
-    public void testNftIssue() throws IOException {
-        String denomID = "denomid" + new Random().nextInt(1000);
-        String denomName = "test_name111" + new Random().nextInt(1000);
-        String schema = "no shcema";
-
-        IssueDenomRequest req = new IssueDenomRequest()
-                .setId(denomID)
-                .setName(denomName)
-                .setSchema(schema);
-        ResultTx resultTx = client.getNftClient().issueDenom(req, baseTx);
+        assertNotNull(commitment);
     }
 }

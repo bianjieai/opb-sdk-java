@@ -7,16 +7,13 @@ import irita.sdk.exception.IritaSDKException;
 import irita.sdk.key.KeyManager;
 import irita.sdk.model.Account;
 import irita.sdk.model.BaseTx;
-import irita.sdk.util.ByteUtils;
 import irita.sdk.util.SecP256K1Utils;
-import org.bouncycastle.crypto.CryptoException;
 import org.bouncycastle.math.ec.ECPoint;
 import proto.cosmos.base.v1beta1.CoinOuterClass;
 import proto.cosmos.crypto.secp256k1.Keys;
 import proto.cosmos.tx.signing.v1beta1.Signing;
 import proto.cosmos.tx.v1beta1.TxOuterClass;
 
-import java.io.IOException;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -79,15 +76,7 @@ public class Secp256k1TxEngine implements TxEngine {
                 .setChainId(chainID)
                 .build();
 
-        byte[] signature;
-        BigInteger[] rs;
-        try {
-            signature = SecP256K1Utils.sign(privKey, signDoc.toByteArray());
-            rs = SecP256K1Utils.getRSFromSignature(signature);
-        } catch (CryptoException | IOException e) {
-            throw new IritaSDKException("use secp256k1 sign filed", e);
-        }
-        byte[] sigBytes = ByteUtils.addAll(ByteUtils.toBytesPadded(rs[0], 32), ByteUtils.toBytesPadded(rs[1], 32));
+        byte[] sigBytes = SecP256K1Utils.sign(privKey, signDoc.toByteArray());
 
         return TxOuterClass.Tx.newBuilder()
                 .setBody(txBody)

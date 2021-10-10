@@ -11,6 +11,7 @@ import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.bouncycastle.crypto.engines.SM2Engine;
 import org.bouncycastle.crypto.engines.SM2Engine.Mode;
 import org.bouncycastle.crypto.params.*;
+import org.bouncycastle.crypto.signers.ECDSASigner;
 import org.bouncycastle.crypto.signers.SM2Signer;
 import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPrivateKey;
 import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPublicKey;
@@ -27,7 +28,7 @@ import java.util.Base64;
 public class SecP256K1 extends GMBaseUtils {
     //////////////////////////////////////////////////////////////////////////////////////
     /*
-     * 以下为SM2推荐曲线参数
+     * 以下为SecP256K1推荐曲线参数
      */
     public static final SecP256K1Curve CURVE = new SecP256K1Curve();
     public final static BigInteger SecP256K1_ECC_P = CURVE.getQ();
@@ -406,87 +407,6 @@ public class SecP256K1 extends GMBaseUtils {
             System.arraycopy(c2, 0, cipherText, pos, c2.length);
         }
         return cipherText;
-    }
-
-    /**
-     * 签名
-     *
-     * @param priKey  私钥
-     * @param srcData 原文
-     * @return DER编码后的签名值
-     * @throws CryptoException
-     */
-    public static byte[] sign(BCECPrivateKey priKey, byte[] srcData) throws CryptoException {
-        ECPrivateKeyParameters priKeyParameters = BCECUtils.convertPrivateKeyToParameters(priKey);
-        return sign(priKeyParameters, null, srcData);
-    }
-
-    /**
-     * 签名
-     * 不指定withId，则默认withId为字节数组:"1234567812345678".getBytes()
-     *
-     * @param priKeyParameters 私钥
-     * @param srcData          原文
-     * @return DER编码后的签名值
-     * @throws CryptoException
-     */
-    public static byte[] sign(ECPrivateKeyParameters priKeyParameters, byte[] srcData) throws CryptoException {
-        return sign(priKeyParameters, null, srcData);
-    }
-
-    /**
-     * 私钥签名
-     *
-     * @param priKey  私钥
-     * @param withId  可以为null，若为null，则默认withId为字节数组:"1234567812345678".getBytes()
-     * @param srcData 原文
-     * @return DER编码后的签名值
-     * @throws CryptoException
-     */
-    public static byte[] sign(BCECPrivateKey priKey, byte[] withId, byte[] srcData) throws CryptoException {
-        ECPrivateKeyParameters priKeyParameters = BCECUtils.convertPrivateKeyToParameters(priKey);
-        return sign(priKeyParameters, withId, srcData);
-    }
-
-    /**
-     * 签名
-     *
-     * @param priKeyParameters 私钥
-     * @param withId           可以为null，若为null，则默认withId为字节数组:"1234567812345678".getBytes()
-     * @param srcData          源数据
-     * @return DER编码后的签名值
-     * @throws CryptoException
-     */
-    public static byte[] sign(ECPrivateKeyParameters priKeyParameters, byte[] withId, byte[] srcData)
-            throws CryptoException {
-
-        /*Signature ecdsaSign = null;
-        try {
-            ecdsaSign = Signature.getInstance("SHA256withECDSA");
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("Couldn't find a SHA256withECDSA provider", e);
-        }
-
-        ecdsaSign.initSign(privateKey);
-        ecdsaSign.update(plaintext.getBytes("UTF-8"));
-        byte[] signature = ecdsaSign.sign();
-//        String sig = Base64.getEncoder().encodeToString(signature);
-        return signature;*/
-
-
-
-
-        SM2Signer signer = new SM2Signer();
-        CipherParameters param = null;
-        ParametersWithRandom pwr = new ParametersWithRandom(priKeyParameters, new SecureRandom());
-        if (withId != null) {
-            param = new ParametersWithID(pwr, withId);
-        } else {
-            param = pwr;
-        }
-        signer.init(true, param);
-        signer.update(srcData, 0, srcData.length);
-        return signer.generateSignature();
     }
 
     /**

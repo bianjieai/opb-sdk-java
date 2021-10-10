@@ -35,13 +35,22 @@ public class BaseClient {
     public BaseClient() {
     }
 
-    public BaseClient(ClientConfig clientConfig, OpbConfig opbConfig, KeyManager keyManager) {//todo
+    public BaseClient(ClientConfig clientConfig, OpbConfig opbConfig, KeyManager keyManager) {
         this.clientConfig = clientConfig;
         this.opbConfig = opbConfig;
         this.km = keyManager;
 
-//        this.txEngine = TxEngineFactory.createDefault(km, clientConfig.getChainID());
-        this.txEngine = TxEngineFactory.createTxEngine(AlgoEnum.SECP256K1, km, clientConfig.getChainID());//todo
+        this.txEngine = TxEngineFactory.createDefault(km, clientConfig.getChainID());
+        this.grpcClient = GrpcFactory.createGrpcClient(clientConfig, opbConfig);
+        this.rpcClient = new RpcClient(clientConfig, opbConfig);
+    }
+
+    public BaseClient(ClientConfig clientConfig, OpbConfig opbConfig, KeyManager keyManager, AlgoEnum algo) {
+        this.clientConfig = clientConfig;
+        this.opbConfig = opbConfig;
+        this.km = keyManager;
+
+        this.txEngine = TxEngineFactory.createTxEngine(algo, km, clientConfig.getChainID());
         this.grpcClient = GrpcFactory.createGrpcClient(clientConfig, opbConfig);
         this.rpcClient = new RpcClient(clientConfig, opbConfig);
     }
