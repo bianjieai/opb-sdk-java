@@ -31,8 +31,8 @@ import static irita.sdk.module.crypto.BCryptImpl.encode_base64;
 
 public class Sm2KeyManager extends KeyManager {
 
-    public Sm2KeyManager(AlgoEnum algo) {
-        super(algo);
+    public Sm2KeyManager() {
+        super(AlgoEnum.SM2);
     }
 
     @Override

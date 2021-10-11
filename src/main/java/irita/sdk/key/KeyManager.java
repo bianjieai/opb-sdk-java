@@ -23,8 +23,6 @@ public abstract class KeyManager implements Key {
 
     public AlgoEnum getAlgo() { return algo; }
 
-    public void setAlgo(AlgoEnum algo) { this.algo = algo; }
-
     public BigInteger getPrivKey() {
         return privKey;
     }

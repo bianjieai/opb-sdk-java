@@ -15,8 +15,8 @@ import java.math.BigInteger;
  */
 public class Secp256k1KeyManger extends KeyManager {
 
-    public Secp256k1KeyManger(AlgoEnum algo) {
-        super(algo);
+    public Secp256k1KeyManger() {
+        super(AlgoEnum.SECP256K1);
     }
 
     @Override
