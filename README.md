@@ -174,3 +174,27 @@ opb-sdk-java
 ```java
         QueryOwnerResp owner = nftClient.queryOwner(denomID, km.getAddr());
 ```
+
+## 使用TIBC模块（Use TibcClient）
+
+### 1. 发起NFT跨链交易（tibc-nft-transfer transfer）
+
+```java
+        BaseTx baseTx = new BaseTx(200000, new Fee("300000", "stake"), BroadcastMode.Commit);
+        String class_ = "denom01";
+        String id = "nft26";
+        String destChainName = "iris-test1";
+        String relayerChainName = "";
+        String receiver = "iaa14u80vaseg99lxej9cvlmfz96xe8mvv6p6g469p";
+        ResultTx resultTx = tibcClient.nftTransfer(class_, id, receiver, destChainName, relayerChainName, baseTx);
+```
+
+### 2. 查询NFT跨链交易的commitment（tibc packet packet-commitment）
+
+```java
+        BaseTx baseTx = new BaseTx(200000, new Fee("300000", "stake"), BroadcastMode.Commit);
+        String destChain = "iris-test1";
+        String sourceChain = "iris-test2";
+        long sequence = 2;
+        QueryOuterClass.QueryPacketCommitmentResponse commitment = tibcClient.packetCommitment(destChain, sourceChain, sequence);
+```

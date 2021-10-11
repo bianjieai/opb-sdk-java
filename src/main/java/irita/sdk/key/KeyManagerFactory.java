@@ -7,15 +7,15 @@ public class KeyManagerFactory {
     public static KeyManager createKeyManger(AlgoEnum algo) {
         switch (algo) {
             case SM2:
-                return new Sm2KeyManager();
+                return new Sm2KeyManager(algo);
             case SECP256K1:
-                return new Secp256k1KeyManger();
+                return new Secp256k1KeyManger(algo);
             default:
                 throw new RuntimeException("panic");
         }
     }
 
     public static KeyManager createDefault() {
-        return new Sm2KeyManager();
+        return new Sm2KeyManager(AlgoEnum.SM2);
     }
 }

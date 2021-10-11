@@ -25,15 +25,6 @@ public class IritaClient {
         this.tibcClient = new TibcClient(baseClient);
     }
 
-    public IritaClient(ClientConfig clientConfig, OpbConfig opbConfig, KeyManager km, AlgoEnum algo) {
-        BaseClient baseClient = new BaseClient(clientConfig, opbConfig, km, algo);
-        this.baseClient = baseClient;
-        this.nftClient = new NftClient(baseClient);
-        this.bankClient = new BankClient(baseClient);
-        this.tibcClient = new TibcClient(baseClient);
-    }
-
-
     public BaseClient getBaseClient() {
         return baseClient;
     }

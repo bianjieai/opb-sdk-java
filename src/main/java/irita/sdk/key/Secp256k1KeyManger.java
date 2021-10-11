@@ -14,6 +14,11 @@ import java.math.BigInteger;
  * Secp256k1KeyManger will implement in the future
  */
 public class Secp256k1KeyManger extends KeyManager {
+
+    public Secp256k1KeyManger(AlgoEnum algo) {
+        super(algo);
+    }
+
     @Override
     public void add() throws Exception {
         String mnemonic = Bip44Utils.generateMnemonic();
@@ -36,7 +41,12 @@ public class Secp256k1KeyManger extends KeyManager {
 
     @Override
     public void recover(BigInteger privKey) {
-        throw new RuntimeException("TODO");
+        ECPoint publicKey = SecP256K1Utils.getPublicKeyFromPrivkey(privKey);
+        String address = pubKeyToAddress(publicKey);
+
+        super.setAddr(address);
+        super.setPublicKey(publicKey);
+        super.setPrivKey(privKey);
     }
 
     @Override

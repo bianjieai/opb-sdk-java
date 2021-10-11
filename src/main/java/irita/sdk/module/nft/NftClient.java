@@ -146,7 +146,7 @@ public class NftClient {
         Channel channel = baseClient.getGrpcClient();
         QueryOuterClass.QueryOwnerRequest req = QueryOuterClass.QueryOwnerRequest
                 .newBuilder()
-                .setDenomId(Optional.of(denomID).orElse(""))
+                .setDenomId(Optional.ofNullable(denomID).orElse(""))
                 .setOwner(owner)
                 .build();
 
