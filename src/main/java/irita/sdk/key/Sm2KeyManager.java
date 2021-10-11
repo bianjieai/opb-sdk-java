@@ -31,10 +31,6 @@ import static irita.sdk.module.crypto.BCryptImpl.encode_base64;
 
 public class Sm2KeyManager extends KeyManager {
 
-    public Sm2KeyManager() {
-        super(AlgoEnum.SM2);
-    }
-
     @Override
     public void add() throws Exception {
         String mnemonic = Bip44Utils.generateMnemonic();
@@ -166,5 +162,10 @@ public class Sm2KeyManager extends KeyManager {
         byte[] pre20 = new byte[20];
         System.arraycopy(hash, 0, pre20, 0, 20);
         return Bech32Utils.toBech32(getHrp(), pre20);
+    }
+
+    @Override
+    public AlgoEnum getAlgo() {
+        return AlgoEnum.SM2;
     }
 }

@@ -15,10 +15,6 @@ import java.math.BigInteger;
  */
 public class Secp256k1KeyManger extends KeyManager {
 
-    public Secp256k1KeyManger() {
-        super(AlgoEnum.SECP256K1);
-    }
-
     @Override
     public void add() throws Exception {
         String mnemonic = Bip44Utils.generateMnemonic();
@@ -71,5 +67,10 @@ public class Secp256k1KeyManger extends KeyManager {
         byte[] pre20 = new byte[20];
         System.arraycopy(md160, 0, pre20, 0, 20);
         return Bech32Utils.toBech32(getHrp(), pre20);
+    }
+
+    @Override
+    public AlgoEnum getAlgo() {
+        return AlgoEnum.SECP256K1;
     }
 }

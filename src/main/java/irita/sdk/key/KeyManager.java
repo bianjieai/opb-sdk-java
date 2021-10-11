@@ -17,11 +17,7 @@ public abstract class KeyManager implements Key {
 
     private AlgoEnum algo;
 
-    public KeyManager(AlgoEnum algo) {
-        this.algo = algo;
-    }
-
-    public AlgoEnum getAlgo() { return algo; }
+    public abstract AlgoEnum getAlgo();
 
     public BigInteger getPrivKey() {
         return privKey;
