@@ -8,8 +8,8 @@ public class TxEngineFactory {
     private TxEngineFactory() {
     }
 
-    public static TxEngine createTxEngine(AlgoEnum algo, KeyManager km, String chainID) {
-        switch (algo) {
+    public static TxEngine createTxEngine(KeyManager km, String chainID) {
+        switch (km.getAlgo()) {
             case SM2:
                 return new Sm2TxEngine(km, chainID);
             case SECP256K1:

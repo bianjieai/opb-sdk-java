@@ -52,7 +52,7 @@ public class TibcTest {
         ClientConfig clientConfig = new ClientConfig(nodeUri, grpcAddr, chainId);
         OpbConfig opbConfig = null;
 
-        client = new IritaClient(clientConfig, opbConfig, km, AlgoEnum.SECP256K1);
+        client = new IritaClient(clientConfig, opbConfig, km);
         tibcClient = client.getTibcClient();
         assertEquals("iaa1qvek4n2awq3zgpwqtr5tcp8mj6u2hpqf0r4x0l", km.getAddr());
     }
@@ -61,7 +61,7 @@ public class TibcTest {
     @Disabled
     public void testNftTransfer() throws IOException {
         String class_ = "denom01";
-        String id = "nft26";
+        String id = "nft28";
         String destName = "iris-test1";
         String rec = "iaa14u80vaseg99lxej9cvlmfz96xe8mvv6p6g469p";
 

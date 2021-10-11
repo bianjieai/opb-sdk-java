@@ -15,6 +15,16 @@ public abstract class KeyManager implements Key {
     private String keyPath = "m/44'/118'/0'/0/0";
     private String hrp = "iaa";
 
+    private AlgoEnum algo;
+
+    public KeyManager(AlgoEnum algo) {
+        this.algo = algo;
+    }
+
+    public AlgoEnum getAlgo() { return algo; }
+
+    public void setAlgo(AlgoEnum algo) { this.algo = algo; }
+
     public BigInteger getPrivKey() {
         return privKey;
     }

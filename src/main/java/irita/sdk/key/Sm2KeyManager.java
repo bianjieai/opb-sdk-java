@@ -30,6 +30,11 @@ import static irita.sdk.module.crypto.BCryptImpl.decode_base64;
 import static irita.sdk.module.crypto.BCryptImpl.encode_base64;
 
 public class Sm2KeyManager extends KeyManager {
+
+    public Sm2KeyManager(AlgoEnum algo) {
+        super(algo);
+    }
+
     @Override
     public void add() throws Exception {
         String mnemonic = Bip44Utils.generateMnemonic();
