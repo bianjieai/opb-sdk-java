@@ -1,0 +1,74 @@
+syntax = "proto3";
+package tibc.core.packet.v1;
+
+option java_package = "proto.tibc.core.packet.v1";
+
+import "gogoproto/gogo.proto";
+
+// Packet defines a type that carries data across different chains through TIBC
+message Packet {
+  option (gogoproto.goproto_getters) = false;
+
+  // number corresponds to the order of sends and receives, where a Packet
+  // with an earlier sequence number must be sent and received before a Packet
+  // with a later sequence number.
+  uint64 sequence = 1;
+  // identifies the port on the sending chain and destination chain.
+  string port = 2;
+  // identifies the chain id of the sending chain.
+  string source_chain = 3 [(gogoproto.moretags) = "yaml:\"source_chain\""];
+  // identifies the chain id of the receiving chain.
+  string destination_chain = 4 [(gogoproto.moretags) = "yaml:\"destination_port\""];
+  // identifies the chain id of the relay chain.
+  string relay_chain = 5 [(gogoproto.moretags) = "yaml:\"relay_chain\""];
+  // actual opaque bytes transferred directly to the application module
+  bytes data = 6;
+}
+
+// CleanPacket defines a type that carries data across different chains through TIBC
+message CleanPacket {
+  option (gogoproto.goproto_getters) = false;
+
+  // number corresponds to the order of sends and receives, where a Packet
+  // with an earlier sequence number must be sent and received before a Packet
+  // with a later sequence number.
+  uint64 sequence = 1;
+  // identifies the chain id of the sending chain.
+  string source_chain = 3 [(gogoproto.moretags) = "yaml:\"source_chain\""];
+  // identifies the chain id of the receiving chain.
+  string destination_chain = 4 [(gogoproto.moretags) = "yaml:\"destination_port\""];
+  // identifies the chain id of the relay chain.
+  string relay_chain = 5 [(gogoproto.moretags) = "yaml:\"relay_chain\""];
+}
+
+// PacketState defines the generic type necessary to retrieve and store
+// packet commitments, acknowledgements, and receipts.
+// Caller is responsible for knowing the context necessary to interpret this
+// state as a commitment, acknowledgement, or a receipt.
+message PacketState {
+  option (gogoproto.goproto_getters) = false;
+
+  // the sending chain identifier.
+  string source_chain = 1 [(gogoproto.moretags) = "yaml:\"source_chain\""];
+  // the receiving chain identifier.
+  string destination_chain = 2 [(gogoproto.moretags) = "yaml:\"source_chain\""];
+  // packet sequence.
+  uint64 sequence = 3;
+  // embedded data that represents packet state.
+  bytes data = 4;
+}
+
+// Acknowledgement is the recommended acknowledgement format to be used by
+// app-specific protocols.
+// NOTE: The field numbers 21 and 22 were explicitly chosen to avoid accidental
+// conflicts with other protobuf message formats used for acknowledgements.
+// The first byte of any message with this format will be the non-ASCII values
+// `0xaa` (result) or `0xb2` (error). Implemented as defined by TICS:
+// https://github.com/bianjieai/tics/tree/master/spec/tics-004-channel-and-packet-semantics#acknowledgement-envelope
+message Acknowledgement {
+  // response contains either a result or an error and must be non-empty
+  oneof response {
+    bytes  result = 21;
+    string error  = 22;
+  }
+}

@@ -1,0 +1,30 @@
+syntax = "proto3";
+package tibc.core.client.v1;
+
+option java_package = "proto.tibc.core.client.v1";
+
+import "gogoproto/gogo.proto";
+import "google/protobuf/any.proto";
+
+// Msg defines the tibc/client Msg service.
+service Msg {
+  // UpdateClient defines a rpc handler method for MsgUpdateClient.
+  rpc UpdateClient(MsgUpdateClient) returns (MsgUpdateClientResponse);
+}
+
+// MsgUpdateClient defines an sdk.Msg to update a TIBC client state using
+// the given header.
+message MsgUpdateClient {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+
+  // client unique identifier
+  string chain_name = 1;
+  // header to update the light client
+  google.protobuf.Any header = 2;
+  // signer address
+  string signer = 3;
+}
+
+// MsgUpdateClientResponse defines the Msg/UpdateClient response type.
+message MsgUpdateClientResponse {}

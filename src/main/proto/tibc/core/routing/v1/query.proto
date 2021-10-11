@@ -1,0 +1,26 @@
+syntax = "proto3";
+package tibc.core.routing.v1;
+
+import "google/api/annotations.proto";
+
+option java_package = "proto.tibc.core.routing.v1";
+
+// Query provides defines the gRPC querier service
+service Query {
+  // RoutingRules queries all routing rules.
+  rpc RoutingRules(QueryRoutingRulesRequest) returns (QueryRoutingRulesResponse) {
+    option (google.api.http).get =
+        "/tibc/core/routing/v1beta1/routing_rules";
+  }
+}
+
+// QueryRoutingRulesRequest is the request type for the
+// RoutingRules RPC method
+message QueryRoutingRulesRequest {
+}
+
+// QueryRoutingRulesResponse defines the routing rules query response
+message QueryRoutingRulesResponse {
+  // rule string array
+  repeated string rules = 1;
+}

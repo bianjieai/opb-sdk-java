@@ -6,6 +6,7 @@ import io.grpc.Channel;
 import irita.sdk.config.ClientConfig;
 import irita.sdk.config.OpbConfig;
 import irita.sdk.exception.IritaSDKException;
+import irita.sdk.key.AlgoEnum;
 import irita.sdk.key.KeyManager;
 import irita.sdk.model.Account;
 import irita.sdk.model.BaseTx;
@@ -40,6 +41,16 @@ public class BaseClient {
         this.km = keyManager;
 
         this.txEngine = TxEngineFactory.createDefault(km, clientConfig.getChainID());
+        this.grpcClient = GrpcFactory.createGrpcClient(clientConfig, opbConfig);
+        this.rpcClient = new RpcClient(clientConfig, opbConfig);
+    }
+
+    public BaseClient(ClientConfig clientConfig, OpbConfig opbConfig, KeyManager keyManager, AlgoEnum algo) {
+        this.clientConfig = clientConfig;
+        this.opbConfig = opbConfig;
+        this.km = keyManager;
+
+        this.txEngine = TxEngineFactory.createTxEngine(algo, km, clientConfig.getChainID());
         this.grpcClient = GrpcFactory.createGrpcClient(clientConfig, opbConfig);
         this.rpcClient = new RpcClient(clientConfig, opbConfig);
     }

@@ -1,0 +1,18 @@
+syntax = "proto3";
+package tibc.core.routing.v1;
+
+option java_package = "proto.tibc.core.routing.v1";
+
+import "gogoproto/gogo.proto";
+
+
+// SetRoutingRulesProposal defines a proposal to set routing rules
+message SetRoutingRulesProposal {
+  option (gogoproto.goproto_getters) = false;
+  // the title of the update proposal
+  string title = 1;
+  // the description of the proposal
+  string description = 2;
+  // routing rules list
+  repeated string rules = 3;
+}

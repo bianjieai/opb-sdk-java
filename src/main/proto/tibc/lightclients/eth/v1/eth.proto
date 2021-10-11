@@ -1,0 +1,76 @@
+syntax = "proto3";
+package tibc.lightclients.eth.v1;
+
+option java_package = "proto.tibc.lightclients.eth.v1";
+
+import "gogoproto/gogo.proto";
+import "tibc/core/client/v1/client.proto";
+
+// Header defines the eth client consensus Header.
+message Header {
+  option (gogoproto.goproto_getters) = false;
+
+  bytes parent_hash = 1;
+  bytes uncle_hash = 2;
+  bytes coinbase = 3;
+  bytes root = 4;
+  bytes tx_hash = 5;
+  bytes receipt_hash = 6;
+  bytes bloom = 7;
+  uint64 difficulty = 8;
+  tibc.core.client.v1.Height height = 9 [ (gogoproto.nullable) = false ];
+  uint64 gas_limit = 10;
+  uint64 gas_used = 11;
+  uint64 time = 12;
+  bytes extra = 13;
+  bytes mix_digest = 14;
+  uint64 nonce = 15;
+  uint64  baseFee=16;
+}
+
+// ClientState from eth tracks the current validator set, latest height,
+// and a possible frozen height.
+message ClientState {
+  option (gogoproto.goproto_getters) = false;
+
+  Header header = 1 [ (gogoproto.nullable) = false ];
+  uint64 chain_id = 2;
+  bytes contract_address = 3;
+  uint64 trusting_period = 4;
+  uint64 timeDelay = 5;
+  uint64 blockDelay = 6;
+}
+
+
+// ConsensusState defines the consensus state from eth.
+message ConsensusState {
+  option (gogoproto.goproto_getters) = false;
+
+  // timestamp that corresponds to the block height in which the ConsensusState
+  // was stored.
+  uint64 timestamp = 1;
+  tibc.core.client.v1.Height number = 2 [ (gogoproto.nullable) = false ];
+  bytes root = 3;
+  Header header = 4 [ (gogoproto.nullable) = false ];
+
+}
+
+message StorageResult {
+  option (gogoproto.goproto_getters) = false;
+
+  string key = 1;
+  string value = 2;
+  repeated string proof = 3;
+}
+
+message Proof {
+  option (gogoproto.goproto_getters) = false;
+
+  string address = 1;
+  string balance = 2;
+  string code_hash = 3;
+  string nonce = 4;
+  string storage_hash = 5;
+  repeated string account_proof = 6;
+  repeated StorageResult storage_proof = 7;
+}

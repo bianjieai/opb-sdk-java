@@ -1,0 +1,82 @@
+syntax = "proto3";
+package tibc.core.packet.v1;
+
+option java_package = "proto.tibc.core.packet.v1";
+
+import "gogoproto/gogo.proto";
+import "tibc/core/client/v1/client.proto";
+import "tibc/core/packet/v1/packet.proto";
+
+// Msg defines the tibc/packet Msg service.
+service Msg {
+  // RecvPacket defines a rpc handler method for MsgRecvPacket.
+  rpc RecvPacket(MsgRecvPacket) returns (MsgRecvPacketResponse);
+
+  // Acknowledgement defines a rpc handler method for MsgAcknowledgement.
+  rpc Acknowledgement(MsgAcknowledgement) returns (MsgAcknowledgementResponse);
+
+  // CleanPacket defines a rpc handler method for MsgCleanPacket.
+  rpc CleanPacket(MsgCleanPacket) returns (MsgCleanPacketResponse);
+
+  // RecvCleanPacket defines a rpc handler method for MsgRecvCleanPacket.
+  rpc RecvCleanPacket(MsgRecvCleanPacket) returns (MsgRecvCleanPacketResponse);
+}
+
+// MsgRecvPacket receives incoming TIBC packet
+message MsgRecvPacket {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+
+  Packet packet = 1 [(gogoproto.nullable) = false];
+  bytes                      proof_commitment = 2 [(gogoproto.moretags) = "yaml:\"proof_commitment\""];
+  tibc.core.client.v1.Height proof_height = 3
+  [(gogoproto.moretags) = "yaml:\"proof_height\"", (gogoproto.nullable) = false];
+  string signer = 4;
+}
+
+// MsgRecvPacketResponse defines the Msg/RecvPacket response type.
+message MsgRecvPacketResponse {}
+
+// MsgAcknowledgement receives incoming TIBC acknowledgement
+message MsgAcknowledgement {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+
+  Packet packet = 1 [(gogoproto.nullable) = false];
+  bytes                      acknowledgement = 2;
+  bytes                      proof_acked = 3 [(gogoproto.moretags) = "yaml:\"proof_acked\""];
+  tibc.core.client.v1.Height proof_height = 4
+  [(gogoproto.moretags) = "yaml:\"proof_height\"", (gogoproto.nullable) = false];
+  string signer = 5;
+}
+
+// MsgAcknowledgementResponse defines the Msg/Acknowledgement response type.
+message MsgAcknowledgementResponse {}
+
+// MsgRecvPacket receives incoming TIBC packet
+message MsgCleanPacket {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+
+  CleanPacket clean_packet = 1 [(gogoproto.nullable) = false];
+  string signer = 2;
+}
+
+// MsgRecvPacketResponse defines the Msg/RecvPacket response type.
+message MsgCleanPacketResponse {}
+
+
+// MsgRecvPacket receives incoming TIBC packet
+message MsgRecvCleanPacket {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+
+  CleanPacket clean_packet = 1 [(gogoproto.nullable) = false];
+  bytes  proof_commitment = 2 [(gogoproto.moretags) = "yaml:\"proof_commitment\""];
+  tibc.core.client.v1.Height proof_height = 3
+  [(gogoproto.moretags) = "yaml:\"proof_height\"", (gogoproto.nullable) = false];
+  string signer = 4;
+}
+
+// MsgRecvPacketResponse defines the Msg/RecvPacket response type.
+message MsgRecvCleanPacketResponse {}
