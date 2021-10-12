@@ -1,5 +1,7 @@
 package irita.sdk.model;
 
+import org.bouncycastle.util.encoders.Hex;
+
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,6 +24,14 @@ public class JsonRpc {
         JsonRpc rpc = new JsonRpc();
         rpc.method = method;
         rpc.params.put("tx", Base64.getEncoder().encodeToString(bytes));
+        return rpc;
+    }
+
+    public static JsonRpc WrapAbciQuery(byte[] bytes, String path) {
+        JsonRpc rpc = new JsonRpc();
+        rpc.method = "abci_query";
+        rpc.params.put("path", path);
+        rpc.params.put("data", Hex.toHexString(bytes));
         return rpc;
     }
 

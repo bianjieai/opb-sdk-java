@@ -6,12 +6,14 @@ import irita.sdk.config.OpbConfig;
 import irita.sdk.constant.TxStatus;
 import irita.sdk.constant.enums.BroadcastMode;
 import irita.sdk.exception.IritaSDKException;
-import irita.sdk.model.JsonRpc;
-import irita.sdk.model.ResultTx;
+import irita.sdk.model.*;
 import irita.sdk.util.HttpUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
+import java.util.Base64;
+import java.util.Objects;
+import java.util.Optional;
 
 public class RpcClient {
     private final String rpcUri;
@@ -66,6 +68,26 @@ public class RpcClient {
         JsonRpc jsonRpc = JsonRpc.WrapTxBytes(txBytes, "broadcast_tx_sync");
         String str = httpUtils.post(rpcUri, JSON.toJSONString(jsonRpc));
         return JSON.parseObject(str, ResultTx.class);
+    }
+
+    public synchronized GasInfo simulateTx(byte[] txBytes) throws IOException {
+        JsonRpc jsonRpc = JsonRpc.WrapAbciQuery(txBytes, "app/simulate");
+        String str = httpUtils.post(rpcUri, JSON.toJSONString(jsonRpc));
+        JsonRpcQueryResponse resp = JSON.parseObject(str, JsonRpcQueryResponse.class);
+        Objects.requireNonNull(resp, "use json deserialize json_rpc_response return null");
+
+        String value = Optional.of(resp)
+                .map(JsonRpcQueryResponse::getResult)
+                .map(ResultABCIQuery::getResponse)
+                .map(ResponseQuery::getValue)
+                .map(x -> new String(Base64.getDecoder().decode(x)))
+                .orElse("");
+        if (StringUtils.isEmpty(value)) {
+            throw new IritaSDKException(resp.getResult().getResponse().getLog());
+        }
+
+        GasInfoWrap gasInfoWrap = JSON.parseObject(value, GasInfoWrap.class);
+        return gasInfoWrap.getGasInfo();
     }
 
     private synchronized ResultTx checkResTxAndConvert(String res) {

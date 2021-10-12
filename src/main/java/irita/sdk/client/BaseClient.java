@@ -6,10 +6,10 @@ import io.grpc.Channel;
 import irita.sdk.config.ClientConfig;
 import irita.sdk.config.OpbConfig;
 import irita.sdk.exception.IritaSDKException;
-import irita.sdk.key.AlgoEnum;
 import irita.sdk.key.KeyManager;
 import irita.sdk.model.Account;
 import irita.sdk.model.BaseTx;
+import irita.sdk.model.GasInfo;
 import irita.sdk.model.ResultTx;
 import irita.sdk.tx.TxEngine;
 import irita.sdk.tx.TxEngineFactory;
@@ -105,7 +105,13 @@ public class BaseClient {
         return account;
     }
 
-    public void subscribe() {
+    public synchronized GasInfo simulateTx(List<GeneratedMessageV3> msgs, BaseTx baseTx, Account account) throws IOException {
+        if (account == null) {
+            account = queryAccount();
+        }
+        TxEngine txEngine = getTxEngine();
+        byte[] txBytes = txEngine.buildAndSign(msgs, baseTx, account);
+        return rpcClient.simulateTx(txBytes);
     }
 
     public ClientConfig getClientConfig() {
