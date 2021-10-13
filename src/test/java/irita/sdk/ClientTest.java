@@ -35,7 +35,7 @@ public class ClientTest {
 
         String nodeUri = "http://101.132.138.109:26657";
         String grpcAddr = "http://101.132.138.109:9090";
-        String chainId = "irita";
+        String chainId = "test";
         ClientConfig clientConfig = new ClientConfig(nodeUri, grpcAddr, chainId);
 //        OpbConfig opbConfig = new OpbConfig("", "", "");
         OpbConfig opbConfig = null;

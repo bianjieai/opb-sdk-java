@@ -2,16 +2,17 @@ package irita.sdk.client;
 
 import irita.sdk.config.ClientConfig;
 import irita.sdk.config.OpbConfig;
-import irita.sdk.key.AlgoEnum;
 import irita.sdk.key.KeyManager;
 import irita.sdk.module.bank.BankClient;
 import irita.sdk.module.nft.NftClient;
+import irita.sdk.module.perm.PermClient;
 import irita.sdk.module.tibc.TibcClient;
 
 public class IritaClient {
     private BaseClient baseClient;
     private NftClient nftClient;
     private BankClient bankClient;
+    private PermClient permClient;
     private TibcClient tibcClient;
 
     private IritaClient() {
@@ -22,6 +23,7 @@ public class IritaClient {
         this.baseClient = baseClient;
         this.nftClient = new NftClient(baseClient);
         this.bankClient = new BankClient(baseClient);
+        this.permClient = new PermClient(baseClient);
         this.tibcClient = new TibcClient(baseClient);
     }
 
@@ -50,6 +52,14 @@ public class IritaClient {
     public IritaClient setBankClient(BankClient bankClient) {
         this.bankClient = bankClient;
         return this;
+    }
+
+    public PermClient getPermClient() {
+        return permClient;
+    }
+
+    public void setPermClient(PermClient permClient) {
+        this.permClient = permClient;
     }
 
     public TibcClient getTibcClient() {
