@@ -7,13 +7,17 @@ import irita.sdk.constant.TxStatus;
 import irita.sdk.constant.enums.BroadcastMode;
 import irita.sdk.exception.IritaSDKException;
 import irita.sdk.model.*;
+import irita.sdk.model.block.BlockDetail;
+import irita.sdk.model.block.BlockDetailRpc;
+import irita.sdk.model.block.BlockResult;
+import irita.sdk.model.block.BlockResultRpc;
+import irita.sdk.model.tx.TxRpc;
 import irita.sdk.util.HttpUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.bouncycastle.util.encoders.Hex;
 
 import java.io.IOException;
-import java.util.Base64;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 public class RpcClient {
     private final String rpcUri;
@@ -97,5 +101,43 @@ public class RpcClient {
             throw new IritaSDKException(String.format("log: %s\nhash: %s", resultTx.getLog(), Optional.of(resultTx).map(ResultTx::getResult).map(Result::getHash).orElse("")));
         }
         return resultTx;
+    }
+
+    public Object queryTx(String hash) throws IOException {
+        Base64.Encoder encoder = Base64.getEncoder();
+        String encode = encoder.encodeToString(Hex.decode(hash));
+        Map params = new HashMap();
+        params.put("prove", true);
+        params.put("hash", encode);
+        JsonRpc jsonRpc = JsonRpc.WrapBaseQuery(params, "tx");
+        String str = httpUtils.post(rpcUri, JSON.toJSONString(jsonRpc));
+        TxRpc txRpc = JSON.parseObject(str, TxRpc.class);
+        BlockDetail blockDetail = queryBlock(txRpc.getResult().getHeight());
+
+        return null;
+    }
+
+    public BlockDetail queryBlock(String height) throws IOException {
+        Map<String, String> params = new HashMap();
+        params.put("height", height);
+
+        JsonRpc jsonRpc = JsonRpc.WrapBaseQuery(params, "block");
+        String str = httpUtils.post(rpcUri, JSON.toJSONString(jsonRpc));
+        BlockDetailRpc blockDetailRpc = JSON.parseObject(str, BlockDetailRpc.class);
+
+//        jsonRpc = JsonRpc.WrapBaseQuery(params, "block_results");
+//        str = httpUtils.post(rpcUri, JSON.toJSONString(jsonRpc));
+//        BlockResultRpc blockResultRpc = JSON.parseObject(str, BlockResultRpc.class);
+//        blockDetailRpc.getResult().setBlockResult(blockResultRpc.getResult());
+        return blockDetailRpc.getResult();
+    }
+
+    public BlockResult queryBlockResult(String height) throws IOException {
+        Map<String, String> params = new HashMap();
+        params.put("height", height);
+        JsonRpc jsonRpc = JsonRpc.WrapBaseQuery(params, "block_results");
+        String str = httpUtils.post(rpcUri, JSON.toJSONString(jsonRpc));
+        BlockResultRpc blockResultRpc = JSON.parseObject(str, BlockResultRpc.class);
+        return blockResultRpc.getResult();
     }
 }

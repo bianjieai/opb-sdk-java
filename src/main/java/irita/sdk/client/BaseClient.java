@@ -11,6 +11,8 @@ import irita.sdk.model.Account;
 import irita.sdk.model.BaseTx;
 import irita.sdk.model.GasInfo;
 import irita.sdk.model.ResultTx;
+import irita.sdk.model.block.BlockDetail;
+import irita.sdk.model.block.BlockResult;
 import irita.sdk.tx.TxEngine;
 import irita.sdk.tx.TxEngineFactory;
 import irita.sdk.util.HashUtils;
@@ -112,6 +114,21 @@ public class BaseClient {
         TxEngine txEngine = getTxEngine();
         byte[] txBytes = txEngine.buildAndSign(msgs, baseTx, account);
         return rpcClient.simulateTx(txBytes);
+    }
+
+    public Object queryTx(String hash) throws IOException {
+        return rpcClient.queryTx(hash);
+    }
+
+    public void queryTxs(String hash) {
+//        return rpcClient.queryTxs(hash);
+    }
+
+    public BlockDetail queryBlock(String height) throws IOException {
+        BlockDetail blockDetail = rpcClient.queryBlock(height);
+        BlockResult blockResult = rpcClient.queryBlockResult(height);
+        blockDetail.setBlockResult(blockResult);
+        return blockDetail;
     }
 
     public ClientConfig getClientConfig() {
