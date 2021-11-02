@@ -1,25 +1,9 @@
 package irita.sdk.model.block;
 
-public class BlockDetailRpc {
-    private String jsonrpc;
-    private int id;
+import irita.sdk.model.RpcBase;
+
+public class BlockDetailRpc extends RpcBase {
     private BlockDetail result;
-
-    public String getJsonrpc() {
-        return jsonrpc;
-    }
-
-    public void setJsonrpc(String jsonrpc) {
-        this.jsonrpc = jsonrpc;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
 
     public BlockDetail getResult() {
         return result;

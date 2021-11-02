@@ -7,10 +7,7 @@ import irita.sdk.config.ClientConfig;
 import irita.sdk.config.OpbConfig;
 import irita.sdk.exception.IritaSDKException;
 import irita.sdk.key.KeyManager;
-import irita.sdk.model.Account;
-import irita.sdk.model.BaseTx;
-import irita.sdk.model.GasInfo;
-import irita.sdk.model.ResultTx;
+import irita.sdk.model.*;
 import irita.sdk.model.block.BlockDetail;
 import irita.sdk.model.block.BlockResult;
 import irita.sdk.tx.TxEngine;
@@ -23,6 +20,7 @@ import proto.cosmos.auth.v1beta1.QueryGrpc;
 import proto.cosmos.auth.v1beta1.QueryOuterClass;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 public class BaseClient {
@@ -116,7 +114,7 @@ public class BaseClient {
         return rpcClient.simulateTx(txBytes);
     }
 
-    public Object queryTx(String hash) throws IOException {
+    public ResultQueryTx queryTx(String hash) throws IOException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         return rpcClient.queryTx(hash);
     }
 
