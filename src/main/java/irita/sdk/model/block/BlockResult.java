@@ -3,6 +3,9 @@
  */
 package irita.sdk.model.block;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import irita.sdk.model.tx.TxResult;
+
 import java.util.List;
 
 /**
@@ -14,7 +17,15 @@ import java.util.List;
 public class BlockResult {
 
     private int height;
-    private List<TxsResult> txsResults;
+    private List<TxResult> txsResults;
+    @JSONField(name = "begin_block_events")
+    private String beginBlockEvents;
+    @JSONField(name = "end_block_events")
+    private String endBlockEvents;
+    @JSONField(name = "validator_updates")
+    private String validatorUpdates;
+    @JSONField(name = "consensus_param_updates")
+    private ConsensusParamUpdates consensusParamUpdates;
 
     public void setHeight(int height) {
         this.height = height;
@@ -24,11 +35,43 @@ public class BlockResult {
         return height;
     }
 
-    public List<TxsResult> getTxsResults() {
+    public List<TxResult> getTxsResults() {
         return txsResults;
     }
 
-    public void setTxsResults(List<TxsResult> txsResults) {
+    public void setTxsResults(List<TxResult> txsResults) {
         this.txsResults = txsResults;
+    }
+
+    public String getBeginBlockEvents() {
+        return beginBlockEvents;
+    }
+
+    public void setBeginBlockEvents(String beginBlockEvents) {
+        this.beginBlockEvents = beginBlockEvents;
+    }
+
+    public String getEndBlockEvents() {
+        return endBlockEvents;
+    }
+
+    public void setEndBlockEvents(String endBlockEvents) {
+        this.endBlockEvents = endBlockEvents;
+    }
+
+    public String getValidatorUpdates() {
+        return validatorUpdates;
+    }
+
+    public void setValidatorUpdates(String validatorUpdates) {
+        this.validatorUpdates = validatorUpdates;
+    }
+
+    public ConsensusParamUpdates getConsensusParamUpdates() {
+        return consensusParamUpdates;
+    }
+
+    public void setConsensusParamUpdates(ConsensusParamUpdates consensusParamUpdates) {
+        this.consensusParamUpdates = consensusParamUpdates;
     }
 }

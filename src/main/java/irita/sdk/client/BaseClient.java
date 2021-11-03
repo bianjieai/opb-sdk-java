@@ -10,6 +10,8 @@ import irita.sdk.key.KeyManager;
 import irita.sdk.model.*;
 import irita.sdk.model.block.BlockDetail;
 import irita.sdk.model.block.BlockResult;
+import irita.sdk.model.block.ResultBlock;
+import irita.sdk.model.tx.EventQueryBuilder;
 import irita.sdk.tx.TxEngine;
 import irita.sdk.tx.TxEngineFactory;
 import irita.sdk.util.HashUtils;
@@ -118,13 +120,20 @@ public class BaseClient {
         return rpcClient.queryTx(hash);
     }
 
-    public void queryTxs(String hash) {
-//        return rpcClient.queryTxs(hash);
+    public ResultSearchTxs queryTxs(EventQueryBuilder builder, int page, int size) throws IOException, ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        if (builder == null) {
+            throw new IritaSDKException("EventQueryBuilder can not be null");
+        }
+        return rpcClient.queryTxs(builder, page, size);
     }
 
-    public BlockDetail queryBlock(String height) throws IOException {
-        BlockDetail blockDetail = rpcClient.queryBlock(height);
+    public BlockDetail queryBlock(String height) throws IOException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        ResultBlock resultBlock = rpcClient.queryBlock(height);
         BlockResult blockResult = rpcClient.queryBlockResult(height);
+
+        BlockDetail blockDetail = new BlockDetail();
+        blockDetail.setBlockId(resultBlock.getBlockID());
+        blockDetail.setBlock(resultBlock.getBlock());
         blockDetail.setBlockResult(blockResult);
         return blockDetail;
     }

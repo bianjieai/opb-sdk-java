@@ -3,24 +3,45 @@
  */
 package irita.sdk.model.block;
 
-import java.util.List;
+import com.alibaba.fastjson.annotation.JSONField;
 
 /**
- * Auto-generated: 2021-11-01 10:51:5
+ * Auto-generated: 2021-11-03 16:3:1
  *
  * @author jb51.net (i@jb51.net)
  * @website http://tools.jb51.net/code/json2javabean
  */
 public class Evidence {
 
-    private List<String> evidence;
+    @JSONField(name = "max_age_num_blocks")
+    private String maxAgeNumBlocks;
+    @JSONField(name = "max_age_duration")
+    private String maxAgeDuration;
+    @JSONField(name = "max_bytes")
+    private String maxBytes;
 
-    public void setEvidence(List<String> evidence) {
-        this.evidence = evidence;
+    public void setMaxAgeNumBlocks(String maxAgeNumBlocks) {
+        this.maxAgeNumBlocks = maxAgeNumBlocks;
     }
 
-    public List<String> getEvidence() {
-        return evidence;
+    public String getMaxAgeNumBlocks() {
+        return maxAgeNumBlocks;
+    }
+
+    public void setMaxAgeDuration(String maxAgeDuration) {
+        this.maxAgeDuration = maxAgeDuration;
+    }
+
+    public String getMaxAgeDuration() {
+        return maxAgeDuration;
+    }
+
+    public void setMaxBytes(String maxBytes) {
+        this.maxBytes = maxBytes;
+    }
+
+    public String getMaxBytes() {
+        return maxBytes;
     }
 
 }

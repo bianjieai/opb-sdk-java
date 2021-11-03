@@ -13,13 +13,13 @@ import java.util.List;
  */
 public class Data {
 
-    private List<String> txs;
+    private List<Object> txs;
 
-    public void setTxs(List<String> txs) {
+    public void setTxs(List txs) {
         this.txs = txs;
     }
 
-    public List<String> getTxs() {
+    public List<Object> getTxs() {
         return txs;
     }
 

@@ -2,7 +2,7 @@ package irita.sdk.model.block;
 
 import irita.sdk.model.RpcBase;
 
-public class BlockResultRpc extends RpcBase {
+public class ResultBlockResults extends RpcBase {
     private BlockResult result;
 
     public BlockResult getResult() {

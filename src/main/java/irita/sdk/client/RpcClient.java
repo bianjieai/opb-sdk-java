@@ -11,12 +11,11 @@ import irita.sdk.constant.enums.BroadcastMode;
 import irita.sdk.constant.enums.MsgEnum;
 import irita.sdk.exception.IritaSDKException;
 import irita.sdk.model.*;
-import irita.sdk.model.block.BlockDetail;
-import irita.sdk.model.block.BlockDetailRpc;
-import irita.sdk.model.block.BlockResult;
-import irita.sdk.model.block.BlockResultRpc;
+import irita.sdk.model.block.*;
 import irita.sdk.model.tx.Body;
+import irita.sdk.model.tx.EventQueryBuilder;
 import irita.sdk.model.tx.TxRpc;
+import irita.sdk.model.tx.TxsRpc;
 import irita.sdk.util.HttpUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.util.encoders.Hex;
@@ -122,27 +121,34 @@ public class RpcClient {
         if (txRpc.getError() != null) {
             throw new IritaSDKException(txRpc.getError().getData());
         }
-        TxOuterClass.Tx tx = TxOuterClass.Tx.parseFrom(Base64.getDecoder().decode(txRpc.getResult().getTx()));
+        return parseResultQueryTx(txRpc.getResult());
+    }
+
+    public ResultQueryTx parseResultQueryTx(irita.sdk.model.tx.Result result) throws IOException, ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        if (result == null) {
+            throw new IritaSDKException("parse ResultQueryTx failed: result can not be null");
+        }
+        TxOuterClass.Tx tx = TxOuterClass.Tx.parseFrom(Base64.getDecoder().decode(result.getTx()));
         List<GeneratedMessageV3> messageList = new ArrayList();
         for (Any any : tx.getBody().getMessagesList()) {
             messageList.add(unpackMsg(any.getTypeUrl(), any.getValue()));
         }
 
-        BlockDetail blockDetail = queryBlock(txRpc.getResult().getHeight());
+        ResultBlock resultBlock = queryBlock(result.getHeight());
 
-        for (int i = 0; i < txRpc.getResult().getTxResult().getEvents().size(); i++) {
-            for (int j = 0; j < txRpc.getResult().getTxResult().getEvents().get(i).getAttributes().size(); j++) {
-                txRpc.getResult().getTxResult().getEvents().get(i).getAttributes().get(j).setKey(
-                        new String(Base64.getDecoder().decode(txRpc.getResult().getTxResult().getEvents().get(i).getAttributes().get(j).getKey())));
-                txRpc.getResult().getTxResult().getEvents().get(i).getAttributes().get(j).setValue(
-                        new String(Base64.getDecoder().decode(txRpc.getResult().getTxResult().getEvents().get(i).getAttributes().get(j).getValue())));
+        for (int i = 0; i < result.getTxResult().getEvents().size(); i++) {
+            for (int j = 0; j < result.getTxResult().getEvents().get(i).getAttributes().size(); j++) {
+                result.getTxResult().getEvents().get(i).getAttributes().get(j).setKey(
+                        new String(Base64.getDecoder().decode(result.getTxResult().getEvents().get(i).getAttributes().get(j).getKey())));
+                result.getTxResult().getEvents().get(i).getAttributes().get(j).setValue(
+                        new String(Base64.getDecoder().decode(result.getTxResult().getEvents().get(i).getAttributes().get(j).getValue())));
             }
         }
         ResultQueryTx resultQueryTx = new ResultQueryTx();
-        resultQueryTx.setHash(txRpc.getResult().getHash());
-        resultQueryTx.setHeight(txRpc.getResult().getHeight());
-        resultQueryTx.setResult(txRpc.getResult().getTxResult());
-        resultQueryTx.setTimeStamp(blockDetail.getBlock().getHeader().getTime());
+        resultQueryTx.setHash(result.getHash());
+        resultQueryTx.setHeight(result.getHeight());
+        resultQueryTx.setResult(result.getTxResult());
+        resultQueryTx.setTimeStamp(resultBlock.getBlock().getHeader().getTime());
 
         Body body = new Body();
         body.setMemo(tx.getBody().getMemo());
@@ -153,6 +159,41 @@ public class RpcClient {
         t.setAuthInfo(tx.getAuthInfo());
         resultQueryTx.setTx(t);
         return resultQueryTx;
+    }
+
+    public ResultSearchTxs queryTxs(EventQueryBuilder builder, int page, int size) throws IOException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        String query = builder.build();
+        if (StringUtils.isEmpty(query)) {
+            throw new IritaSDKException("must declare at least one tag to search");
+        }
+        Map params = new HashMap();
+        params.put("query", query);
+        params.put("prove", true);
+        params.put("order_by", "asc");
+        if (page > 0) {
+            params.put("page", String.valueOf(page));
+        }
+        if (size > 0) {
+            params.put("per_page", String.valueOf(size));
+        }
+        JsonRpc jsonRpc = JsonRpc.WrapBaseQuery(params, "tx_search");
+        String str = httpUtils.post(rpcUri, JSON.toJSONString(jsonRpc));
+        TxsRpc txsRpc = JSON.parseObject(str, TxsRpc.class);
+        Objects.requireNonNull(txsRpc, "use json deserialize json_rpc_response return null");
+        if (txsRpc.getError() != null) {
+            throw new IritaSDKException(txsRpc.getError().getData());
+        }
+
+        ResultSearchTxs resultSearchTxs = new ResultSearchTxs();
+        resultSearchTxs.setTotal(txsRpc.getResult().getTotalCount());
+        if (txsRpc.getResult().getTxs().size() > 0) {
+            List<ResultQueryTx> list = new ArrayList(txsRpc.getResult().getTxs().size());
+            for (irita.sdk.model.tx.Result result : txsRpc.getResult().getTxs()) {
+                list.add(parseResultQueryTx(result));
+            }
+            resultSearchTxs.setTxs(list);
+        }
+        return resultSearchTxs;
     }
 
     public GeneratedMessageV3 unpackMsg(String typeUrl, ByteString value) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
@@ -169,19 +210,36 @@ public class RpcClient {
         return (GeneratedMessageV3) method.invoke(clazz, value);
     }
 
-    public BlockDetail queryBlock(String height) throws IOException {
+    public ResultBlock queryBlock(String height) throws IOException, ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         Map<String, String> params = new HashMap();
         params.put("height", height);
 
         JsonRpc jsonRpc = JsonRpc.WrapBaseQuery(params, "block");
         String str = httpUtils.post(rpcUri, JSON.toJSONString(jsonRpc));
-        BlockDetailRpc blockDetailRpc = JSON.parseObject(str, BlockDetailRpc.class);
-        Objects.requireNonNull(blockDetailRpc, "use json deserialize json_rpc_response return null");
-        if (blockDetailRpc.getError() != null) {
-            throw new IritaSDKException(blockDetailRpc.getError().getData());
+        ResultBlockRpc resultBlock = JSON.parseObject(str, ResultBlockRpc.class);
+        Objects.requireNonNull(resultBlock, "use json deserialize json_rpc_response return null");
+        if (resultBlock.getError() != null) {
+            throw new IritaSDKException(resultBlock.getError().getData());
         }
-
-        return blockDetailRpc.getResult();
+        List<StdTx> stdTxList = new ArrayList();
+        StdTx stdTx;
+        List<GeneratedMessageV3> messageList;
+        if (resultBlock.getResult().getBlock().getData().getTxs().size() > 0) {
+            for (Object o : resultBlock.getResult().getBlock().getData().getTxs()) {
+                stdTx = new StdTx();
+                TxOuterClass.Tx tx = TxOuterClass.Tx.parseFrom(Base64.getDecoder().decode((String) o));
+                messageList = new ArrayList();
+                for (Any any : tx.getBody().getMessagesList()) {
+                    messageList.add(unpackMsg(any.getTypeUrl(), any.getValue()));
+                }
+                stdTx.setMsgs(messageList);
+                stdTx.setMemo(tx.getBody().getMemo());
+                stdTx.setFee(tx.getAuthInfo().getFee());
+                stdTxList.add(stdTx);
+            }
+        }
+        resultBlock.getResult().getBlock().getData().setTxs(stdTxList);
+        return resultBlock.getResult();
     }
 
     public BlockResult queryBlockResult(String height) throws IOException {
@@ -189,11 +247,26 @@ public class RpcClient {
         params.put("height", height);
         JsonRpc jsonRpc = JsonRpc.WrapBaseQuery(params, "block_results");
         String str = httpUtils.post(rpcUri, JSON.toJSONString(jsonRpc));
-        BlockResultRpc blockResultRpc = JSON.parseObject(str, BlockResultRpc.class);
-        Objects.requireNonNull(blockResultRpc, "use json deserialize json_rpc_response return null");
-        if (blockResultRpc.getError() != null) {
-            throw new IritaSDKException(blockResultRpc.getError().getData());
+        ResultBlockResults resultBlockResults = JSON.parseObject(str, ResultBlockResults.class);
+        Objects.requireNonNull(resultBlockResults, "use json deserialize json_rpc_response return null");
+        if (resultBlockResults.getError() != null) {
+            throw new IritaSDKException(resultBlockResults.getError().getData());
         }
-        return blockResultRpc.getResult();
+        if (resultBlockResults.getResult().getTxsResults().size() > 0) {
+            BlockResult result = resultBlockResults.getResult();
+            for (int n = 0; n < result.getTxsResults().size(); n++) {
+                if (result.getTxsResults().get(n).getEvents().size() > 0) {
+                    for (int i = 0; i < result.getTxsResults().get(n).getEvents().size(); i++) {
+                        for (int j = 0; j < result.getTxsResults().get(n).getEvents().get(i).getAttributes().size(); j++) {
+                            result.getTxsResults().get(n).getEvents().get(i).getAttributes().get(j).setKey(
+                                    new String(Base64.getDecoder().decode(result.getTxsResults().get(n).getEvents().get(i).getAttributes().get(j).getKey())));
+                            result.getTxsResults().get(n).getEvents().get(i).getAttributes().get(j).setValue(
+                                    new String(Base64.getDecoder().decode(result.getTxsResults().get(n).getEvents().get(i).getAttributes().get(j).getValue())));
+                        }
+                    }
+                }
+            }
+        }
+        return resultBlockResults.getResult();
     }
 }
