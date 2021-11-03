@@ -7,10 +7,11 @@ import irita.sdk.config.ClientConfig;
 import irita.sdk.config.OpbConfig;
 import irita.sdk.exception.IritaSDKException;
 import irita.sdk.key.KeyManager;
-import irita.sdk.model.Account;
-import irita.sdk.model.BaseTx;
-import irita.sdk.model.GasInfo;
-import irita.sdk.model.ResultTx;
+import irita.sdk.model.*;
+import irita.sdk.model.block.BlockDetail;
+import irita.sdk.model.block.BlockResult;
+import irita.sdk.model.block.ResultBlock;
+import irita.sdk.model.tx.EventQueryBuilder;
 import irita.sdk.tx.TxEngine;
 import irita.sdk.tx.TxEngineFactory;
 import irita.sdk.util.HashUtils;
@@ -21,6 +22,7 @@ import proto.cosmos.auth.v1beta1.QueryGrpc;
 import proto.cosmos.auth.v1beta1.QueryOuterClass;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 public class BaseClient {
@@ -112,6 +114,28 @@ public class BaseClient {
         TxEngine txEngine = getTxEngine();
         byte[] txBytes = txEngine.buildAndSign(msgs, baseTx, account);
         return rpcClient.simulateTx(txBytes);
+    }
+
+    public ResultQueryTx queryTx(String hash) throws IOException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        return rpcClient.queryTx(hash);
+    }
+
+    public ResultSearchTxs queryTxs(EventQueryBuilder builder, int page, int size) throws IOException, ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        if (builder == null) {
+            throw new IritaSDKException("EventQueryBuilder can not be null");
+        }
+        return rpcClient.queryTxs(builder, page, size);
+    }
+
+    public BlockDetail queryBlock(String height) throws IOException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        ResultBlock resultBlock = rpcClient.queryBlock(height);
+        BlockResult blockResult = rpcClient.queryBlockResult(height);
+
+        BlockDetail blockDetail = new BlockDetail();
+        blockDetail.setBlockId(resultBlock.getBlockID());
+        blockDetail.setBlock(resultBlock.getBlock());
+        blockDetail.setBlockResult(blockResult);
+        return blockDetail;
     }
 
     public ClientConfig getClientConfig() {

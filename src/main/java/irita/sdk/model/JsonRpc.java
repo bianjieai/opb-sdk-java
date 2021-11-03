@@ -10,7 +10,8 @@ public class JsonRpc {
     private String jsonrpc = "2.0";
     private int id = 1;
     private String method;
-    private Map<String, String> params = new HashMap<>();
+    //    private Map<String, String> params = new HashMap<>();
+    private Map params = new HashMap<>();
 
     private JsonRpc() {
     }
@@ -32,6 +33,13 @@ public class JsonRpc {
         rpc.method = "abci_query";
         rpc.params.put("path", path);
         rpc.params.put("data", Hex.toHexString(bytes));
+        return rpc;
+    }
+
+    public static JsonRpc WrapBaseQuery(Map params, String method) {
+        JsonRpc rpc = new JsonRpc();
+        rpc.method = method;
+        rpc.setParams(params);
         return rpc;
     }
 
