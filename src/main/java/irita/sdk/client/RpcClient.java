@@ -104,6 +104,9 @@ public class RpcClient {
     private synchronized ResultTx checkResTxAndConvert(String res) {
         ResultTx resultTx = JSON.parseObject(res, ResultTx.class);
 
+        if (resultTx.getError() != null) {
+            throw new IritaSDKException(resultTx.getError().getData());
+        }
         if (resultTx.getCode() != TxStatus.SUCCESS) {
             throw new IritaSDKException(String.format("log: %s\nhash: %s", resultTx.getLog(), Optional.of(resultTx).map(ResultTx::getResult).map(Result::getHash).orElse("")));
         }

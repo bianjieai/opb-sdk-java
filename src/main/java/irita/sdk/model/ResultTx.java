@@ -4,9 +4,8 @@ import irita.sdk.constant.enums.EventEnum;
 
 import java.util.Optional;
 
-public class ResultTx {
-    private String jsonrpc;
-    private int id;
+public class ResultTx extends RpcBase{
+
     private Result result;
 
     public int getCode() {
@@ -32,22 +31,6 @@ public class ResultTx {
                 .map(Result::getDeliver_tx)
                 .map(x -> x.getEventValue(eventEnum))
                 .orElse("");
-    }
-
-    public void setJsonrpc(String jsonrpc) {
-        this.jsonrpc = jsonrpc;
-    }
-
-    public String getJsonrpc() {
-        return jsonrpc;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public int getId() {
-        return id;
     }
 
     public void setResult(Result result) {

@@ -10,7 +10,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 public class HttpUtils {
-    private static final int DEFAULT_TIME_OUT = 15000;
+    private static final int DEFAULT_TIME_OUT = 30000;
     private String projectKey;
 
     public HttpUtils() {
