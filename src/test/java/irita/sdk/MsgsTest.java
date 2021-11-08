@@ -31,13 +31,15 @@ public class MsgsTest {
     private KeyManager km;
     private NftClient nftClient;
     private BaseClient baseClient;
-    private BaseTx baseTx = new BaseTx(200000, new Fee("300000", "uirita"), BroadcastMode.Commit);
+    private String name = "test_name";
+    private String password = "test_password";
+    private BaseTx baseTx = new BaseTx(name, password, 200000, new Fee("300000", "uirita"), BroadcastMode.Commit);
 
     @BeforeEach
     public void init() {
         String mnemonic = "opera vivid pride shallow brick crew found resist decade neck expect apple chalk belt sick author know try tank detail tree impact hand best";
         km = KeyManagerFactory.createDefault();
-        km.recover(mnemonic);
+        km.recover(name, password, mnemonic);
 
         String nodeUri = "http://101.132.138.109:26657";
         String grpcAddr = "http://101.132.138.109:9090";
@@ -49,7 +51,7 @@ public class MsgsTest {
         IritaClient client = new IritaClient(clientConfig, opbConfig, km);
         baseClient = client.getBaseClient();
         nftClient = client.getNftClient();
-        assertEquals("iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3", km.getAddr());
+        assertEquals("iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3", km.getKeyDAO(name).getAddress());
     }
 
     @Test
@@ -62,7 +64,7 @@ public class MsgsTest {
         String denomName = "denomname" + new Random().nextInt(1000);
         String schema = "no shcema";
 
-        Account account = baseClient.queryAccount();
+        Account account = baseClient.queryAccount(baseClient.getCurrentAddr(baseTx.getFrom()));
         Tx.MsgIssueDenom msg1 = Tx.MsgIssueDenom
                 .newBuilder()
                 .setId(denomID + "1")

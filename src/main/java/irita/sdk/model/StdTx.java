@@ -10,6 +10,7 @@ public class StdTx {
     private TxOuterClass.Fee fee;
     //    private irita.sdk.model.block.Signatures Signatures;
     private String memo;
+    private String txHash;
 
     public List<GeneratedMessageV3> getMsgs() {
         return msgs;
@@ -33,5 +34,13 @@ public class StdTx {
 
     public void setMemo(String memo) {
         this.memo = memo;
+    }
+
+    public String getTxHash() {
+        return txHash;
+    }
+
+    public void setTxHash(String txHash) {
+        this.txHash = txHash;
     }
 }

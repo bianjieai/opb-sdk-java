@@ -23,7 +23,7 @@ public class BankClient {
     }
 
     public ResultTx send(String amount, String denom, String toAddress, BaseTx baseTx) throws IOException {
-        Account account = baseClient.queryAccount();
+        Account account = baseClient.queryAccount(baseClient.getCurrentAddr(baseTx.getFrom()));
         AddressUtils.validAddress(toAddress);
 
         Tx.MsgSend msg = Tx.MsgSend.newBuilder()

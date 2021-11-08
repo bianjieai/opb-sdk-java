@@ -25,7 +25,8 @@ import static org.junit.jupiter.api.Assertions.*;
 public class PermTest {
     private IritaClient client;
     private final BaseTx baseTx = new BaseTx(200000, new Fee("300000", "uirita"), BroadcastMode.Commit);
-
+    private String name = "test_name";
+    private String password = "test_password";
 
     @BeforeEach
     public void init() throws FileNotFoundException {
@@ -88,7 +89,7 @@ public class PermTest {
 
     public String getRandomAddress() throws Exception {
         KeyManager km = KeyManagerFactory.createDefault();
-        km.add();
-        return km.getAddr();
+        String mnemonic = km.add(name, password);
+        return km.getKeyDAO(name).getAddress();
     }
 }

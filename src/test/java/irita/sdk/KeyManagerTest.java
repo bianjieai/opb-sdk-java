@@ -16,13 +16,16 @@ import java.nio.charset.StandardCharsets;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class KeyManagerTest {
+    private String name = "test_name";
+    private String password = "test_password";
+
     @Test
     public void recoverFromMnemonic() {
         String mnemonic = "opera vivid pride shallow brick crew found resist decade neck expect apple chalk belt sick author know try tank detail tree impact hand best";
         KeyManager km = KeyManagerFactory.createDefault();
-        km.recover(mnemonic);
+        km.recover(name, password, mnemonic);
 
-        assertEquals("iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3", km.getAddr());
+        assertEquals("iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3", km.getKeyDAO(name).getAddress());
         assertEquals("3c49175daf981965679bf88d2690e22144424e16c84e9d397ddb58b63603eeec", km.getPrivKey().toString(16));
     }
 
@@ -90,8 +93,7 @@ public class KeyManagerTest {
     @Test
     public void addNewKm() throws Exception {
         KeyManager km = KeyManagerFactory.createDefault();
-        km.add();
-        String mnemonic = km.getMnemonic();
+        String mnemonic = km.add(name, password);
         System.out.println(mnemonic);
     }
 }

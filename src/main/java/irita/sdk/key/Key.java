@@ -4,9 +4,9 @@ import java.io.InputStream;
 import java.math.BigInteger;
 
 public interface Key {
-    void add() throws Exception;
+    String add(String name, String password) throws Exception;
 
-    void recover(String mnemonic);
+    void recover(String name, String password, String mnemonic);
 
     void recover(BigInteger privKey);
 

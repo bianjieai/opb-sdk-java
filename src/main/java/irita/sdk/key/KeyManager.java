@@ -5,6 +5,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.math.ec.ECPoint;
 
 import java.math.BigInteger;
+import java.util.HashMap;
+import java.util.Map;
 
 public abstract class KeyManager implements Key {
     private BigInteger privKey;
@@ -16,6 +18,7 @@ public abstract class KeyManager implements Key {
     private String hrp = "iaa";
 
     private AlgoEnum algo;
+    private Map<String, KeyInfo> keyDAO = new HashMap();
 
     public abstract AlgoEnum getAlgo();
 
@@ -69,5 +72,25 @@ public abstract class KeyManager implements Key {
 
     public void setHrp(String hrp) {
         this.hrp = hrp;
+    }
+
+    public void addKeyDAO(String name, String password, KeyInfo keyInfo) {
+        this.keyDAO.put(name, keyInfo);
+    }
+
+    public KeyInfo getKeyDAO(String name) {
+        KeyInfo keyInfo = this.keyDAO.get(name);
+        if (keyInfo == null) {
+            throw new IritaSDKException(String.format("keyDAO name %s is not exist", name));
+        }
+        return keyInfo;
+    }
+
+    public boolean hasKeyDAO(String name) {
+        return this.keyDAO.containsKey(name);
+    }
+
+    public void removeKeyDAO(String name) {
+        this.keyDAO.remove(name);
     }
 }

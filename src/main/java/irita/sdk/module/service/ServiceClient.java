@@ -25,7 +25,7 @@ public class ServiceClient {
 
     // DefineService is responsible for creating a new service definition
     public ResultTx defineService(DefineServiceRequest req, BaseTx baseTx) throws IOException {
-        Account account = baseClient.queryAccount();
+        Account account = baseClient.queryAccount(baseClient.getCurrentAddr(baseTx.getFrom()));
 
         Tx.MsgDefineService.Builder builder = Tx.MsgDefineService.newBuilder()
                 .setName(req.getServiceName())
@@ -45,7 +45,7 @@ public class ServiceClient {
 
     // BindService is responsible for binding a new service definition
     public ResultTx bindService(BindServiceRequest req, BaseTx baseTx) throws IOException {
-        Account account = baseClient.queryAccount();
+        Account account = baseClient.queryAccount(baseClient.getCurrentAddr(baseTx.getFrom()));
         CoinOuterClass.Coin coin = CoinOuterClass.Coin.newBuilder()
                 .setAmount(req.getDeposit().getAmount())
                 .setDenom(req.getDeposit().getDenom())
@@ -67,7 +67,7 @@ public class ServiceClient {
 
     // BindService is responsible for binding a new service definition
     public ResultTx updateServiceBinding(UpdateServiceBindingRequest req, BaseTx baseTx) throws IOException {
-        Account account = baseClient.queryAccount();
+        Account account = baseClient.queryAccount(baseClient.getCurrentAddr(baseTx.getFrom()));
         AddressUtils.validAddress(req.getProvider());
 
         CoinOuterClass.Coin coin = CoinOuterClass.Coin.newBuilder()
@@ -89,7 +89,7 @@ public class ServiceClient {
 
     // BindService is responsible for binding a new service definition
     public ResultTx disableServiceBinding(String serviceName, String provider, BaseTx baseTx) throws IOException {
-        Account account = baseClient.queryAccount();
+        Account account = baseClient.queryAccount(baseClient.getCurrentAddr(baseTx.getFrom()));
         AddressUtils.validAddress(provider);
 
         Tx.MsgDisableServiceBinding msg = Tx.MsgDisableServiceBinding.newBuilder()
@@ -104,7 +104,7 @@ public class ServiceClient {
 
     // BindService is responsible for binding a new service definition
     public ResultTx enableServiceBinding(String serviceName, String provider, Coin deposit, BaseTx baseTx) throws IOException {
-        Account account = baseClient.queryAccount();
+        Account account = baseClient.queryAccount(baseClient.getCurrentAddr(baseTx.getFrom()));
         AddressUtils.validAddress(provider);
 
         CoinOuterClass.Coin coin = CoinOuterClass.Coin.newBuilder()
@@ -126,7 +126,7 @@ public class ServiceClient {
     // InvokeService is responsible for invoke a new service
     // return reqCtxId, resultTx
     public CallServiceResp callService(CallServiceRequest req, BaseTx baseTx) throws IOException {
-        Account consumer = baseClient.queryAccount();
+        Account consumer = baseClient.queryAccount(baseClient.getCurrentAddr(baseTx.getFrom()));
         req.getProviders().forEach(AddressUtils::validAddress);
 
         CoinOuterClass.Coin coin = CoinOuterClass.Coin.newBuilder()
@@ -155,7 +155,7 @@ public class ServiceClient {
 
 
     public ResultTx responseService(ResponseServiceRequest req, BaseTx baseTx) throws IOException {
-        Account provider = baseClient.queryAccount();
+        Account provider = baseClient.queryAccount(baseClient.getCurrentAddr(baseTx.getFrom()));
         queryServiceRequest(req.getRequestId());
 
         Tx.MsgRespondService msg = Tx.MsgRespondService.newBuilder()

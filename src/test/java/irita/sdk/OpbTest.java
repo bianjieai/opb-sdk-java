@@ -17,12 +17,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class OpbTest {
     private OpbClient client;
+    private String name = "test_name";
+    private String password = "test_password";
 
     @BeforeEach
     public void init() {
         String mnemonic = "opera vivid pride shallow brick crew found resist decade neck expect apple chalk belt sick author know try tank detail tree impact hand best";
         KeyManager km = KeyManagerFactory.createDefault();
-        km.recover(mnemonic);
+        km.recover(name, password, mnemonic);
 
         String nodeUri = "https://opbt.bsngate.com:18602";
         String grpcAddr = "https://opbt.bsngate.com:18603";
@@ -31,7 +33,7 @@ public class OpbTest {
         OpbConfig opbConfig = new OpbConfig("4efe1d3f67b5484aa91331e29dc09ea1", null, "");
 
         client = new OpbClient(clientConfig, opbConfig, km);
-        assertEquals("iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3", km.getAddr());
+        assertEquals("iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3", km.getKeyDAO(name).getAddress());
     }
 
     @Test

@@ -26,13 +26,15 @@ public class TibcTest {
     private KeyManager km;
     private TibcClient tibcClient;
     private IritaClient client;
-    private BaseTx baseTx = new BaseTx(200000, new Fee("300000", "stake"), BroadcastMode.Commit);
+    private String name = "test_name";
+    private String password = "test_password";
+    private BaseTx baseTx = new BaseTx(name, password, 200000, new Fee("300000", "stake"), BroadcastMode.Commit);
 
     @BeforeEach
     public void init() {
         String mnemonic = "genre stamp head slam drop chuckle patrol mushroom staff range bomb accuse donor bounce main ancient home guide account floor label trigger wife doctor";
         km = KeyManagerFactory.createKeyManger(AlgoEnum.SECP256K1);
-        km.recover(mnemonic);
+        km.recover(name, password, mnemonic);
 //        String keystore="-----BEGIN TENDERMINT PRIVATE KEY-----\n"+
 //                "salt: 183EF9B57DEF8EF8C3AD9D21DE672E1B\n"+
 //                "type: sm2\n"+
@@ -54,7 +56,7 @@ public class TibcTest {
 
         client = new IritaClient(clientConfig, opbConfig, km);
         tibcClient = client.getTibcClient();
-        assertEquals("iaa1qvek4n2awq3zgpwqtr5tcp8mj6u2hpqf0r4x0l", km.getAddr());
+        assertEquals("iaa1qvek4n2awq3zgpwqtr5tcp8mj6u2hpqf0r4x0l", km.getKeyDAO(name).getAddress());
     }
 
     @Test

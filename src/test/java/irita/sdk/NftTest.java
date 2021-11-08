@@ -4,6 +4,7 @@ import irita.sdk.client.IritaClient;
 import irita.sdk.config.ClientConfig;
 import irita.sdk.config.OpbConfig;
 import irita.sdk.constant.enums.BroadcastMode;
+import irita.sdk.key.AlgoEnum;
 import irita.sdk.key.KeyManager;
 import irita.sdk.key.KeyManagerFactory;
 import irita.sdk.model.BaseTx;
@@ -23,24 +24,35 @@ import static org.junit.jupiter.api.Assertions.*;
 public class NftTest {
     private KeyManager km;
     private NftClient nftClient;
-    private BaseTx baseTx = new BaseTx(200000, new Fee("300000", "uirita"), BroadcastMode.Commit);
+    private String name1 = "test_name1";
+    private String password1 = "test_password";
+    private String name2 = "test_name2";
+    private String password2 = "test_password";
+    private String senderName = name1;
+    private BaseTx baseTx = new BaseTx(senderName, password1, 200000, new Fee("300000", "uiris"), BroadcastMode.Commit);
 
     @BeforeEach
     public void init() {
-        String mnemonic = "opera vivid pride shallow brick crew found resist decade neck expect apple chalk belt sick author know try tank detail tree impact hand best";
-        km = KeyManagerFactory.createDefault();
-        km.recover(mnemonic);
+//        String mnemonic = "code tattoo laundry ice chuckle priority immune rebuild dream prevent sibling inspire banner black shock page person brush oxygen sorry dilemma raccoon estate funny";
 
-        String nodeUri = "http://101.132.138.109:26657";
-        String grpcAddr = "http://101.132.138.109:9090";
-        String chainId = "test";
+        String mnemonic1 = "recycle now echo fun balance sight clown memory coach pistol arctic soul dentist novel illness share such utility delay sing reunion used glow muffin";
+        String mnemonic2 = "harsh key can lunch elephant movie toe when alarm slogan suffer secret chaos sunny vehicle rude obey help edge embrace excuse elder arrest emotion";
+//        km = KeyManagerFactory.createDefault();
+        km = KeyManagerFactory.createKeyManger(AlgoEnum.SECP256K1);
+        km.recover(name1, password1, mnemonic1);
+        km.recover(name2, password2, mnemonic2);
+
+        String nodeUri = "http://101.132.67.8:16657";
+        String grpcAddr = "http://101.132.67.8:19090";
+        String chainId = "irishub";
         ClientConfig clientConfig = new ClientConfig(nodeUri, grpcAddr, chainId);
 //        OpbConfig opbConfig = new OpbConfig("", "", "");
         OpbConfig opbConfig = null;
 
         IritaClient client = new IritaClient(clientConfig, opbConfig, km);
         nftClient = client.getNftClient();
-        assertEquals("iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3", km.getAddr());
+        assertEquals("iaa1j2juc02z52c869tu7t8vy3j98r4u0vn88us5jm", km.getKeyDAO(name1).getAddress());
+        assertEquals("iaa1l4tmtr5qvcqhcg8t4xn3zg5fwumssr7x3akmzd", km.getKeyDAO(name2).getAddress());
     }
 
     @Test
@@ -61,7 +73,7 @@ public class NftTest {
         assertEquals(denomID, denom.getId());
         assertEquals(denomName, denom.getName());
         assertEquals(schema, denom.getSchema());
-        assertEquals(km.getAddr(), denom.getCreator());
+        assertEquals(km.getKeyDAO(senderName).getAddress(), denom.getCreator());
 
         String nftID = "nftid08";
         String nftName = "你好呀";
@@ -74,7 +86,7 @@ public class NftTest {
                 .setName(nftName)
                 .setUri(uri)
                 .setData(data)
-                .setRecipient(km.getAddr());
+                .setRecipient(km.getKeyDAO(senderName).getAddress());
         resultTx = nftClient.mintNft(mintReq, baseTx);
         assertNotNull(resultTx.getResult().getHash());
 
@@ -94,9 +106,9 @@ public class NftTest {
         assertEquals(nftID, nft.getId());
         assertEquals(newUri, nft.getUri());
         assertEquals(newData, nft.getData());
-        assertEquals(km.getAddr(), nft.getOwner());
+        assertEquals(km.getKeyDAO(senderName).getAddress(), nft.getOwner());
 
-        long supply = nftClient.querySupply(denomID, km.getAddr());
+        long supply = nftClient.querySupply(denomID, km.getKeyDAO(senderName).getAddress());
         assertEquals(supply, 1);
 
         String reci = "iaa1r49m366kaexmvrlppqqeyr8ykqq248g0d4qra4";
@@ -116,11 +128,11 @@ public class NftTest {
         QueryCollectionResp nfts = nftClient.queryCollection(denomID, null);
         assertEquals(denomID, nfts.getDenom().getId());
         assertEquals(denomName, nfts.getDenom().getName());
-        assertEquals(km.getAddr(), nfts.getDenom().getCreator());
+        assertEquals(km.getKeyDAO(senderName).getAddress(), nfts.getDenom().getCreator());
         assertTrue(nfts.getNfts().size() > 0);
 
-        QueryOwnerResp owner = nftClient.queryOwner(denomID, km.getAddr());
-        assertEquals(km.getAddr(), owner.getAddress());
+        QueryOwnerResp owner = nftClient.queryOwner(denomID, km.getKeyDAO(senderName).getAddress());
+        assertEquals(km.getKeyDAO(senderName).getAddress(), owner.getAddress());
 
 //        BurnNFTRequest burnNFTReq = new BurnNFTRequest()
 //                .setDenom(denomID)

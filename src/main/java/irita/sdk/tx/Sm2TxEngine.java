@@ -4,11 +4,13 @@ import com.google.protobuf.Any;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.GeneratedMessageV3;
 import irita.sdk.exception.IritaSDKException;
+import irita.sdk.key.KeyInfo;
 import irita.sdk.key.KeyManager;
 import irita.sdk.model.Account;
 import irita.sdk.model.BaseTx;
 import irita.sdk.util.ByteUtils;
 import irita.sdk.util.SM2Utils;
+import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.crypto.CryptoException;
 import org.bouncycastle.math.ec.ECPoint;
 import proto.cosmos.base.v1beta1.CoinOuterClass;
@@ -58,8 +60,17 @@ public class Sm2TxEngine implements TxEngine {
             throw new IritaSDKException("baseTx not be null");
         }
 
-        BigInteger privKey = km.getPrivKey();
-        ECPoint publicKey = km.getPublicKey();
+        BigInteger privKey;
+        ECPoint publicKey;
+        if (StringUtils.isEmpty(baseTx.getFrom())) {
+            privKey = km.getPrivKey();
+            publicKey = km.getPublicKey();
+        } else {
+            KeyInfo keyDAO = km.getKeyDAO(baseTx.getFrom());
+            privKey = keyDAO.getPrivKey();
+            publicKey = keyDAO.getPublicKey();
+        }
+
         byte[] publicKeyEncoded = publicKey.getEncoded(true);
 
         TxOuterClass.AuthInfo ai = TxOuterClass.AuthInfo.newBuilder()

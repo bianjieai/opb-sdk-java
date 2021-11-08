@@ -8,7 +8,7 @@ opb-sdk-java
 
 ```java
         KeyManager km = KeyManagerFactory.createDefault();
-        km.add();
+        km.add("test_name", "test_password");
         String mnemonic = km.getMnemonic();
         System.out.println(mnemonic);
 ```
@@ -20,7 +20,7 @@ opb-sdk-java
 ```java
         String mnemonic="opera xxx ..."；
         KeyManager km=KeyManagerFactory.createDefault();
-        km.recover(mnemonic);
+        km.recover("test_name", "test_password", mnemonic);
 ```
 
 #### 1.2 从私钥(recover from privKey)
@@ -65,9 +65,11 @@ opb-sdk-java
 ### 1 初始化OpbClient (连接测试网)
 
 ```java
+        String name = "test_name";
+        String password = "test_password";
         String mnemonic = "opera vivid pride shallow brick crew found resist decade neck expect apple chalk belt sick author know try tank detail tree impact hand best";
         KeyManager km = KeyManagerFactory.createDefault();
-        km.recover(mnemonic);
+        km.recover(name, password, mnemonic);
 
         // projectID: 填你的 projectID
         String nodeUri = "http://47.100.192.234:26657";
@@ -83,9 +85,11 @@ opb-sdk-java
 ### 1 初始化OpbClient (连接文昌链)
 
 ```java
+        String name = "test_name";
+        String password = "test_password";
         String mnemonic = "opera vivid pride shallow brick crew found resist decade neck expect apple chalk belt sick author know try tank detail tree impact hand best";
         KeyManager km = KeyManagerFactory.createDefault();
-        km.recover(mnemonic);
+        km.recover(name, password, mnemonic);
 
         // projectID: 填你的 projectID
         String nodeUri = "https://opbt.bsngate.com:18602/api/projectID/rpc";

@@ -33,12 +33,14 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ComGovContractTest {
     private CommunityGovClient comGovClient;
     private WasmClient wasmClient;
+    private String name = "test_name";
+    private String password = "test_password";
 
     @BeforeEach
     public void init() {
         String mnemonic = "opera vivid pride shallow brick crew found resist decade neck expect apple chalk belt sick author know try tank detail tree impact hand best";
         KeyManager km = KeyManagerFactory.createDefault();
-        km.recover(mnemonic);
+        km.recover(name, password, mnemonic);
 
         String nodeUri = "http://101.132.138.109:26657";
         String grpcAddr = "http://101.132.138.109:9090";
@@ -49,7 +51,7 @@ public class ComGovContractTest {
 
         wasmClient = new WasmClient(new BaseClient(clientConfig, opbConfig, km));
         comGovClient = new CommunityGovClient(wasmClient);
-        assertEquals("iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3", km.getAddr());
+        assertEquals("iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3", km.getKeyDAO(name).getAddress());
     }
 
     // it is ignore unless you want to new community_governance contract to block-chain.
@@ -58,7 +60,7 @@ public class ComGovContractTest {
         // store contract
         StoreRequest storeReq = new StoreRequest();
         storeReq.setWasmFile("src/test/resources/community_governance.wasm");
-        BaseTx baseTx = new BaseTx(2000000, new Fee("120", "stake"), BroadcastMode.Commit);
+        BaseTx baseTx = new BaseTx(name, password, 2000000, new Fee("120", "stake"), BroadcastMode.Commit);
 
         String codeId = wasmClient.store(storeReq, baseTx);
         assertTrue(StringUtils.isNotEmpty(codeId));
@@ -146,7 +148,7 @@ public class ComGovContractTest {
         // new irita.sdk.client, he role of cur_address must hash_admin
         String mnemonic = "apart various produce pond bachelor size pumpkin gate pretty awake silver worth dust pledge pioneer patrol current fall escape lunar zero afraid this fish";
         KeyManager km = KeyManagerFactory.createDefault();
-        km.recover(mnemonic);
+        km.recover(name, password, mnemonic);
 
         String nodeUri = "http://localhost:26657";
         String grpcAddr = "http://localhost:9090";

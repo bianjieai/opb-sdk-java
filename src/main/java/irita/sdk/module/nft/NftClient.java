@@ -30,7 +30,7 @@ public class NftClient {
     }
 
     public ResultTx issueDenom(IssueDenomRequest req, BaseTx baseTx) throws IOException {
-        Account account = baseClient.queryAccount();
+        Account account = baseClient.queryAccount(baseClient.getCurrentAddr(baseTx.getFrom()));
         Tx.MsgIssueDenom msg = Tx.MsgIssueDenom
                 .newBuilder()
                 .setId(req.getId())
@@ -50,14 +50,14 @@ public class NftClient {
                 .setName(req.getName())
                 .setUri(req.getUri())
                 .setData(req.getData())
-                .setSender(baseClient.getCurrentAddr());
+                .setSender(baseClient.getCurrentAddr(baseTx.getFrom()));
 
         if (StringUtils.isNotEmpty(req.getRecipient())) {
             String recipient = req.getRecipient();
             AddressUtils.validAddress(recipient);
             builder.setRecipient(recipient);
         } else {
-            builder.setRecipient(baseClient.getCurrentAddr());
+            builder.setRecipient(baseClient.getCurrentAddr(baseTx.getFrom()));
         }
         Tx.MsgMintNFT msg = builder.build();
         List<GeneratedMessageV3> msgs = Collections.singletonList(msg);
@@ -82,7 +82,7 @@ public class NftClient {
                 .setName(req.getName())
                 .setUri(req.getUri())
                 .setData(req.getData())
-                .setSender(baseClient.getCurrentAddr())
+                .setSender(baseClient.getCurrentAddr(baseTx.getFrom()))
                 .build();
         List<GeneratedMessageV3> msgs = Collections.singletonList(msg);
         return baseClient.buildAndSend(msgs, baseTx);
@@ -106,7 +106,7 @@ public class NftClient {
                 .setUri(req.getUri())
                 .setData(req.getData())
                 .setName(req.getName())
-                .setSender(baseClient.getCurrentAddr());
+                .setSender(baseClient.getCurrentAddr(baseTx.getFrom()));
 
         if (StringUtils.isNotEmpty(req.getRecipient())) {
             String recipient = req.getRecipient();
@@ -123,7 +123,7 @@ public class NftClient {
                 .newBuilder()
                 .setDenomId(req.getDenom())
                 .setId(req.getId())
-                .setSender(baseClient.getCurrentAddr())
+                .setSender(baseClient.getCurrentAddr(baseTx.getFrom()))
                 .build();
         List<GeneratedMessageV3> msgs = Collections.singletonList(msg);
         return baseClient.buildAndSend(msgs, baseTx);

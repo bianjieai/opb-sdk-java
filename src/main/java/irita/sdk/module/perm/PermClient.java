@@ -25,7 +25,7 @@ public class PermClient {
 
     public ResultTx assignRoles(String address, List<Perm.Role> roles, BaseTx baseTx) throws IOException {
         AddressUtils.validAddress(address);
-        Account sender = baseClient.queryAccount();
+        Account sender = baseClient.queryAccount(baseClient.getCurrentAddr(baseTx.getFrom()));
 
         Tx.MsgAssignRoles msg = Tx.MsgAssignRoles
                 .newBuilder()
@@ -39,7 +39,7 @@ public class PermClient {
 
     public ResultTx unAssignRoles(String address, List<Perm.Role> roles, BaseTx baseTx) throws IOException {
         AddressUtils.validAddress(address);
-        Account sender = baseClient.queryAccount();
+        Account sender = baseClient.queryAccount(baseClient.getCurrentAddr(baseTx.getFrom()));
 
         Tx.MsgUnassignRoles msg = Tx.MsgUnassignRoles
                 .newBuilder()
@@ -53,7 +53,7 @@ public class PermClient {
 
     public ResultTx blockAccount(String address, BaseTx baseTx) throws IOException {
         AddressUtils.validAddress(address);
-        Account sender = baseClient.queryAccount();
+        Account sender = baseClient.queryAccount(baseClient.getCurrentAddr(baseTx.getFrom()));
 
         Tx.MsgBlockAccount msg = Tx.MsgBlockAccount
                 .newBuilder()
@@ -66,7 +66,7 @@ public class PermClient {
 
     public ResultTx unblockAccount(String address, BaseTx baseTx) throws IOException {
         AddressUtils.validAddress(address);
-        Account sender = baseClient.queryAccount();
+        Account sender = baseClient.queryAccount(baseClient.getCurrentAddr(baseTx.getFrom()));
 
         Tx.MsgUnblockAccount msg = Tx.MsgUnblockAccount
                 .newBuilder()

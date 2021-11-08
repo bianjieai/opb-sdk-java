@@ -6,6 +6,7 @@ import io.grpc.Channel;
 import irita.sdk.config.ClientConfig;
 import irita.sdk.config.OpbConfig;
 import irita.sdk.exception.IritaSDKException;
+import irita.sdk.key.KeyInfo;
 import irita.sdk.key.KeyManager;
 import irita.sdk.model.*;
 import irita.sdk.model.block.BlockDetail;
@@ -47,8 +48,13 @@ public class BaseClient {
         this.rpcClient = new RpcClient(clientConfig, opbConfig);
     }
 
-    public String getCurrentAddr() {
+    /*public String getCurrentAddr() {
         return km.getAddr();
+    }*/
+
+    public String getCurrentAddr(String name) {
+        KeyInfo keyDAO = km.getKeyDAO(name);
+        return keyDAO.getAddress();
     }
 
     public RpcClient getRpcClient() {
@@ -65,7 +71,7 @@ public class BaseClient {
 
     public ResultTx buildAndSend(List<GeneratedMessageV3> msgs, BaseTx baseTx, Account account) throws IOException {
         if (account == null) {
-            account = queryAccount();
+            account = queryAccount(getCurrentAddr(baseTx.getFrom()));
         }
         TxEngine txEngine = getTxEngine();
         byte[] txBytes = txEngine.buildAndSign(msgs, baseTx, account);
@@ -74,7 +80,7 @@ public class BaseClient {
 
     public String buildTxHash(List<GeneratedMessageV3> msgs, BaseTx baseTx, Account account) {
         if (account == null) {
-            account = queryAccount();
+            account = queryAccount(getCurrentAddr(baseTx.getFrom()));
         }
         TxEngine txEngine = getTxEngine();
         byte[] txBytes = txEngine.buildAndSign(msgs, baseTx, account);
@@ -82,9 +88,9 @@ public class BaseClient {
         return Strings.toUpperCase(Hex.toHexString(sum));
     }
 
-    public Account queryAccount() {
+    /*public Account queryAccount() {
         return queryAccount(km.getAddr());
-    }
+    }*/
 
     public Account queryAccount(String address) {
         QueryOuterClass.QueryAccountRequest req = QueryOuterClass.QueryAccountRequest
@@ -109,7 +115,7 @@ public class BaseClient {
 
     public synchronized GasInfo simulateTx(List<GeneratedMessageV3> msgs, BaseTx baseTx, Account account) throws IOException {
         if (account == null) {
-            account = queryAccount();
+            account = queryAccount(getCurrentAddr(baseTx.getFrom()));
         }
         TxEngine txEngine = getTxEngine();
         byte[] txBytes = txEngine.buildAndSign(msgs, baseTx, account);

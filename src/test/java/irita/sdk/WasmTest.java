@@ -23,12 +23,14 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class WasmTest {
     private WasmClient wasmClient;
+    private String name = "test_name";
+    private String password = "test_password";
 
     @BeforeEach
     public void init() {
         String mnemonic = "opera vivid pride shallow brick crew found resist decade neck expect apple chalk belt sick author know try tank detail tree impact hand best";
         KeyManager km = KeyManagerFactory.createDefault();
-        km.recover(mnemonic);
+        km.recover(name, password, mnemonic);
 
         String nodeUri = "http://101.132.138.109:26657";
         String grpcAddr = "http://101.132.138.109:9090";
@@ -38,7 +40,7 @@ public class WasmTest {
         OpbConfig opbConfig = null;
 
         wasmClient = new WasmClient(new BaseClient(clientConfig, opbConfig, km));
-        assertEquals("iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3", km.getAddr());
+        assertEquals("iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3", km.getKeyDAO(name).getAddress());
     }
 
 
@@ -70,7 +72,7 @@ public class WasmTest {
         req.setCodeId(codeId);
         req.setInitMsg(initMsg);
         req.setLabel("test wasm");
-        BaseTx baseTx = new BaseTx(2000000, new Fee("120", "stake"),BroadcastMode.Commit);
+        BaseTx baseTx = new BaseTx(2000000, new Fee("120", "stake"), BroadcastMode.Commit);
 
         String contractAddress = wasmClient.instantiate(req, baseTx);
         assertTrue(StringUtils.isNotEmpty(contractAddress));
@@ -93,7 +95,7 @@ public class WasmTest {
         ContractABI execAbi = new ContractABI();
         execAbi.setArgs(args);
         execAbi.setMethod("vote");
-        BaseTx baseTx = new BaseTx(2000000, new Fee("120", "stake"),BroadcastMode.Commit);
+        BaseTx baseTx = new BaseTx(2000000, new Fee("120", "stake"), BroadcastMode.Commit);
 
         ResultTx resultTx = wasmClient.execute(contractAddress, execAbi, null, baseTx);
 

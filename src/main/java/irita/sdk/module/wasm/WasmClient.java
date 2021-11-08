@@ -31,7 +31,7 @@ public class WasmClient {
 
     // upload the contract to block-chain and return the codeId for user
     public String store(StoreRequest req, BaseTx baseTx) throws IOException {
-        Account account = baseClient.queryAccount();
+        Account account = baseClient.queryAccount(baseClient.getCurrentAddr(baseTx.getFrom()));
 
         if (req.getWasmByteCode() != null) {
             req.setWasmByteCode(req.getWasmByteCode());
@@ -56,7 +56,7 @@ public class WasmClient {
 
     // instantiate the contract state
     public String instantiate(InstantiateRequest req, BaseTx baseTx) throws IOException {
-        Account account = baseClient.queryAccount();
+        Account account = baseClient.queryAccount(baseClient.getCurrentAddr(baseTx.getFrom()));
         Tx.MsgInstantiateContract.Builder builder = Tx.MsgInstantiateContract.newBuilder()
                 .setSender(account.getAddress())
                 .setAdmin(Optional.of(req).map(InstantiateRequest::getAdmin).orElse(""))
@@ -79,7 +79,7 @@ public class WasmClient {
 
     // execute the contract method
     public ResultTx execute(String contractAddress, ContractABI abi, Coin funds, BaseTx baseTx) throws IOException {
-        Account account = baseClient.queryAccount();
+        Account account = baseClient.queryAccount(baseClient.getCurrentAddr(baseTx.getFrom()));
         byte[] msgBytes = abi.build();
 
         Tx.MsgExecuteContract.Builder builder = Tx.MsgExecuteContract.newBuilder()
@@ -100,7 +100,7 @@ public class WasmClient {
     }
 
     public ResultTx migrate(String contractAddress, long newCodeID, byte[] msgByte, BaseTx baseTx) throws IOException {
-        Account account = baseClient.queryAccount();
+        Account account = baseClient.queryAccount(baseClient.getCurrentAddr(baseTx.getFrom()));
         Tx.MsgMigrateContract msg = Tx.MsgMigrateContract.newBuilder()
                 .setSender(account.getAddress())
                 .setContract(contractAddress)

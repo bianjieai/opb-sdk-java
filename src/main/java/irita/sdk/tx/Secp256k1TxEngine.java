@@ -4,10 +4,12 @@ import com.google.protobuf.Any;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.GeneratedMessageV3;
 import irita.sdk.exception.IritaSDKException;
+import irita.sdk.key.KeyInfo;
 import irita.sdk.key.KeyManager;
 import irita.sdk.model.Account;
 import irita.sdk.model.BaseTx;
 import irita.sdk.util.SecP256K1Utils;
+import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.math.ec.ECPoint;
 import proto.cosmos.base.v1beta1.CoinOuterClass;
 import proto.cosmos.crypto.secp256k1.Keys;
@@ -56,10 +58,18 @@ public class Secp256k1TxEngine implements TxEngine {
             throw new IritaSDKException("baseTx not be null");
         }
 
-        BigInteger privKey = km.getPrivKey();
-        ECPoint publicKey = km.getPublicKey();
-        byte[] publicKeyEncoded = publicKey.getEncoded(true);
+        BigInteger privKey;
+        ECPoint publicKey;
+        if (StringUtils.isEmpty(baseTx.getFrom())) {
+            privKey = km.getPrivKey();
+            publicKey = km.getPublicKey();
+        } else {
+            KeyInfo keyDAO = km.getKeyDAO(baseTx.getFrom());
+            privKey = keyDAO.getPrivKey();
+            publicKey = keyDAO.getPublicKey();
+        }
 
+        byte[] publicKeyEncoded = publicKey.getEncoded(true);
         TxOuterClass.AuthInfo ai = TxOuterClass.AuthInfo.newBuilder()
                 .addSignerInfos(
                         TxOuterClass.SignerInfo.newBuilder()

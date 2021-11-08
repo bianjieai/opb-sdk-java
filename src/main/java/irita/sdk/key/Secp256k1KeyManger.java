@@ -1,5 +1,6 @@
 package irita.sdk.key;
 
+import irita.sdk.exception.IritaSDKException;
 import irita.sdk.util.Bech32Utils;
 import irita.sdk.util.Bip44Utils;
 import irita.sdk.util.HashUtils;
@@ -16,12 +17,13 @@ import java.math.BigInteger;
 public class Secp256k1KeyManger extends KeyManager {
 
     @Override
-    public void add() throws Exception {
+    public String add(String name, String password) throws Exception {
         String mnemonic = Bip44Utils.generateMnemonic();
-        recover(mnemonic);
+        recover(name, password, mnemonic);
+        return mnemonic;
     }
 
-    @Override
+    /*@Override
     public void recover(String mnemonic) {
         byte[] seed = Bip44Utils.getSeed(mnemonic);
         DeterministicKey dk = Bip44Utils.getDeterministicKey(mnemonic, seed, getKeyPath());
@@ -33,6 +35,20 @@ public class Secp256k1KeyManger extends KeyManager {
         super.setPublicKey(publicKey);
         super.setPrivKey(privKey);
         super.setMnemonic(mnemonic);
+    }*/
+
+    @Override
+    public void recover(String name, String password, String mnemonic) {
+        if (super.hasKeyDAO(name)) {
+            throw new IritaSDKException(String.format("name %s has existed", name));
+        }
+        byte[] seed = Bip44Utils.getSeed(mnemonic);
+        DeterministicKey dk = Bip44Utils.getDeterministicKey(mnemonic, seed, getKeyPath());
+        BigInteger privKey = dk.getPrivKey();
+        ECPoint publicKey = SecP256K1Utils.getPublicKeyFromPrivkey(privKey);
+        String address = pubKeyToAddress(publicKey);
+
+        super.addKeyDAO(name, password, new KeyInfo(name, address, publicKey, privKey, AlgoEnum.SECP256K1));
     }
 
     @Override
