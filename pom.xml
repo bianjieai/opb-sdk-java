@@ -35,6 +35,8 @@
         <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
+        <protobuf.plugin.version>0.6.1</protobuf.plugin.version>
+        <grpc.version>1.18.0</grpc.version>
     </properties>
 
     <dependencies>
@@ -124,24 +126,6 @@
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>2.22.2</version>
                 </plugin>
-                <plugin>
-                    <groupId>org.xolstice.maven.plugins</groupId>
-                    <artifactId>protobuf-maven-plugin</artifactId>
-                    <version>0.6.1</version>
-                    <configuration>
-                        <protocArtifact>com.google.protobuf:protoc:3.12.0:exe:osx-x86_64</protocArtifact>
-                        <pluginId>grpc-java</pluginId>
-                        <pluginArtifact>io.grpc:protoc-gen-grpc-java:1.35.0:exe:osx-x86_64</pluginArtifact>
-                    </configuration>
-                    <!--                <executions>-->
-                    <!--                    <execution>-->
-                    <!--                        <goals>-->
-                    <!--                            <goal>compile</goal>-->
-                    <!--                            <goal>compile-custom</goal>-->
-                    <!--                        </goals>-->
-                    <!--                    </execution>-->
-                    <!--                </executions>-->
-                </plugin>
 
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -190,8 +174,45 @@
                         <additionalparam>-Xdoclint:none</additionalparam>
                     </configuration>
                 </plugin>
-
             </plugins>
         </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.xolstice.maven.plugins</groupId>
+                <artifactId>protobuf-maven-plugin</artifactId>
+                <version>${protobuf.plugin.version}</version>
+                <configuration>
+                    <useArgumentFile>true</useArgumentFile>
+                    <protocArtifact>com.google.protobuf:protoc:3.6.1:exe:${os.detected.classifier}</protocArtifact>
+                    <clearOutputDirectory>false</clearOutputDirectory>
+                    <protoSourceRoot>${project.basedir}/src/main/proto</protoSourceRoot>
+                    <outputDirectory>${project.basedir}/src/main/java/</outputDirectory>
+
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>protobuf.java</id>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                        <phase>generate-sources</phase>
+                    </execution>
+
+
+                    <execution>
+                        <id>protobuf.grpc-java</id>
+                        <goals>
+                            <goal>compile-custom</goal>
+                        </goals>
+                        <phase>generate-sources</phase>
+                        <configuration>
+                            <pluginId>grpc-java</pluginId>
+                            <pluginArtifact>io.grpc:protoc-gen-grpc-java:${grpc.version}:exe:${os.detected.classifier}</pluginArtifact>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
     </build>
 </project>
