@@ -62,7 +62,7 @@ public class RecordTest {
 
     @Test
     @Disabled
-    public void testPacketCommitment() {
+    public void testQueryRecord() {
         QueryOuterClass.QueryRecordResponse recordResponse = recordClient.queryRecord("676aff876e56a711757bcbaf69d17ad57d539f6267fc448f435394d8c4af5d4a");
         assertNotNull(recordResponse);
     }
