@@ -22,7 +22,6 @@ import java.util.Optional;
 
 public class RecordClient {
     private final BaseClient baseClient;
-    private static final String DO_NOT_MODIFY = "[do-not-modify]";
 
     public RecordClient(BaseClient baseClient) {
         this.baseClient = baseClient;
