@@ -49,7 +49,7 @@ public class MsgsTest {
         IritaClient client = new IritaClient(clientConfig, opbConfig, km);
         baseClient = client.getBaseClient();
         nftClient = client.getNftClient();
-        assertEquals("iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3", km.getAddr());
+        assertEquals("iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3", km.getCurrentKeyInfo().getAddress());
     }
 
     @Test
@@ -62,7 +62,7 @@ public class MsgsTest {
         String denomName = "denomname" + new Random().nextInt(1000);
         String schema = "no shcema";
 
-        Account account = baseClient.queryAccount();
+        Account account = baseClient.queryAccount(baseTx);
         Tx.MsgIssueDenom msg1 = Tx.MsgIssueDenom
                 .newBuilder()
                 .setId(denomID + "1")

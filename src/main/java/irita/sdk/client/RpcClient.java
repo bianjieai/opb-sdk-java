@@ -115,7 +115,7 @@ public class RpcClient {
     }
 
     public ResultQueryTx queryTx(String hash) throws IOException, ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-        Map params = new HashMap();
+        Map<String, Object> params = new HashMap<>();
         params.put("prove", true);
         params.put("hash", Base64.getEncoder().encodeToString(Hex.decode(hash)));
         JsonRpc jsonRpc = JsonRpc.WrapBaseQuery(params, "tx");
@@ -170,7 +170,7 @@ public class RpcClient {
         if (StringUtils.isEmpty(query)) {
             throw new IritaSDKException("must declare at least one tag to search");
         }
-        Map params = new HashMap();
+        Map<String, Object> params = new HashMap<>();
         params.put("query", query);
         params.put("prove", true);
         params.put("order_by", "asc");
@@ -191,7 +191,7 @@ public class RpcClient {
         ResultSearchTxs resultSearchTxs = new ResultSearchTxs();
         resultSearchTxs.setTotal(txsRpc.getResult().getTotalCount());
         if (txsRpc.getResult().getTxs().size() > 0) {
-            List<ResultQueryTx> list = new ArrayList(txsRpc.getResult().getTxs().size());
+            List<ResultQueryTx> list = new ArrayList<>(txsRpc.getResult().getTxs().size());
             for (irita.sdk.model.tx.Result result : txsRpc.getResult().getTxs()) {
                 list.add(parseResultQueryTx(result));
             }
@@ -209,13 +209,13 @@ public class RpcClient {
         if (StringUtils.isEmpty(protoClassName)) {
             throw new IritaSDKException("not exist tx type");
         }
-        Class clazz = Class.forName(protoClassName);
+        Class<?> clazz = Class.forName(protoClassName);
         Method method = clazz.getMethod("parseFrom", ByteString.class);
         return (GeneratedMessageV3) method.invoke(clazz, value);
     }
 
     public ResultBlock queryBlock(String height) throws IOException, ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-        Map<String, String> params = new HashMap();
+        Map<String, Object> params = new HashMap<>();
         params.put("height", height);
 
         JsonRpc jsonRpc = JsonRpc.WrapBaseQuery(params, "block");
@@ -225,14 +225,14 @@ public class RpcClient {
         if (resultBlock.getError() != null) {
             throw new IritaSDKException(resultBlock.getError().getData());
         }
-        List<StdTx> stdTxList = new ArrayList();
+        List<StdTx> stdTxList = new ArrayList<>();
         StdTx stdTx;
         List<GeneratedMessageV3> messageList;
         if (resultBlock.getResult().getBlock().getData().getTxs() != null && resultBlock.getResult().getBlock().getData().getTxs().size() > 0) {
             for (Object o : resultBlock.getResult().getBlock().getData().getTxs()) {
                 stdTx = new StdTx();
                 TxOuterClass.Tx tx = TxOuterClass.Tx.parseFrom(Base64.getDecoder().decode((String) o));
-                messageList = new ArrayList();
+                messageList = new ArrayList<>();
                 for (Any any : tx.getBody().getMessagesList()) {
                     messageList.add(unpackMsg(any.getTypeUrl(), any.getValue()));
                 }
@@ -248,7 +248,7 @@ public class RpcClient {
     }
 
     public BlockResult queryBlockResult(String height) throws IOException {
-        Map<String, String> params = new HashMap();
+        Map<String, Object> params = new HashMap<>();
         params.put("height", height);
         JsonRpc jsonRpc = JsonRpc.WrapBaseQuery(params, "block_results");
         String str = httpUtils.post(rpcUri, JSON.toJSONString(jsonRpc));
@@ -260,6 +260,7 @@ public class RpcClient {
         if (resultBlockResults.getResult().getTxsResults() != null && resultBlockResults.getResult().getTxsResults().size() > 0) {
             BlockResult result = resultBlockResults.getResult();
             for (int n = 0; n < result.getTxsResults().size(); n++) {
+                // TODO refactor this
                 if (result.getTxsResults().get(n).getEvents().size() > 0) {
                     for (int i = 0; i < result.getTxsResults().get(n).getEvents().size(); i++) {
                         for (int j = 0; j < result.getTxsResults().get(n).getEvents().get(i).getAttributes().size(); j++) {

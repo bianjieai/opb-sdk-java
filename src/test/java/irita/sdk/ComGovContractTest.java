@@ -49,7 +49,7 @@ public class ComGovContractTest {
 
         wasmClient = new WasmClient(new BaseClient(clientConfig, opbConfig, km));
         comGovClient = new CommunityGovClient(wasmClient);
-        assertEquals("iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3", km.getAddr());
+        assertEquals("iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3", km.getCurrentKeyInfo().getAddress());
     }
 
     // it is ignore unless you want to new community_governance contract to block-chain.

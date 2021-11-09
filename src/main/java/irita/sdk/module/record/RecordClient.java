@@ -31,7 +31,7 @@ public class RecordClient {
         if (contents == null || contents.size() == 0) {
             throw new IritaSDKException("contents can not be empty");
         }
-        Account account = baseClient.queryAccount(baseClient.getCurrentAddr());
+        Account account = baseClient.queryAccount(baseTx);
         Tx.MsgCreateRecord.Builder builder = Tx.MsgCreateRecord.newBuilder();
         for (RecordOuterClass.Content content : contents) {
             builder.addContents(content);

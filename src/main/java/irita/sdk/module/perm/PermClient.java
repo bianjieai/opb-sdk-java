@@ -25,7 +25,7 @@ public class PermClient {
 
     public ResultTx assignRoles(String address, List<Perm.Role> roles, BaseTx baseTx) throws IOException {
         AddressUtils.validAddress(address);
-        Account sender = baseClient.queryAccount();
+        Account sender = baseClient.queryAccount(baseTx);
 
         Tx.MsgAssignRoles msg = Tx.MsgAssignRoles
                 .newBuilder()
@@ -34,12 +34,12 @@ public class PermClient {
                 .setOperator(sender.getAddress())
                 .build();
         List<GeneratedMessageV3> msgs = Collections.singletonList(msg);
-        return baseClient.buildAndSend(msgs, baseTx);
+        return baseClient.buildAndSend(msgs, baseTx, sender);
     }
 
     public ResultTx unAssignRoles(String address, List<Perm.Role> roles, BaseTx baseTx) throws IOException {
         AddressUtils.validAddress(address);
-        Account sender = baseClient.queryAccount();
+        Account sender = baseClient.queryAccount(baseTx);
 
         Tx.MsgUnassignRoles msg = Tx.MsgUnassignRoles
                 .newBuilder()
@@ -48,12 +48,12 @@ public class PermClient {
                 .setOperator(sender.getAddress())
                 .build();
         List<GeneratedMessageV3> msgs = Collections.singletonList(msg);
-        return baseClient.buildAndSend(msgs, baseTx);
+        return baseClient.buildAndSend(msgs, baseTx, sender);
     }
 
     public ResultTx blockAccount(String address, BaseTx baseTx) throws IOException {
         AddressUtils.validAddress(address);
-        Account sender = baseClient.queryAccount();
+        Account sender = baseClient.queryAccount(baseTx);
 
         Tx.MsgBlockAccount msg = Tx.MsgBlockAccount
                 .newBuilder()
@@ -61,12 +61,12 @@ public class PermClient {
                 .setOperator(sender.getAddress())
                 .build();
         List<GeneratedMessageV3> msgs = Collections.singletonList(msg);
-        return baseClient.buildAndSend(msgs, baseTx);
+        return baseClient.buildAndSend(msgs, baseTx, sender);
     }
 
     public ResultTx unblockAccount(String address, BaseTx baseTx) throws IOException {
         AddressUtils.validAddress(address);
-        Account sender = baseClient.queryAccount();
+        Account sender = baseClient.queryAccount(baseTx);
 
         Tx.MsgUnblockAccount msg = Tx.MsgUnblockAccount
                 .newBuilder()
@@ -74,7 +74,7 @@ public class PermClient {
                 .setOperator(sender.getAddress())
                 .build();
         List<GeneratedMessageV3> msgs = Collections.singletonList(msg);
-        return baseClient.buildAndSend(msgs, baseTx);
+        return baseClient.buildAndSend(msgs, baseTx, sender);
     }
 
     public List<Perm.Role> queryRoles(String address) {

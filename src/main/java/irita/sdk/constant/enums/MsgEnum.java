@@ -41,6 +41,26 @@ public enum MsgEnum {
 //    MSG_TRANSFER("ibc.applications.transfer.v1.MsgTransfer", MsgTransfer.class.getName()),
     //record
     MSG_CREATE_RECORD("irismod.record.MsgCreateRecord", proto.record.Tx.MsgCreateRecord.class.getName()),
+    // service
+    MSG_DEFINE_SERVICE("irismod.record.MsgCreateRecord", proto.service.Tx.MsgDefineService.class.getName()),
+    MSG_BIND_SERVICE("irismod.service.MsgBindService", proto.service.Tx.MsgBindService.class.getName()),
+    MSG_CALL_SERVICE("irismod.service.MsgCallService", proto.service.Tx.MsgCallService.class.getName()),
+    MSG_RESPOND_SERVICE("irismod.service.MsgRespondService", proto.service.Tx.MsgRespondService.class.getName()),
+    MSG_UPDATE_REQUEST_CONTEXT("irismod.service.MsgUpdateRequestContext", proto.service.Tx.MsgUpdateRequestContext.class.getName()),
+    MSG_KILL_REQUEST_CONTEXT("irismod.service.MsgKillRequestContext", proto.service.Tx.MsgKillRequestContext.class.getName()),
+    MSG_PAUSE_REQUEST_CONTEXT("irismod.service.MsgPauseRequestContext", proto.service.Tx.MsgPauseRequestContext.class.getName()),
+    MSG_UPDATE_SERVICE_BINDING("irismod.service.MsgUpdateServiceBinding", proto.service.Tx.MsgUpdateServiceBinding.class.getName()),
+    MSG_DISABLE_SERVICE_BINDING("irismod.service.MsgDisableServiceBinding", proto.service.Tx.MsgDisableServiceBinding.class.getName()),
+    MSG_ENABLE_SERVICE_BINDING("irismod.service.MsgEnableServiceBinding", proto.service.Tx.MsgEnableServiceBinding.class.getName()),
+    // identity
+    MSG_CREATE_IDENTITY("iritamod.identity.MsgCreateIdentity", proto.identity.Tx.MsgCreateIdentity.class.getName()),
+    MSG_UPDATE_IDENTITY("iritamod.identity.MsgUpdateIdentity", proto.identity.Tx.MsgUpdateIdentity.class.getName()),
+    // perm
+    MSG_ASSIGN_ROLES("iritamod.perm.MsgAssignRoles", proto.perm.Tx.MsgAssignRoles.class.getName()),
+    MSG_UNASSIGN_ROLES("iritamod.perm.MsgUnassignRoles", proto.perm.Tx.MsgUnassignRoles.class.getName()),
+    MSG_BLOCK_ACCOUNT("iritamod.perm.MsgBlockAccount", proto.perm.Tx.MsgBlockAccount.class.getName()),
+    MSG_UNBLOCK_ACCOUNT("iritamod.perm.MsgUnblockAccount", proto.perm.Tx.MsgUnblockAccount.class.getName()),
+
     ;
 
     private final String typeUrl;

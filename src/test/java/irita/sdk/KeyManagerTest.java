@@ -1,6 +1,7 @@
 package irita.sdk;
 
 import irita.sdk.key.AlgoEnum;
+import irita.sdk.key.KeyInfo;
 import irita.sdk.key.KeyManager;
 import irita.sdk.key.KeyManagerFactory;
 import org.junit.jupiter.api.Tag;
@@ -22,8 +23,9 @@ public class KeyManagerTest {
         KeyManager km = KeyManagerFactory.createDefault();
         km.recover(mnemonic);
 
-        assertEquals("iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3", km.getAddr());
-        assertEquals("3c49175daf981965679bf88d2690e22144424e16c84e9d397ddb58b63603eeec", km.getPrivKey().toString(16));
+        KeyInfo keyInfo = km.getCurrentKeyInfo();
+        assertEquals("iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3", keyInfo.getAddress());
+        assertEquals("3c49175daf981965679bf88d2690e22144424e16c84e9d397ddb58b63603eeec", keyInfo.getPrivKey().toString(16));
     }
 
     @Test
@@ -32,8 +34,9 @@ public class KeyManagerTest {
         KeyManager km = KeyManagerFactory.createKeyManger(AlgoEnum.SM2);
         km.recover(privKey);
 
-        assertEquals("iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3", km.getAddr());
-        assertEquals("3c49175daf981965679bf88d2690e22144424e16c84e9d397ddb58b63603eeec", km.getPrivKey().toString(16));
+        KeyInfo keyInfo = km.getCurrentKeyInfo();
+        assertEquals("iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3", keyInfo.getAddress());
+        assertEquals("3c49175daf981965679bf88d2690e22144424e16c84e9d397ddb58b63603eeec", keyInfo.getPrivKey().toString(16));
     }
 
     @Test
@@ -63,8 +66,9 @@ public class KeyManagerTest {
         KeyManager km = KeyManagerFactory.createDefault();
         km.recover(input, "123456");
 
-        assertEquals("iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3", km.getAddr());
-        assertEquals("3c49175daf981965679bf88d2690e22144424e16c84e9d397ddb58b63603eeec", km.getPrivKey().toString(16));
+        KeyInfo keyInfo = km.getCurrentKeyInfo();
+        assertEquals("iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3", keyInfo.getAddress());
+        assertEquals("3c49175daf981965679bf88d2690e22144424e16c84e9d397ddb58b63603eeec", keyInfo.getPrivKey().toString(16));
     }
 
     @Test
@@ -74,8 +78,9 @@ public class KeyManagerTest {
         KeyManager km = KeyManagerFactory.createDefault();
         km.recover(input, "123456");
 
-        assertEquals("iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3", km.getAddr());
-        assertEquals("3c49175daf981965679bf88d2690e22144424e16c84e9d397ddb58b63603eeec", km.getPrivKey().toString(16));
+        KeyInfo keyInfo = km.getCurrentKeyInfo();
+        assertEquals("iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3", keyInfo.getAddress());
+        assertEquals("3c49175daf981965679bf88d2690e22144424e16c84e9d397ddb58b63603eeec", keyInfo.getPrivKey().toString(16));
     }
 
     @Test
@@ -84,14 +89,13 @@ public class KeyManagerTest {
         KeyManager km = KeyManagerFactory.createDefault();
         km.recoverFromCA(input, "123456");
 
-        assertEquals("iaa1sul8jyesxq5nuwstyj5lzzsdc2sedeehl365qk", km.getAddr());
+        assertEquals("iaa1sul8jyesxq5nuwstyj5lzzsdc2sedeehl365qk", km.getCurrentKeyInfo().getAddress());
     }
 
     @Test
     public void addNewKm() throws Exception {
         KeyManager km = KeyManagerFactory.createDefault();
-        km.add();
-        String mnemonic = km.getMnemonic();
+        String mnemonic = km.add();
         System.out.println(mnemonic);
     }
 }

@@ -38,7 +38,7 @@ public class WasmTest {
         OpbConfig opbConfig = null;
 
         wasmClient = new WasmClient(new BaseClient(clientConfig, opbConfig, km));
-        assertEquals("iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3", km.getAddr());
+        assertEquals("iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3", km.getCurrentKeyInfo().getAddress());
     }
 
 

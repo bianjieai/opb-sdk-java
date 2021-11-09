@@ -1,8 +1,12 @@
 package irita.sdk.model;
 
+import irita.sdk.constant.Constant;
 import irita.sdk.constant.enums.BroadcastMode;
+import org.apache.commons.lang3.StringUtils;
 
 public class BaseTx {
+    private String from;
+    private String password;
     private int gas;
     private Fee fee;
     private String memo;
@@ -15,6 +19,31 @@ public class BaseTx {
         this.gas = gas;
         this.fee = fee;
         this.mode = mode;
+    }
+
+    public BaseTx(String from, String password, int gas, Fee fee, String memo, BroadcastMode mode) {
+        this.from = from;
+        this.password = password;
+        this.gas = gas;
+        this.fee = fee;
+        this.memo = memo;
+        this.mode = mode;
+    }
+
+    public String getFrom() {
+        return StringUtils.isNotEmpty(from) ? from : Constant.DEFAULT_USER_NAME;
+    }
+
+    public void setFrom(String from) {
+        this.from = from;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public int getGas() {

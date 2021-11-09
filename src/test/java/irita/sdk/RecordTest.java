@@ -43,7 +43,7 @@ public class RecordTest {
 
         client = new IritaClient(clientConfig, opbConfig, km);
         recordClient = client.getRecordClient();
-        assertEquals("iaa1j2juc02z52c869tu7t8vy3j98r4u0vn88us5jm", km.getAddr());
+        assertEquals("iaa1j2juc02z52c869tu7t8vy3j98r4u0vn88us5jm", km.getCurrentKeyInfo().getAddress());
     }
 
     @Test

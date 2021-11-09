@@ -4,6 +4,7 @@ import irita.sdk.client.IritaClient;
 import irita.sdk.config.ClientConfig;
 import irita.sdk.config.OpbConfig;
 import irita.sdk.constant.enums.BroadcastMode;
+import irita.sdk.key.KeyInfo;
 import irita.sdk.key.KeyManager;
 import irita.sdk.key.KeyManagerFactory;
 import irita.sdk.model.BaseTx;
@@ -40,7 +41,7 @@ public class NftTest {
 
         IritaClient client = new IritaClient(clientConfig, opbConfig, km);
         nftClient = client.getNftClient();
-        assertEquals("iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3", km.getAddr());
+        assertEquals("iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3", km.getCurrentKeyInfo().getAddress());
     }
 
     @Test
@@ -61,7 +62,9 @@ public class NftTest {
         assertEquals(denomID, denom.getId());
         assertEquals(denomName, denom.getName());
         assertEquals(schema, denom.getSchema());
-        assertEquals(km.getAddr(), denom.getCreator());
+
+        KeyInfo keyInfo = km.getCurrentKeyInfo();
+        assertEquals(keyInfo.getAddress(), denom.getCreator());
 
         String nftID = "nftid08";
         String nftName = "你好呀";
@@ -74,7 +77,7 @@ public class NftTest {
                 .setName(nftName)
                 .setUri(uri)
                 .setData(data)
-                .setRecipient(km.getAddr());
+                .setRecipient(keyInfo.getAddress());
         resultTx = nftClient.mintNft(mintReq, baseTx);
         assertNotNull(resultTx.getResult().getHash());
 
@@ -94,9 +97,9 @@ public class NftTest {
         assertEquals(nftID, nft.getId());
         assertEquals(newUri, nft.getUri());
         assertEquals(newData, nft.getData());
-        assertEquals(km.getAddr(), nft.getOwner());
+        assertEquals(keyInfo.getAddress(), nft.getOwner());
 
-        long supply = nftClient.querySupply(denomID, km.getAddr());
+        long supply = nftClient.querySupply(denomID, keyInfo.getAddress());
         assertEquals(supply, 1);
 
         String reci = "iaa1r49m366kaexmvrlppqqeyr8ykqq248g0d4qra4";
@@ -116,11 +119,11 @@ public class NftTest {
         QueryCollectionResp nfts = nftClient.queryCollection(denomID, null);
         assertEquals(denomID, nfts.getDenom().getId());
         assertEquals(denomName, nfts.getDenom().getName());
-        assertEquals(km.getAddr(), nfts.getDenom().getCreator());
+        assertEquals(keyInfo.getAddress(), nfts.getDenom().getCreator());
         assertTrue(nfts.getNfts().size() > 0);
 
-        QueryOwnerResp owner = nftClient.queryOwner(denomID, km.getAddr());
-        assertEquals(km.getAddr(), owner.getAddress());
+        QueryOwnerResp owner = nftClient.queryOwner(denomID, keyInfo.getAddress());
+        assertEquals(keyInfo.getAddress(), owner.getAddress());
 
 //        BurnNFTRequest burnNFTReq = new BurnNFTRequest()
 //                .setDenom(denomID)

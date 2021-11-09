@@ -31,7 +31,7 @@ public class OpbTest {
         OpbConfig opbConfig = new OpbConfig("4efe1d3f67b5484aa91331e29dc09ea1", null, "");
 
         client = new OpbClient(clientConfig, opbConfig, km);
-        assertEquals("iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3", km.getAddr());
+        assertEquals("iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3", km.getCurrentKeyInfo().getAddress());
     }
 
     @Test

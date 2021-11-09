@@ -4,6 +4,7 @@ import com.google.protobuf.Any;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.GeneratedMessageV3;
 import irita.sdk.exception.IritaSDKException;
+import irita.sdk.key.KeyInfo;
 import irita.sdk.key.KeyManager;
 import irita.sdk.model.Account;
 import irita.sdk.model.BaseTx;
@@ -58,8 +59,9 @@ public class Sm2TxEngine implements TxEngine {
             throw new IritaSDKException("baseTx not be null");
         }
 
-        BigInteger privKey = km.getPrivKey();
-        ECPoint publicKey = km.getPublicKey();
+        KeyInfo keyInfo = km.getKeyDAO().read(baseTx.getFrom(), baseTx.getPassword());
+        BigInteger privKey = keyInfo.getPrivKey();
+        ECPoint publicKey = keyInfo.getPublicKey();
         byte[] publicKeyEncoded = publicKey.getEncoded(true);
 
         TxOuterClass.AuthInfo ai = TxOuterClass.AuthInfo.newBuilder()

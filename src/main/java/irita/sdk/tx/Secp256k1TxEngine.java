@@ -4,6 +4,7 @@ import com.google.protobuf.Any;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.GeneratedMessageV3;
 import irita.sdk.exception.IritaSDKException;
+import irita.sdk.key.KeyInfo;
 import irita.sdk.key.KeyManager;
 import irita.sdk.model.Account;
 import irita.sdk.model.BaseTx;
@@ -16,9 +17,10 @@ import proto.cosmos.tx.v1beta1.TxOuterClass;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 public class Secp256k1TxEngine implements TxEngine {
-
     private KeyManager km;
     private String chainID;
 
@@ -37,27 +39,23 @@ public class Secp256k1TxEngine implements TxEngine {
         if (msgs.size() == 0) {
             throw new IritaSDKException("size of msgs should larger than 0");
         }
-        if (memo == null) {
-            memo = "";
-        }
         TxOuterClass.TxBody.Builder builder = TxOuterClass.TxBody.newBuilder();
         msgs.forEach(msg -> {
             builder.addMessages(Any.pack(msg, "/"));
         });
         return builder
-                .setMemo(memo)
+                .setMemo(Optional.ofNullable(memo).orElse(""))
                 .setTimeoutHeight(0)
                 .build();
     }
 
     @Override
     public TxOuterClass.Tx signTx(TxOuterClass.TxBody txBody, BaseTx baseTx, Account account) {
-        if (baseTx == null) {
-            throw new IritaSDKException("baseTx not be null");
-        }
+        Objects.requireNonNull(baseTx, "baseTx not be null");
 
-        BigInteger privKey = km.getPrivKey();
-        ECPoint publicKey = km.getPublicKey();
+        KeyInfo keyInfo = km.getKeyDAO().read(baseTx.getFrom(), baseTx.getPassword());
+        BigInteger privKey = keyInfo.getPrivKey();
+        ECPoint publicKey = keyInfo.getPublicKey();
         byte[] publicKeyEncoded = publicKey.getEncoded(true);
 
         TxOuterClass.AuthInfo ai = TxOuterClass.AuthInfo.newBuilder()

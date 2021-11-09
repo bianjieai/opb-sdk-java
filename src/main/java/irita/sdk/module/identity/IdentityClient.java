@@ -13,13 +13,14 @@ import java.util.Collections;
 import java.util.List;
 
 public class IdentityClient {
-    private BaseClient baseClient;
+    private final BaseClient baseClient;
 
     public IdentityClient(BaseClient baseClient) {
         this.baseClient = baseClient;
     }
+
     public ResultTx createIdentity(String id, String pubkey, String pubkey_algo, String certificate, String credentials, BaseTx baseTx) throws IOException {
-        Account account = baseClient.queryAccount();
+        Account account = baseClient.queryAccount(baseTx);
 
         IdentityOuterClass.PubKeyInfo pubKeyInfo = IdentityOuterClass.PubKeyInfo.newBuilder()
                 .setPubKey(pubkey)
@@ -33,11 +34,10 @@ public class IdentityClient {
                 .build();
         List<GeneratedMessageV3> msgs = Collections.singletonList(msg);
         return baseClient.buildAndSend(msgs, baseTx, account);
-
     }
 
-    public ResultTx updateIdentity(String id,String pubkey, String pubkey_algo, String certificate, String credentials, BaseTx baseTx) throws IOException {
-        Account account = baseClient.queryAccount();
+    public ResultTx updateIdentity(String id, String pubkey, String pubkey_algo, String certificate, String credentials, BaseTx baseTx) throws IOException {
+        Account account = baseClient.queryAccount(baseTx);
         IdentityOuterClass.PubKeyInfo pubKeyInfo = IdentityOuterClass.PubKeyInfo.newBuilder()
                 .setPubKey(pubkey)
                 .setAlgorithm(IdentityOuterClass.PubKeyAlgorithm.valueOf(pubkey_algo))

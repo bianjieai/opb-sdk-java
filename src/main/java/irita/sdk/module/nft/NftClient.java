@@ -30,7 +30,7 @@ public class NftClient {
     }
 
     public ResultTx issueDenom(IssueDenomRequest req, BaseTx baseTx) throws IOException {
-        Account account = baseClient.queryAccount();
+        Account account = baseClient.queryAccount(baseTx);
         Tx.MsgIssueDenom msg = Tx.MsgIssueDenom
                 .newBuilder()
                 .setId(req.getId())
@@ -43,6 +43,7 @@ public class NftClient {
     }
 
     public ResultTx mintNft(MintNFTRequest req, BaseTx baseTx) throws IOException {
+        Account account = baseClient.queryAccount(baseTx);
         Tx.MsgMintNFT.Builder builder = Tx.MsgMintNFT
                 .newBuilder()
                 .setDenomId(req.getDenom())
@@ -50,18 +51,18 @@ public class NftClient {
                 .setName(req.getName())
                 .setUri(req.getUri())
                 .setData(req.getData())
-                .setSender(baseClient.getCurrentAddr());
+                .setSender(account.getAddress());
 
         if (StringUtils.isNotEmpty(req.getRecipient())) {
             String recipient = req.getRecipient();
             AddressUtils.validAddress(recipient);
             builder.setRecipient(recipient);
         } else {
-            builder.setRecipient(baseClient.getCurrentAddr());
+            builder.setRecipient(account.getAddress());
         }
         Tx.MsgMintNFT msg = builder.build();
         List<GeneratedMessageV3> msgs = Collections.singletonList(msg);
-        return baseClient.buildAndSend(msgs, baseTx);
+        return baseClient.buildAndSend(msgs, baseTx, account);
     }
 
     public ResultTx editNft(EditNFTRequest req, BaseTx baseTx) throws IOException {
@@ -75,6 +76,7 @@ public class NftClient {
             req.setName(DO_NOT_MODIFY);
         }
 
+        Account account = baseClient.queryAccount(baseTx);
         Tx.MsgEditNFT msg = Tx.MsgEditNFT
                 .newBuilder()
                 .setDenomId(req.getDenom())
@@ -82,10 +84,10 @@ public class NftClient {
                 .setName(req.getName())
                 .setUri(req.getUri())
                 .setData(req.getData())
-                .setSender(baseClient.getCurrentAddr())
+                .setSender(account.getAddress())
                 .build();
         List<GeneratedMessageV3> msgs = Collections.singletonList(msg);
-        return baseClient.buildAndSend(msgs, baseTx);
+        return baseClient.buildAndSend(msgs, baseTx, account);
     }
 
     public ResultTx transferNFt(TransferNFTRequest req, BaseTx baseTx) throws IOException {
@@ -99,6 +101,7 @@ public class NftClient {
             req.setName(DO_NOT_MODIFY);
         }
 
+        Account account = baseClient.queryAccount(baseTx);
         Tx.MsgTransferNFT.Builder builder = Tx.MsgTransferNFT
                 .newBuilder()
                 .setDenomId(req.getDenom())
@@ -106,7 +109,7 @@ public class NftClient {
                 .setUri(req.getUri())
                 .setData(req.getData())
                 .setName(req.getName())
-                .setSender(baseClient.getCurrentAddr());
+                .setSender(account.getAddress());
 
         if (StringUtils.isNotEmpty(req.getRecipient())) {
             String recipient = req.getRecipient();
@@ -115,18 +118,19 @@ public class NftClient {
         }
         Tx.MsgTransferNFT msg = builder.build();
         List<GeneratedMessageV3> msgs = Collections.singletonList(msg);
-        return baseClient.buildAndSend(msgs, baseTx);
+        return baseClient.buildAndSend(msgs, baseTx, account);
     }
 
     public ResultTx burnNft(BurnNFTRequest req, BaseTx baseTx) throws IOException {
+        Account account = baseClient.queryAccount(baseTx);
         Tx.MsgBurnNFT msg = Tx.MsgBurnNFT
                 .newBuilder()
                 .setDenomId(req.getDenom())
                 .setId(req.getId())
-                .setSender(baseClient.getCurrentAddr())
+                .setSender(account.getAddress())
                 .build();
         List<GeneratedMessageV3> msgs = Collections.singletonList(msg);
-        return baseClient.buildAndSend(msgs, baseTx);
+        return baseClient.buildAndSend(msgs, baseTx, account);
     }
 
 
