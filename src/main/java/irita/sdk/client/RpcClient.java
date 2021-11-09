@@ -16,6 +16,7 @@ import irita.sdk.model.tx.Body;
 import irita.sdk.model.tx.EventQueryBuilder;
 import irita.sdk.model.tx.TxRpc;
 import irita.sdk.model.tx.TxsRpc;
+import irita.sdk.util.HashUtils;
 import irita.sdk.util.HttpUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.util.encoders.Hex;
@@ -227,7 +228,7 @@ public class RpcClient {
         List<StdTx> stdTxList = new ArrayList();
         StdTx stdTx;
         List<GeneratedMessageV3> messageList;
-        if (resultBlock.getResult().getBlock().getData().getTxs().size() > 0) {
+        if (resultBlock.getResult().getBlock().getData().getTxs() != null && resultBlock.getResult().getBlock().getData().getTxs().size() > 0) {
             for (Object o : resultBlock.getResult().getBlock().getData().getTxs()) {
                 stdTx = new StdTx();
                 TxOuterClass.Tx tx = TxOuterClass.Tx.parseFrom(Base64.getDecoder().decode((String) o));
@@ -238,6 +239,7 @@ public class RpcClient {
                 stdTx.setMsgs(messageList);
                 stdTx.setMemo(tx.getBody().getMemo());
                 stdTx.setFee(tx.getAuthInfo().getFee());
+                stdTx.setTxHash(Hex.toHexString(HashUtils.sha256(Base64.getDecoder().decode((String) o))));
                 stdTxList.add(stdTx);
             }
         }
@@ -255,7 +257,7 @@ public class RpcClient {
         if (resultBlockResults.getError() != null) {
             throw new IritaSDKException(resultBlockResults.getError().getData());
         }
-        if (resultBlockResults.getResult().getTxsResults().size() > 0) {
+        if (resultBlockResults.getResult().getTxsResults() != null && resultBlockResults.getResult().getTxsResults().size() > 0) {
             BlockResult result = resultBlockResults.getResult();
             for (int n = 0; n < result.getTxsResults().size(); n++) {
                 if (result.getTxsResults().get(n).getEvents().size() > 0) {

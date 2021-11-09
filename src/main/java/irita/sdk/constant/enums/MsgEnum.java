@@ -39,6 +39,8 @@ public enum MsgEnum {
 //    MSG_CLAIM_HTLC("irismod.htlc.MsgClaimHTLC", MsgClaimHTLC.class.getName()),
     //ibc
 //    MSG_TRANSFER("ibc.applications.transfer.v1.MsgTransfer", MsgTransfer.class.getName()),
+    //record
+    MSG_CREATE_RECORD("irismod.record.MsgCreateRecord", proto.record.Tx.MsgCreateRecord.class.getName()),
     ;
 
     private final String typeUrl;

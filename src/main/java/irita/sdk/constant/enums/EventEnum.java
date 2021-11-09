@@ -4,6 +4,7 @@ public enum EventEnum {
     MESSAGE_CODE_ID("message", "code_id"),
     MESSAGE_CONTRACT_ADDRESS("message", "contract_address"),
     CREATE_CONTEXT_REQUEST_CONTEXT_ID("create_context", "request_context_id"),
+    CREATE_RECORD_RECORD_ID("create_record", "record_id"),
     ;
 
     private final String type;

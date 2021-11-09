@@ -7,6 +7,7 @@ import irita.sdk.module.bank.BankClient;
 import irita.sdk.module.identity.IdentityClient;
 import irita.sdk.module.nft.NftClient;
 import irita.sdk.module.perm.PermClient;
+import irita.sdk.module.record.RecordClient;
 import irita.sdk.module.tibc.TibcClient;
 
 public class IritaClient {
@@ -16,6 +17,8 @@ public class IritaClient {
     private PermClient permClient;
     private TibcClient tibcClient;
     private IdentityClient identityClient;
+    private RecordClient recordClient;
+
     private IritaClient() {
     }
 
@@ -27,6 +30,7 @@ public class IritaClient {
         this.permClient = new PermClient(baseClient);
         this.tibcClient = new TibcClient(baseClient);
         this.identityClient=new IdentityClient(baseClient);
+        this.recordClient = new RecordClient(baseClient);
     }
 
     public BaseClient getBaseClient() {
@@ -79,5 +83,14 @@ public class IritaClient {
 
     public void setIdentityClient(IdentityClient identityClient) {
         this.identityClient = identityClient;
+    }
+
+    public RecordClient getRecordClient() {
+        return recordClient;
+    }
+
+    public IritaClient setRecordClient(RecordClient recordClient) {
+        this.recordClient = recordClient;
+        return this;
     }
 }

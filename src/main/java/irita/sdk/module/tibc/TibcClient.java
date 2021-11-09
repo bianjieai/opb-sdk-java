@@ -16,7 +16,6 @@ import java.util.List;
 
 public class TibcClient {
     private final BaseClient baseClient;
-    private static final String DO_NOT_MODIFY = "[do-not-modify]";
 
     public TibcClient(BaseClient baseClient) {
         this.baseClient = baseClient;
