@@ -54,7 +54,7 @@ public class TibcTest {
 
         client = new IritaClient(clientConfig, opbConfig, km);
         tibcClient = client.getTibcClient();
-        assertEquals("iaa1qvek4n2awq3zgpwqtr5tcp8mj6u2hpqf0r4x0l", km.getAddr());
+        assertEquals("iaa1qvek4n2awq3zgpwqtr5tcp8mj6u2hpqf0r4x0l", km.getCurrentKeyInfo().getAddress());
     }
 
     @Test

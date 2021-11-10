@@ -6,6 +6,7 @@ import io.grpc.Channel;
 import irita.sdk.config.ClientConfig;
 import irita.sdk.config.OpbConfig;
 import irita.sdk.exception.IritaSDKException;
+import irita.sdk.key.KeyInfo;
 import irita.sdk.key.KeyManager;
 import irita.sdk.model.*;
 import irita.sdk.model.block.BlockDetail;
@@ -24,6 +25,7 @@ import proto.cosmos.auth.v1beta1.QueryOuterClass;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import java.util.Objects;
 
 public class BaseClient {
     private ClientConfig clientConfig;
@@ -47,10 +49,6 @@ public class BaseClient {
         this.rpcClient = new RpcClient(clientConfig, opbConfig);
     }
 
-    public String getCurrentAddr() {
-        return km.getAddr();
-    }
-
     public RpcClient getRpcClient() {
         return rpcClient;
     }
@@ -59,14 +57,7 @@ public class BaseClient {
         return grpcClient;
     }
 
-    public ResultTx buildAndSend(List<GeneratedMessageV3> msgs, BaseTx baseTx) throws IOException {
-        return buildAndSend(msgs, baseTx, null);
-    }
-
     public ResultTx buildAndSend(List<GeneratedMessageV3> msgs, BaseTx baseTx, Account account) throws IOException {
-        if (account == null) {
-            account = queryAccount();
-        }
         TxEngine txEngine = getTxEngine();
         byte[] txBytes = txEngine.buildAndSign(msgs, baseTx, account);
         return rpcClient.broadcastTx(txBytes, baseTx.getMode());
@@ -74,7 +65,7 @@ public class BaseClient {
 
     public String buildTxHash(List<GeneratedMessageV3> msgs, BaseTx baseTx, Account account) {
         if (account == null) {
-            account = queryAccount();
+            account = queryAccount(baseTx);
         }
         TxEngine txEngine = getTxEngine();
         byte[] txBytes = txEngine.buildAndSign(msgs, baseTx, account);
@@ -82,8 +73,13 @@ public class BaseClient {
         return Strings.toUpperCase(Hex.toHexString(sum));
     }
 
-    public Account queryAccount() {
-        return queryAccount(km.getAddr());
+
+    public Account queryAccount(BaseTx baseTx) {
+        if (!km.getKeyDAO().has(baseTx.getFrom())) {
+            throw new IritaSDKException(String.format("name %s has existed in keyDao", baseTx.getFrom()));
+        }
+        KeyInfo keyInfo = km.getKeyDAO().read(baseTx.getFrom(), baseTx.getPassword());
+        return queryAccount(keyInfo.getAddress());
     }
 
     public Account queryAccount(String address) {
@@ -109,7 +105,7 @@ public class BaseClient {
 
     public synchronized GasInfo simulateTx(List<GeneratedMessageV3> msgs, BaseTx baseTx, Account account) throws IOException {
         if (account == null) {
-            account = queryAccount();
+            account = queryAccount(baseTx);
         }
         TxEngine txEngine = getTxEngine();
         byte[] txBytes = txEngine.buildAndSign(msgs, baseTx, account);

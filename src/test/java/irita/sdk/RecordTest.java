@@ -9,7 +9,7 @@ import irita.sdk.key.KeyManager;
 import irita.sdk.key.KeyManagerFactory;
 import irita.sdk.model.BaseTx;
 import irita.sdk.model.Fee;
-import irita.sdk.model.record.CreateRecordResult;
+import irita.sdk.module.record.CreateRecordResult;
 import irita.sdk.module.record.RecordClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -43,7 +43,7 @@ public class RecordTest {
 
         client = new IritaClient(clientConfig, opbConfig, km);
         recordClient = client.getRecordClient();
-        assertEquals("iaa1j2juc02z52c869tu7t8vy3j98r4u0vn88us5jm", km.getAddr());
+        assertEquals("iaa1j2juc02z52c869tu7t8vy3j98r4u0vn88us5jm", km.getCurrentKeyInfo().getAddress());
     }
 
     @Test

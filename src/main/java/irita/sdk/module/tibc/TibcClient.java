@@ -22,7 +22,7 @@ public class TibcClient {
     }
 
     public ResultTx nftTransfer(String class_, String id, String receiver, String destChainName, String realayChainName, BaseTx baseTx) throws IOException {
-        Account account = baseClient.queryAccount();
+        Account account = baseClient.queryAccount(baseTx);
         Tx.MsgNftTransfer msg = Tx.MsgNftTransfer
                 .newBuilder()
                 .setClass_(class_)

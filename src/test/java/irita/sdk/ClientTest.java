@@ -43,7 +43,7 @@ public class ClientTest {
         OpbConfig opbConfig = null;
 
         client = new IritaClient(clientConfig, opbConfig, km);
-        assertEquals("iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3", km.getAddr());
+        assertEquals("iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3", km.getCurrentKeyInfo().getAddress());
     }
 
     @Test
@@ -58,15 +58,16 @@ public class ClientTest {
     @Disabled
     public void simulateTx() throws IOException {
         BaseClient baseClient = client.getBaseClient();
+        BaseTx baseTx = new BaseTx(10000, new Fee("10000", "uirita"), BroadcastMode.Commit);
+        Account account = baseClient.queryAccount(baseTx);
         Tx.MsgIssueDenom msg = Tx.MsgIssueDenom
                 .newBuilder()
                 .setId("testfjdsklf21A3")
                 .setName("testfjdsklf213")
                 .setSchema("nullschema")
-                .setSender(baseClient.getCurrentAddr())
+                .setSender(account.getAddress())
                 .build();
 
-        BaseTx baseTx = new BaseTx(10000, new Fee("10000", "uirita"), BroadcastMode.Commit);
         List<GeneratedMessageV3> msgs = Collections.singletonList(msg);
         GasInfo gasInfo = baseClient.simulateTx(msgs, baseTx, null);
         System.out.println(gasInfo);

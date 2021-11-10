@@ -1,7 +1,5 @@
 package irita.sdk.tx;
 
-import irita.sdk.config.OpbConfig;
-import irita.sdk.key.AlgoEnum;
 import irita.sdk.key.KeyManager;
 
 public class TxEngineFactory {

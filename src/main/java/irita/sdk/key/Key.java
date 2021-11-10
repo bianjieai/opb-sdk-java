@@ -4,7 +4,7 @@ import java.io.InputStream;
 import java.math.BigInteger;
 
 public interface Key {
-    void add() throws Exception;
+    String add() throws Exception;
 
     void recover(String mnemonic);
 
