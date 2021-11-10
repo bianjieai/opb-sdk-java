@@ -46,8 +46,6 @@ class IdentityClientTest {
         km.recover(input, "1234567890");
 
 
-
-
         String nodeUri = "http://127.0.0.1:26657";
         String grpcAddr = "http://127.0.0.1:9090";
         String chainId = "test";
@@ -67,7 +65,7 @@ class IdentityClientTest {
         try {
             String str = ByteUtils.getRandomStr(16);
             //String id=Hex.toHexString(str.getBytes(StandardCharsets.UTF_8));
-            String id="37644773453030353876796753344436";
+            String id = "37644773453030353876796753344436";
             System.out.println(id);
             identityClient.createIdentity(id,
                     "53281ce4ba0b8c97e5b1434f8f298b064f03d4c1d21aae9276065e170fc90a5d52",
@@ -82,8 +80,8 @@ class IdentityClientTest {
     @Disabled
     void updateIdentity() {
         try {
-            identityClient.updateIdentity("37644773453030353876796753344436","53281ce4ba0b8c97e5b1434f8f298b064f03d4c1d21aae9276065e170fc90a5d58", IdentityOuterClass.PubKeyAlgorithm.SM2.name(), "","https://security.com/kyc/10001/",baseTx);
-        }catch (Exception e){
+            identityClient.updateIdentity("37644773453030353876796753344436", "53281ce4ba0b8c97e5b1434f8f298b064f03d4c1d21aae9276065e170fc90a5d58", IdentityOuterClass.PubKeyAlgorithm.SM2.name(), "", "https://security.com/kyc/10001/", baseTx);
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
