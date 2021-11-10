@@ -63,10 +63,7 @@ public class Sm2KeyManager extends KeyManager {
             byte[] privKeyTemp = Arrays.copyOfRange(privKeyAmino, 5, privKeyAmino.length);
 
             BigInteger privKey = new BigInteger(1, privKeyTemp);
-            ECPoint pubKey = SM2Utils.getPublicKeyFromPrivkey(privKey);
-            String address = pubKeyToAddress(pubKey);
-
-            setDefaultKeyDao(privKey, pubKey, address);
+            recover(privKey);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

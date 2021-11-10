@@ -102,7 +102,7 @@ public class RpcClient {
         return gasInfoWrap.getGasInfo();
     }
 
-    private synchronized ResultTx checkResTxAndConvert(String res) {
+    private ResultTx checkResTxAndConvert(String res) {
         ResultTx resultTx = JSON.parseObject(res, ResultTx.class);
 
         if (resultTx.getError() != null) {
@@ -133,7 +133,7 @@ public class RpcClient {
             throw new IritaSDKException("parse ResultQueryTx failed: result can not be null");
         }
         TxOuterClass.Tx tx = TxOuterClass.Tx.parseFrom(Base64.getDecoder().decode(result.getTx()));
-        List<GeneratedMessageV3> messageList = new ArrayList();
+        List<GeneratedMessageV3> messageList = new ArrayList<>();
         for (Any any : tx.getBody().getMessagesList()) {
             messageList.add(unpackMsg(any.getTypeUrl(), any.getValue()));
         }

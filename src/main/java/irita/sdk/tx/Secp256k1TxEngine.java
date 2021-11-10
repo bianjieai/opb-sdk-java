@@ -21,8 +21,8 @@ import java.util.Objects;
 import java.util.Optional;
 
 public class Secp256k1TxEngine implements TxEngine {
-    private KeyManager km;
-    private String chainID;
+    private final KeyManager km;
+    private final String chainID;
 
     public Secp256k1TxEngine(KeyManager km, String chainID) {
         this.km = km;

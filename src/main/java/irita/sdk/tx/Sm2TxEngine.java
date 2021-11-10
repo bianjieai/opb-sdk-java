@@ -20,6 +20,7 @@ import proto.cosmos.tx.v1beta1.TxOuterClass;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Optional;
 
 public class Sm2TxEngine implements TxEngine {
     private KeyManager km;
@@ -40,15 +41,12 @@ public class Sm2TxEngine implements TxEngine {
         if (msgs.size() == 0) {
             throw new IritaSDKException("size of msgs should larger than 0");
         }
-        if (memo == null) {
-            memo = "";
-        }
         TxOuterClass.TxBody.Builder builder = TxOuterClass.TxBody.newBuilder();
         msgs.forEach(msg -> {
             builder.addMessages(Any.pack(msg, "/"));
         });
         return builder
-                .setMemo(memo)
+                .setMemo(Optional.ofNullable(memo).orElse(""))
                 .setTimeoutHeight(0)
                 .build();
     }

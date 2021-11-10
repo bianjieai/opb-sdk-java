@@ -29,7 +29,7 @@ public class IritaClient {
         this.bankClient = new BankClient(baseClient);
         this.permClient = new PermClient(baseClient);
         this.tibcClient = new TibcClient(baseClient);
-        this.identityClient=new IdentityClient(baseClient);
+        this.identityClient = new IdentityClient(baseClient);
         this.recordClient = new RecordClient(baseClient);
     }
 

@@ -1,4 +1,4 @@
-package irita.sdk.model.record;
+package irita.sdk.module.record;
 
 public class CreateRecordResult {
     private String recordID;

@@ -10,7 +10,6 @@ public class JsonRpc {
     private String jsonrpc = "2.0";
     private int id = 1;
     private String method;
-    //    private Map<String, String> params = new HashMap<>();
     private Map<String, Object> params = new HashMap<>();
 
     private JsonRpc() {

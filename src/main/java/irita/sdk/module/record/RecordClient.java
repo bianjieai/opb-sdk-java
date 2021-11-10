@@ -9,7 +9,6 @@ import irita.sdk.model.Account;
 import irita.sdk.model.BaseTx;
 import irita.sdk.model.Result;
 import irita.sdk.model.ResultTx;
-import irita.sdk.model.record.CreateRecordResult;
 import proto.record.QueryGrpc;
 import proto.record.QueryOuterClass;
 import proto.record.RecordOuterClass;
