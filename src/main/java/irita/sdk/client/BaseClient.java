@@ -76,7 +76,7 @@ public class BaseClient {
 
     public Account queryAccount(BaseTx baseTx) {
         if (!km.getKeyDAO().has(baseTx.getFrom())) {
-            throw new IritaSDKException(String.format("name %s has existed in keyDao", baseTx.getFrom()));
+            throw new IritaSDKException(String.format("name %s hasn't existed in keyDao", baseTx.getFrom()));
         }
         KeyInfo keyInfo = km.getKeyDAO().read(baseTx.getFrom(), baseTx.getPassword());
         return queryAccount(keyInfo.getAddress());
