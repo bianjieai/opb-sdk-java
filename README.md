@@ -2,6 +2,19 @@
 
 opb-sdk-java
 
+## 引入 opb-sdk-java
+
+从 Asset 页面下载jar包，并手动将jar包上传到私服
+
+依赖如下
+```xml
+        <dependency>
+            <groupId>com.github.bianjieai</groupId>
+            <artifactId>opb-sdk</artifactId>
+            <version>0.1.1</version>
+        </dependency>
+```
+
 ## Key Manger管理
 
 ### 0 新生成一个助记词(如果已有 私钥/keystore/助记词 忽略此步骤)
