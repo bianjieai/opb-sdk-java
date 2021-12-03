@@ -4,14 +4,20 @@ opb-sdk-java
 
 ## 引入 opb-sdk-java
 
+### 从maven中央仓库引入
+
+https://mvnrepository.com/artifact/io.github.io.github.bianjieai/opb-sdk
+
+### 手动下载引入
+
 从 Asset 页面下载jar包，并手动将jar包上传到私服
 
 依赖如下
 ```xml
         <dependency>
-            <groupId>com.github.bianjieai</groupId>
+            <groupId>io.github.bianjieai</groupId>
             <artifactId>opb-sdk</artifactId>
-            <version>0.1.1</version>
+            <version>${version}</version>
         </dependency>
 ```
 
