@@ -1,4 +1,4 @@
-package irita.sdk.module.identity;
+package irita.sdk;
 
 import irita.sdk.client.IritaClient;
 import irita.sdk.config.ClientConfig;
@@ -9,6 +9,7 @@ import irita.sdk.key.KeyManager;
 import irita.sdk.key.KeyManagerFactory;
 import irita.sdk.model.BaseTx;
 import irita.sdk.model.Fee;
+import irita.sdk.module.identity.IdentityClient;
 import irita.sdk.util.ByteUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;

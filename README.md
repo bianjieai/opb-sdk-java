@@ -1,18 +1,13 @@
 # opb-sdk-java
 
-opb-sdk-java
+opb-sdk-java (open alliance chain SDK java)
 
 ## 引入 opb-sdk-java
 
-### 从maven中央仓库引入
+### 从maven中央仓库引入 (load from central maven)
 
-https://mvnrepository.com/artifact/io.github.io.github.bianjieai/opb-sdk
+https://mvnrepository.com/artifact/io.github.bianjieai
 
-### 手动下载引入
-
-从 Asset 页面下载jar包，并手动将jar包上传到私服
-
-依赖如下
 ```xml
         <dependency>
             <groupId>io.github.bianjieai</groupId>
@@ -20,6 +15,10 @@ https://mvnrepository.com/artifact/io.github.io.github.bianjieai/opb-sdk
             <version>${version}</version>
         </dependency>
 ```
+
+### 手动下载引入 (manual load)
+
+从 Asset 页面下载jar包，并手动将jar包上传到私服
 
 ## Key Manger管理
 
@@ -81,7 +80,7 @@ https://mvnrepository.com/artifact/io.github.io.github.bianjieai/opb-sdk
 
 ## 怎样使用opb-sdk-java(How to use opb-sdk-java)
 
-### 1 初始化OpbClient (连接测试网)
+### 1 初始化OpbClient (连接测试网 connect testnet)
 
 ```java
         String mnemonic = "opera vivid pride shallow brick crew found resist decade neck expect apple chalk belt sick author know try tank detail tree impact hand best";
@@ -99,7 +98,7 @@ https://mvnrepository.com/artifact/io.github.io.github.bianjieai/opb-sdk
         assertEquals("iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3", km.getAddr());
 ```
 
-### 1 初始化OpbClient (连接文昌链)
+### 1 初始化OpbClient (连接开放联盟链 connect open alliance chain)
 
 ```java
         String mnemonic = "opera vivid pride shallow brick crew found resist decade neck expect apple chalk belt sick author know try tank detail tree impact hand best";
