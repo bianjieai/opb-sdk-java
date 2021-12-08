@@ -11,7 +11,10 @@ import irita.sdk.constant.enums.BroadcastMode;
 import irita.sdk.constant.enums.MsgEnum;
 import irita.sdk.exception.IritaSDKException;
 import irita.sdk.model.*;
-import irita.sdk.model.block.*;
+import irita.sdk.model.block.BlockResult;
+import irita.sdk.model.block.ResultBlock;
+import irita.sdk.model.block.ResultBlockResults;
+import irita.sdk.model.block.ResultBlockRpc;
 import irita.sdk.model.tx.Body;
 import irita.sdk.model.tx.EventQueryBuilder;
 import irita.sdk.model.tx.TxRpc;
@@ -114,7 +117,7 @@ public class RpcClient {
         return resultTx;
     }
 
-    public ResultQueryTx queryTx(String hash) throws IOException, ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+    public ResultQueryTx queryTx(String hash) throws IOException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         Map<String, Object> params = new HashMap<>();
         params.put("prove", true);
         params.put("hash", Base64.getEncoder().encodeToString(Hex.decode(hash)));
@@ -128,7 +131,7 @@ public class RpcClient {
         return parseResultQueryTx(txRpc.getResult());
     }
 
-    public ResultQueryTx parseResultQueryTx(irita.sdk.model.tx.Result result) throws IOException, ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+    public ResultQueryTx parseResultQueryTx(irita.sdk.model.tx.Result result) throws IOException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         if (result == null) {
             throw new IritaSDKException("parse ResultQueryTx failed: result can not be null");
         }
@@ -165,7 +168,7 @@ public class RpcClient {
         return resultQueryTx;
     }
 
-    public ResultSearchTxs queryTxs(EventQueryBuilder builder, int page, int size) throws IOException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    public ResultSearchTxs queryTxs(EventQueryBuilder builder, int page, int size) throws IOException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         String query = builder.build();
         if (StringUtils.isEmpty(query)) {
             throw new IritaSDKException("must declare at least one tag to search");
@@ -200,21 +203,17 @@ public class RpcClient {
         return resultSearchTxs;
     }
 
-    public GeneratedMessageV3 unpackMsg(String typeUrl, ByteString value) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    public GeneratedMessageV3 unpackMsg(String typeUrl, ByteString value) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         if (StringUtils.isEmpty(typeUrl) || value.isEmpty()) {
             throw new IritaSDKException("message can not be empty");
         }
         typeUrl = typeUrl.replace("/", "");
-        String protoClassName = MsgEnum.getClassName(typeUrl);
-        if (StringUtils.isEmpty(protoClassName)) {
-            throw new IritaSDKException("not exist tx type");
-        }
-        Class<?> clazz = Class.forName(protoClassName);
+        Class<?> clazz = MsgEnum.getClassName(typeUrl);
         Method method = clazz.getMethod("parseFrom", ByteString.class);
         return (GeneratedMessageV3) method.invoke(clazz, value);
     }
 
-    public ResultBlock queryBlock(String height) throws IOException, ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+    public ResultBlock queryBlock(String height) throws IOException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         Map<String, Object> params = new HashMap<>();
         params.put("height", height);
 
