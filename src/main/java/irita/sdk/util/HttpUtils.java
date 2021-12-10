@@ -104,7 +104,7 @@ public class HttpUtils {
             is = connection.getInputStream();
             result = getResponse(is);
         } else {
-            throw new IOException("connect error, httpCode:" + connection.getResponseCode());
+            throw new IOException("connect error, httpCode:" + connection.getResponseCode() + connection.getResponseMessage());
         }
         return result;
     }

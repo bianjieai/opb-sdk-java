@@ -4,6 +4,7 @@ import irita.sdk.config.ClientConfig;
 import irita.sdk.config.OpbConfig;
 import irita.sdk.key.KeyManager;
 import irita.sdk.module.bank.BankClient;
+import irita.sdk.module.community_gov.CommunityGovClient;
 import irita.sdk.module.identity.IdentityClient;
 import irita.sdk.module.nft.NftClient;
 import irita.sdk.module.perm.PermClient;
@@ -20,6 +21,7 @@ public class IritaClient {
     private IdentityClient identityClient;
     private RecordClient recordClient;
     private WasmClient wasmClient;
+    private CommunityGovClient comGovClient;
 
     private IritaClient() {
     }
@@ -34,6 +36,7 @@ public class IritaClient {
         this.identityClient = new IdentityClient(baseClient);
         this.recordClient = new RecordClient(baseClient);
         this.wasmClient = new WasmClient(baseClient);
+        this.comGovClient = new CommunityGovClient(this.wasmClient);
     }
 
     public BaseClient getBaseClient() {
@@ -104,6 +107,16 @@ public class IritaClient {
 
     public IritaClient setWasmClient(WasmClient wasmClient) {
         this.wasmClient = wasmClient;
+        return this;
+    }
+
+
+    public CommunityGovClient getComGovClient() {
+        return comGovClient;
+    }
+
+    public IritaClient setComGovClient(CommunityGovClient comGovClient) {
+        this.comGovClient = comGovClient;
         return this;
     }
 }

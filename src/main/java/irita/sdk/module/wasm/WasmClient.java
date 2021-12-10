@@ -153,7 +153,7 @@ public class WasmClient {
         List<Types.Model> models = resp.getModelsList();
         for (Types.Model model : models) {
             byte[] bytes = model.getKey().toByteArray();
-            final int PREFIX = 0;
+            int PREFIX = new String(bytes).startsWith("\00") ? 2 : 0;
             byte[] dest = new byte[bytes.length - PREFIX];
             System.arraycopy(bytes, PREFIX, dest, 0, dest.length);
 
