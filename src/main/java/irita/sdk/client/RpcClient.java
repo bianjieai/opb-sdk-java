@@ -1,6 +1,7 @@
 package irita.sdk.client;
 
-import com.alibaba.fastjson.JSON;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.protobuf.Any;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.GeneratedMessageV3;
@@ -68,27 +69,31 @@ public class RpcClient {
 
     public synchronized ResultTx broadcastTxCommit(byte[] txBytes) throws IOException {
         JsonRpc jsonRpc = JsonRpc.WrapTxBytes(txBytes, "broadcast_tx_commit");
-        String str = httpUtils.post(rpcUri, JSON.toJSONString(jsonRpc));
+        ObjectMapper mapper = new ObjectMapper();
+        String str = httpUtils.post(rpcUri, mapper.writeValueAsString(jsonRpc));
         return checkResTxAndConvert(str);
     }
 
     public synchronized ResultTx broadcastTxAsync(byte[] txBytes) throws IOException {
         JsonRpc jsonRpc = JsonRpc.WrapTxBytes(txBytes, "broadcast_tx_async");
-        String str = httpUtils.post(rpcUri, JSON.toJSONString(jsonRpc));
-        return JSON.parseObject(str, ResultTx.class);
+        ObjectMapper mapper = new ObjectMapper();
+        String str = httpUtils.post(rpcUri, mapper.writeValueAsString(jsonRpc));
+        return mapper.readValue(str, ResultTx.class);
     }
 
 
     public synchronized ResultTx broadcastTxSync(byte[] txBytes) throws IOException {
         JsonRpc jsonRpc = JsonRpc.WrapTxBytes(txBytes, "broadcast_tx_sync");
-        String str = httpUtils.post(rpcUri, JSON.toJSONString(jsonRpc));
-        return JSON.parseObject(str, ResultTx.class);
+        ObjectMapper mapper = new ObjectMapper();
+        String str = httpUtils.post(rpcUri, mapper.writeValueAsString(jsonRpc));
+        return mapper.readValue(str, ResultTx.class);
     }
 
     public synchronized GasInfo simulateTx(byte[] txBytes) throws IOException {
         JsonRpc jsonRpc = JsonRpc.WrapAbciQuery(txBytes, "app/simulate");
-        String str = httpUtils.post(rpcUri, JSON.toJSONString(jsonRpc));
-        JsonRpcQueryResponse resp = JSON.parseObject(str, JsonRpcQueryResponse.class);
+        ObjectMapper mapper = new ObjectMapper();
+        String str = httpUtils.post(rpcUri, mapper.writeValueAsString(jsonRpc));
+        JsonRpcQueryResponse resp = mapper.readValue(str, JsonRpcQueryResponse.class);
         Objects.requireNonNull(resp, "use json deserialize json_rpc_response return null");
 
         String value = Optional.of(resp)
@@ -101,12 +106,13 @@ public class RpcClient {
             throw new IritaSDKException(resp.getResult().getResponse().getLog());
         }
 
-        GasInfoWrap gasInfoWrap = JSON.parseObject(value, GasInfoWrap.class);
+        GasInfoWrap gasInfoWrap = mapper.readValue(value, GasInfoWrap.class);
         return gasInfoWrap.getGasInfo();
     }
 
-    private ResultTx checkResTxAndConvert(String res) {
-        ResultTx resultTx = JSON.parseObject(res, ResultTx.class);
+    private ResultTx checkResTxAndConvert(String res) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        ResultTx resultTx = mapper.readValue(res, ResultTx.class);
 
         if (resultTx.getError() != null) {
             throw new IritaSDKException(resultTx.getError().getData());
@@ -122,8 +128,10 @@ public class RpcClient {
         params.put("prove", true);
         params.put("hash", Base64.getEncoder().encodeToString(Hex.decode(hash)));
         JsonRpc jsonRpc = JsonRpc.WrapBaseQuery(params, "tx");
-        String str = httpUtils.post(rpcUri, JSON.toJSONString(jsonRpc));
-        TxRpc txRpc = JSON.parseObject(str, TxRpc.class);
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        String str = httpUtils.post(rpcUri, mapper.writeValueAsString(jsonRpc));
+        TxRpc txRpc = mapper.readValue(str, TxRpc.class);
         Objects.requireNonNull(txRpc, "use json deserialize json_rpc_response return null");
         if (txRpc.getError() != null) {
             throw new IritaSDKException(txRpc.getError().getData());
@@ -184,8 +192,10 @@ public class RpcClient {
             params.put("per_page", String.valueOf(size));
         }
         JsonRpc jsonRpc = JsonRpc.WrapBaseQuery(params, "tx_search");
-        String str = httpUtils.post(rpcUri, JSON.toJSONString(jsonRpc));
-        TxsRpc txsRpc = JSON.parseObject(str, TxsRpc.class);
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        String str = httpUtils.post(rpcUri, mapper.writeValueAsString(jsonRpc));
+        TxsRpc txsRpc = mapper.readValue(str, TxsRpc.class);
         Objects.requireNonNull(txsRpc, "use json deserialize json_rpc_response return null");
         if (txsRpc.getError() != null) {
             throw new IritaSDKException(txsRpc.getError().getData());
@@ -218,8 +228,10 @@ public class RpcClient {
         params.put("height", height);
 
         JsonRpc jsonRpc = JsonRpc.WrapBaseQuery(params, "block");
-        String str = httpUtils.post(rpcUri, JSON.toJSONString(jsonRpc));
-        ResultBlockRpc resultBlock = JSON.parseObject(str, ResultBlockRpc.class);
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        String str = httpUtils.post(rpcUri, mapper.writeValueAsString(jsonRpc));
+        ResultBlockRpc resultBlock = mapper.readValue(str, ResultBlockRpc.class);
         Objects.requireNonNull(resultBlock, "use json deserialize json_rpc_response return null");
         if (resultBlock.getError() != null) {
             throw new IritaSDKException(resultBlock.getError().getData());
@@ -250,8 +262,9 @@ public class RpcClient {
         Map<String, Object> params = new HashMap<>();
         params.put("height", height);
         JsonRpc jsonRpc = JsonRpc.WrapBaseQuery(params, "block_results");
-        String str = httpUtils.post(rpcUri, JSON.toJSONString(jsonRpc));
-        ResultBlockResults resultBlockResults = JSON.parseObject(str, ResultBlockResults.class);
+        ObjectMapper mapper = new ObjectMapper();
+        String str = httpUtils.post(rpcUri, mapper.writeValueAsString(jsonRpc));
+        ResultBlockResults resultBlockResults = mapper.readValue(str, ResultBlockResults.class);
         Objects.requireNonNull(resultBlockResults, "use json deserialize json_rpc_response return null");
         if (resultBlockResults.getError() != null) {
             throw new IritaSDKException(resultBlockResults.getError().getData());

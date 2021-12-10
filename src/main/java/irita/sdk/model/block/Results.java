@@ -1,25 +1,15 @@
-/**
- * Copyright 2021 jb51.net
- */
 package irita.sdk.model.block;
 
-import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
-/**
- * Auto-generated: 2021-11-01 9:42:4
- *
- * @author jb51.net (i@jb51.net)
- * @website http://tools.jb51.net/code/json2javabean
- */
 public class Results {
-
-    @JSONField(name = "DeliverTx")
+    @JsonProperty(value = "DeliverTx")
     private List<Delivertx> delivertx;
-    @JSONField(name = "EndBlock")
+    @JsonProperty(value = "EndBlock")
     private Endblock endblock;
-    @JSONField(name = "BeginBlock")
+    @JsonProperty(value = "BeginBlock")
     private Beginblock beginblock;
 
     public void setDelivertx(List<Delivertx> delivertx) {

@@ -1,6 +1,6 @@
 package irita.sdk.model;
 
-import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ResponseQuery {
     private int code;
@@ -9,7 +9,7 @@ public class ResponseQuery {
     private String index;
     private String key;
     private String value;
-    @JSONField(name = "proofOps")
+    @JsonProperty(value = "proofOps")
     private String proofops;
     private String height;
     private String codespace;

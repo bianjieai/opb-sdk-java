@@ -1,7 +1,6 @@
 package irita.sdk;
 
-import irita.sdk.client.BaseClient;
-import irita.sdk.client.IritaClient;
+import irita.sdk.client.OpbClient;
 import irita.sdk.config.ClientConfig;
 import irita.sdk.config.OpbConfig;
 import irita.sdk.constant.enums.BroadcastMode;
@@ -10,9 +9,6 @@ import irita.sdk.key.KeyManagerFactory;
 import irita.sdk.model.BaseTx;
 import irita.sdk.model.Fee;
 import irita.sdk.model.ResultTx;
-import irita.sdk.module.bank.BankClient;
-import irita.sdk.module.nft.MintNFTRequest;
-import irita.sdk.module.nft.NftClient;
 import irita.sdk.module.wasm.*;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -29,20 +26,21 @@ public class WasmTest {
     private WasmClient wasmClient;
 
     @BeforeEach
-    public void init() throws IOException {
-        String mnemonic = "orange mirror borrow truth impact blade web cruel abandon napkin holiday shoot spare change during priority velvet mandate wage smooth scout senior recycle common";
+    public void init() {
+        Properties properties = Config.getTestConfig();
+        String mnemonic = properties.getProperty("mnemonic");
         KeyManager km = KeyManagerFactory.createDefault();
         km.recover(mnemonic);
 
-        String nodeUri = "http://101.132.138.109:26657";
-        String grpcAddr = "http://101.132.138.109:9090";
-        String chainId = "chain-o21KNi";
+        String nodeUri = properties.getProperty("node_uri");
+        String grpcAddr = properties.getProperty("grpc_addr");
+        String chainId = properties.getProperty("chain_id");
         ClientConfig clientConfig = new ClientConfig(nodeUri, grpcAddr, chainId);
-//        OpbConfig opbConfig = new OpbConfig("", "", "");
         OpbConfig opbConfig = null;
 
-        wasmClient = new WasmClient(new BaseClient(clientConfig, opbConfig, km));
-        assertEquals("iaa1d2aqqhsqp3lcwg55kyg6rclefe2zgfqmttfh8w", km.getCurrentKeyInfo().getAddress());
+        OpbClient opbClient = new OpbClient(clientConfig, opbConfig, km);
+        wasmClient = opbClient.getWasmClient();
+        assertEquals(properties.getProperty("address"), km.getCurrentKeyInfo().getAddress());
     }
 
 
@@ -63,7 +61,7 @@ public class WasmTest {
     @Disabled
     public void instantiate() throws IOException {
         // code_id is res of store
-        long codeId = 5L;
+        long codeId = 9L;
 
         Map<String, Object> initMsg = new HashMap<>();
         InstantiateRequest req = new InstantiateRequest();
@@ -87,7 +85,7 @@ public class WasmTest {
     @Disabled
     public void execute() throws IOException {
         // contractAddress is res of instantiate
-        String contractAddress = "iaa1436kxs0w2es6xlqpp9rd35e3d0cjnw4sfhhe2r";
+        String contractAddress = "iaa1plr28ztj64a47a32lw7tdae8vluzm2lmjylpnr";
         ContractABI execAbi = new ContractABI();
         execAbi.setMethod("increment");
         BaseTx baseTx = new BaseTx(2000000, new Fee("2000", "uirita"), BroadcastMode.Commit);
@@ -110,7 +108,7 @@ public class WasmTest {
     @Test
     @Disabled
     public void exportContractState() {
-        String contractAddress = "iaa1436kxs0w2es6xlqpp9rd35e3d0cjnw4sfhhe2r";
+        String contractAddress = "iaa1plr28ztj64a47a32lw7tdae8vluzm2lmjylpnr";
 
         Map<String, String> res = wasmClient.exportContractState(contractAddress);
         System.out.println(res);

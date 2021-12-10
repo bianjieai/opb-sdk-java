@@ -1,9 +1,10 @@
 package irita.sdk.model.block;
 
-import com.alibaba.fastjson.annotation.JSONField;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ResultBlock {
-    @JSONField(name = "block_id")
+    @JsonProperty(value = "block_id")
     private BlockId blockID;
     private Block block;
 

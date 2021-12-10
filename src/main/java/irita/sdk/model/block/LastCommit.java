@@ -3,21 +3,14 @@
  */
 package irita.sdk.model.block;
 
-import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
-/**
- * Auto-generated: 2021-11-01 10:51:5
- *
- * @author jb51.net (i@jb51.net)
- * @website http://tools.jb51.net/code/json2javabean
- */
 public class LastCommit {
-
     private String height;
     private int round;
-    @JSONField(name = "block_id")
+    @JsonProperty(value = "block_id")
     private BlockId blockId;
     private List<Signatures> signatures;
 

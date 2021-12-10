@@ -21,42 +21,31 @@ import proto.identity.QueryOuterClass;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class IdentityClientTest {
-
     private final BaseTx baseTx = new BaseTx(200000, new Fee("300000", "uirita"), BroadcastMode.Commit);
     IdentityClient identityClient;
     private IritaClient client;
 
     @BeforeEach
     public void init() {
-        String keystore = "-----BEGIN TENDERMINT PRIVATE KEY-----\n" +
-                "kdf: bcrypt\n" +
-                "salt: 943EFC3A385F04FC6E975CF82AA5845F\n" +
-                "type: sm2\n" +
-                "\n" +
-                "xDERDa3TO9g4o4Lz62gzDosjuyAsLvQxi8GS42gj8HZmX3MAW7zL6w8mf/eYfl7b\n" +
-                "8yTGpakinFq5J5NRZIbmAZGvYq+P7o/x7JjjzrI=\n" +
-                "=/iQs\n" +
-                "-----END TENDERMINT PRIVATE KEY-----";
+        Properties properties = Config.getTestConfig();
+        String mnemonic = properties.getProperty("mnemonic");
+        KeyManager km = KeyManagerFactory.createDefault();
+        km.recover(mnemonic);
 
-        InputStream input = new ByteArrayInputStream(keystore.getBytes(StandardCharsets.UTF_8));
-        KeyManager km = KeyManagerFactory.createKeyManger(AlgoEnum.SM2);
-        km.recover(input, "1234567890");
-
-
-        String nodeUri = "http://127.0.0.1:26657";
-        String grpcAddr = "http://127.0.0.1:9090";
-        String chainId = "test";
+        String nodeUri = properties.getProperty("node_uri");
+        String grpcAddr = properties.getProperty("grpc_addr");
+        String chainId = properties.getProperty("chain_id");
         ClientConfig clientConfig = new ClientConfig(nodeUri, grpcAddr, chainId);
-//        OpbConfig opbConfig = new OpbConfig("", "", "");
         OpbConfig opbConfig = null;
 
         client = new IritaClient(clientConfig, opbConfig, km);
-        identityClient = new IdentityClient(client.getBaseClient());
-        assertEquals("iaa1scwlz30csd2hkfchw7djjpelrc9ltfkp5egxr0", km.getCurrentKeyInfo().getAddress());
+        identityClient = client.getIdentityClient();
+        assertEquals(properties.getProperty("address"), km.getCurrentKeyInfo().getAddress());
     }
 
 

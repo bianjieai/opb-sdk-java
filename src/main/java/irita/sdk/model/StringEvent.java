@@ -9,6 +9,31 @@ public class StringEvent {
     public static class Attribute {
         public String key;
         public String value;
+        public boolean index;
+
+        public String getKey() {
+            return key;
+        }
+
+        public void setKey(String key) {
+            this.key = key;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
+        }
+
+        public boolean isIndex() {
+            return index;
+        }
+
+        public void setIndex(boolean index) {
+            this.index = index;
+        }
     }
 
     public String getType() {

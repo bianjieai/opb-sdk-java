@@ -1,25 +1,16 @@
-/**
- * Copyright 2021 jb51.net
- */
 package irita.sdk.model.block;
 
-import com.alibaba.fastjson.annotation.JSONField;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
-/**
- * Auto-generated: 2021-11-01 9:42:4
- *
- * @author jb51.net (i@jb51.net)
- * @website http://tools.jb51.net/code/json2javabean
- */
 public class Delivertx {
-
     private int code;
     private String log;
-    @JSONField(name = "gas_wanted")
+    @JsonProperty(value = "gas_wanted")
     private int gasWanted;
-    @JSONField(name = "gas_used")
+    @JsonProperty(value = "gas_used")
     private int gasUsed;
     private List<Events> events;
 

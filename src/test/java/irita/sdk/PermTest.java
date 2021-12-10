@@ -15,10 +15,9 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import proto.perm.Perm;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -28,19 +27,20 @@ public class PermTest {
 
 
     @BeforeEach
-    public void init() throws FileNotFoundException {
-        FileInputStream input = new FileInputStream("src/test/resources/root_admin_priv.key");
+    public void init() {
+        Properties properties = Config.getTestConfig();
+        String mnemonic = properties.getProperty("mnemonic");
         KeyManager km = KeyManagerFactory.createDefault();
-        km.recover(input, "1234567890");
-        assertEquals("iaa1r49m366kaexmvrlppqqeyr8ykqq248g0d4qra4", km.getCurrentKeyInfo().getAddress());
+        km.recover(mnemonic);
 
-        String nodeUri = "http://101.132.138.109:26657";
-        String grpcAddr = "http://101.132.138.109:9090";
-        String chainId = "test";
+        String nodeUri = properties.getProperty("node_uri");
+        String grpcAddr = properties.getProperty("grpc_addr");
+        String chainId = properties.getProperty("chain_id");
         ClientConfig clientConfig = new ClientConfig(nodeUri, grpcAddr, chainId);
         OpbConfig opbConfig = null;
 
         client = new IritaClient(clientConfig, opbConfig, km);
+        assertEquals(properties.getProperty("address"), km.getCurrentKeyInfo().getAddress());
     }
 
     @Test

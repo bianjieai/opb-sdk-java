@@ -1,22 +1,12 @@
-/**
- * Copyright 2021 jb51.net
- */
 package irita.sdk.model.tx;
 
-import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-/**
- * Auto-generated: 2021-11-01 13:58:12
- *
- * @author jb51.net (i@jb51.net)
- * @website http://tools.jb51.net/code/json2javabean
- */
 public class Result {
-
     private String hash;
     private String height;
     private int index;
-    @JSONField(name = "tx_result")
+    @JsonProperty(value = "tx_result")
     private TxResult txResult;
     private String tx;
     private Proof proof;

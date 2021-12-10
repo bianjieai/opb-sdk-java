@@ -1,42 +1,32 @@
-/**
- * Copyright 2021 jb51.net
- */
 package irita.sdk.model.block;
 
-import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-/**
- * Auto-generated: 2021-11-01 10:51:5
- *
- * @author jb51.net (i@jb51.net)
- * @website http://tools.jb51.net/code/json2javabean
- */
 public class Header {
-
     private Version version;
-    @JSONField(name = "chain_id")
+    @JsonProperty(value = "chain_id")
     private String chainId;
     private String height;
     private String time;
-    @JSONField(name = "last_block_id")
+    @JsonProperty(value = "last_block_id")
     private LastBlockId lastBlockId;
-    @JSONField(name = "last_commit_hash")
+    @JsonProperty(value = "last_commit_hash")
     private String lastCommitHash;
-    @JSONField(name = "data_hash")
+    @JsonProperty(value = "data_hash")
     private String dataHash;
-    @JSONField(name = "validators_hash")
+    @JsonProperty(value = "validators_hash")
     private String validatorsHash;
-    @JSONField(name = "next_validators_hash")
+    @JsonProperty(value = "next_validators_hash")
     private String nextValidatorsHash;
-    @JSONField(name = "consensus_hash")
+    @JsonProperty(value = "consensus_hash")
     private String consensusHash;
-    @JSONField(name = "app_hash")
+    @JsonProperty(value = "app_hash")
     private String appHash;
-    @JSONField(name = "last_results_hash")
+    @JsonProperty(value = "last_results_hash")
     private String lastResultsHash;
-    @JSONField(name = "evidence_hash")
+    @JsonProperty(value = "evidence_hash")
     private String evidenceHash;
-    @JSONField(name = "proposer_address")
+    @JsonProperty(value = "proposer_address")
     private String proposerAddress;
 
     public void setVersion(Version version) {

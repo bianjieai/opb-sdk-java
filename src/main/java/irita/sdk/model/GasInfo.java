@@ -1,11 +1,11 @@
 package irita.sdk.model;
 
-import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class GasInfo {
-    @JSONField(name = "gas_wanted")
+    @JsonProperty(value = "gas_wanted")
     private String gasWanted;
-    @JSONField(name = "gas_used")
+    @JsonProperty(value = "gas_used")
     private String gasUsed;
 
     public void setGasWanted(String gasWanted) {

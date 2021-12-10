@@ -20,10 +20,7 @@ import proto.nft.Tx;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -35,21 +32,21 @@ public class MsgsTest {
 
     @BeforeEach
     public void init() {
-        String mnemonic = "opera vivid pride shallow brick crew found resist decade neck expect apple chalk belt sick author know try tank detail tree impact hand best";
-        km = KeyManagerFactory.createDefault();
+        Properties properties = Config.getTestConfig();
+        String mnemonic = properties.getProperty("mnemonic");
+        KeyManager km = KeyManagerFactory.createDefault();
         km.recover(mnemonic);
 
-        String nodeUri = "http://101.132.138.109:26657";
-        String grpcAddr = "http://101.132.138.109:9090";
-        String chainId = "test";
+        String nodeUri = properties.getProperty("node_uri");
+        String grpcAddr = properties.getProperty("grpc_addr");
+        String chainId = properties.getProperty("chain_id");
         ClientConfig clientConfig = new ClientConfig(nodeUri, grpcAddr, chainId);
-//        OpbConfig opbConfig = new OpbConfig("", "", "");
         OpbConfig opbConfig = null;
 
-        IritaClient client = new IritaClient(clientConfig, opbConfig, km);
-        baseClient = client.getBaseClient();
-        nftClient = client.getNftClient();
-        assertEquals("iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3", km.getCurrentKeyInfo().getAddress());
+        IritaClient iritaClient = new IritaClient(clientConfig, opbConfig, km);
+        nftClient = iritaClient.getNftClient();
+        baseClient = iritaClient.getBaseClient();
+        assertEquals(properties.getProperty("address"), km.getCurrentKeyInfo().getAddress());
     }
 
     @Test

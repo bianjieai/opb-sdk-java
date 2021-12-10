@@ -1,6 +1,6 @@
 package irita.sdk.module.wasm;
 
-import com.alibaba.fastjson.JSON;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.GeneratedMessageV3;
 import io.grpc.Channel;
@@ -58,11 +58,12 @@ public class WasmClient {
     // instantiate the contract state
     public String instantiate(InstantiateRequest req, BaseTx baseTx) throws IOException {
         Account account = baseClient.queryAccount(baseTx);
+        ObjectMapper mapper = new ObjectMapper();
         Tx.MsgInstantiateContract.Builder builder = Tx.MsgInstantiateContract.newBuilder()
                 .setSender(account.getAddress())
                 .setAdmin(Optional.of(req).map(InstantiateRequest::getAdmin).orElse(""))
                 .setCodeId(req.getCodeId())
-                .setMsg(ByteString.copyFrom(JSON.toJSONString(req.getInitMsg()).getBytes(StandardCharsets.UTF_8)))
+                .setMsg(ByteString.copyFrom(mapper.writeValueAsString(req.getInitMsg()).getBytes(StandardCharsets.UTF_8)))
                 .setLabel(req.getLabel());
 
         if (req.getInitFunds() != null) {
