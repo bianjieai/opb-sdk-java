@@ -1,8 +1,8 @@
 package irita.sdk.module.wasm;
 
 
-import proto.x.wasm.internal.types.QueryOuterClass;
-import proto.x.wasm.internal.types.Types;
+import proto.cosmwasm.wasm.v1.QueryOuterClass;
+import proto.cosmwasm.wasm.v1.Types;
 
 public class Convert {
     public static ContractInfo toContractInfo(QueryOuterClass.QueryContractInfoResponse resp) {
