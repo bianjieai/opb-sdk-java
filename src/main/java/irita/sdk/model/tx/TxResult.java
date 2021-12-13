@@ -1,27 +1,17 @@
-/**
- * Copyright 2021 jb51.net
- */
 package irita.sdk.model.tx;
 
-import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
-/**
- * Auto-generated: 2021-11-01 13:58:11
- *
- * @author jb51.net (i@jb51.net)
- * @website http://tools.jb51.net/code/json2javabean
- */
 public class TxResult {
-
     private int code;
     private String data;
     private String log;
     private String info;
-    @JSONField(name = "gas_wanted")
+    @JsonProperty(value = "gas_wanted")
     private String gasWanted;
-    @JSONField(name = "gas_used")
+    @JsonProperty(value = "gas_used")
     private String gasUsed;
     private List<Events> events;
     private String codespace;

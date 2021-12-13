@@ -4,13 +4,11 @@ import io.grpc.StatusRuntimeException;
 import irita.sdk.constant.ContractAddress;
 import irita.sdk.constant.ContractArg;
 import irita.sdk.constant.ContractMethod;
-import irita.sdk.constant.enums.BroadcastMode;
 import irita.sdk.constant.enums.DocType;
 import irita.sdk.constant.enums.Role;
 import irita.sdk.exception.ContractException;
 import irita.sdk.exception.IritaSDKException;
 import irita.sdk.model.BaseTx;
-import irita.sdk.model.Fee;
 import irita.sdk.model.ResultTx;
 import irita.sdk.module.wasm.ContractABI;
 import irita.sdk.module.wasm.WasmClient;
@@ -33,7 +31,7 @@ public class CommunityGovClient {
      * @param departmentName 部门名称
      * @param publicKey      证书所对应的公钥（当前版本在链上存储时是直接存储，认为公钥就是地址）
      */
-    public void addDepartment(String departmentName, String publicKey) throws ContractException {
+    public void addDepartment(String departmentName, String publicKey, BaseTx baseTx) throws ContractException {
         if (StringUtils.isEmpty(departmentName) || StringUtils.isEmpty(publicKey)) {
             throw new NullPointerException("departmentName or publicKey is null");
         }
@@ -47,7 +45,7 @@ public class CommunityGovClient {
         abi.setArgs(args);
 
         try {
-            wasmClient.execute(ContractAddress.DEFAULT, abi, null, getComGovBaseTx());
+            wasmClient.execute(ContractAddress.DEFAULT, abi, null, baseTx);
         } catch (IritaSDKException | IOException e) {
             throw new ContractException(e.getMessage());
         }
@@ -58,7 +56,7 @@ public class CommunityGovClient {
      *
      * @param publicKey 对方的公钥（当前版本和地址一样）
      */
-    public void updateDepartment(String publicKey) throws ContractException {
+    public void updateDepartment(String publicKey, BaseTx baseTx) throws ContractException {
         if (StringUtils.isEmpty(publicKey)) {
             throw new NullPointerException("publicKey is null");
         }
@@ -71,7 +69,7 @@ public class CommunityGovClient {
         abi.setArgs(args);
 
         try {
-            wasmClient.execute(ContractAddress.DEFAULT, abi, null, getComGovBaseTx());
+            wasmClient.execute(ContractAddress.DEFAULT, abi, null, baseTx);
         } catch (IritaSDKException | IOException e) {
             throw new ContractException(e.getMessage());
         }
@@ -83,7 +81,7 @@ public class CommunityGovClient {
      * @param address 成员管理员的地址
      * @param role    成员的角色
      */
-    public void addMember(String address, Role role) throws ContractException {
+    public void addMember(String address, Role role, BaseTx baseTx) throws ContractException {
         if (StringUtils.isEmpty(address) || role == null) {
             throw new NullPointerException("address or role is null");
         }
@@ -97,7 +95,7 @@ public class CommunityGovClient {
         abi.setArgs(args);
 
         try {
-            wasmClient.execute(ContractAddress.DEFAULT, abi, null, getComGovBaseTx());
+            wasmClient.execute(ContractAddress.DEFAULT, abi, null, baseTx);
         } catch (IritaSDKException | IOException e) {
             throw new ContractException(e.getMessage());
         }
@@ -108,7 +106,7 @@ public class CommunityGovClient {
      *
      * @param address 要删除的地址
      */
-    public void removeMember(String address) throws ContractException {
+    public void removeMember(String address, BaseTx baseTx) throws ContractException {
         if (StringUtils.isEmpty(address)) {
             throw new NullPointerException("address is null");
         }
@@ -121,7 +119,7 @@ public class CommunityGovClient {
         abi.setArgs(args);
 
         try {
-            wasmClient.execute(ContractAddress.DEFAULT, abi, null, getComGovBaseTx());
+            wasmClient.execute(ContractAddress.DEFAULT, abi, null, baseTx);
         } catch (IritaSDKException | IOException e) {
             throw new ContractException(e.getMessage());
         }
@@ -135,7 +133,7 @@ public class CommunityGovClient {
      * @param strHash  文件hash, 当file_hash为空时必填
      * @param fileHash 字符hash, 当str_hash为空时必填
      */
-    public ResultTx addHash(DocType docType, String docId, String strHash, String fileHash) throws IOException {
+    public ResultTx addHash(DocType docType, String docId, String strHash, String fileHash, BaseTx baseTx) throws IOException {
         if (!addHashParamExist(docId, strHash, fileHash)) {
             throw new NullPointerException("param is not correct");
         }
@@ -150,7 +148,7 @@ public class CommunityGovClient {
         abi.setMethod(ContractMethod.ADD_HASH);
         abi.setArgs(args);
 
-        return wasmClient.execute(ContractAddress.DEFAULT, abi, null, getComGovBaseTx());
+        return wasmClient.execute(ContractAddress.DEFAULT, abi, null, baseTx);
     }
 
     private boolean addHashParamExist(String docId, String strHash, String fileHash) {
@@ -186,9 +184,5 @@ public class CommunityGovClient {
             throw new ContractException(e.getMessage());
         }
         return false;
-    }
-
-    private BaseTx getComGovBaseTx() {
-        return new BaseTx(2000000, new Fee("120", "stake"), BroadcastMode.Commit);
     }
 }

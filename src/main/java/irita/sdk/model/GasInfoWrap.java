@@ -1,9 +1,9 @@
 package irita.sdk.model;
 
-import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class GasInfoWrap {
-    @JSONField(name = "gas_info")
+    @JsonProperty(value = "gas_info")
     private GasInfo gasInfo;
 
     public void setGasInfo(GasInfo gasInfo) {

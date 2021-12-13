@@ -75,19 +75,15 @@ public class ClientTest {
 
     @Test
     @Disabled
-    public void queryTx() throws IOException, ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-        String hash = "321FB2F2C314B5F7A7BBB4FECC5B34425A701C2878534EBE2E7760D37CCC2F45";//tibc
-//        String hash = "FBE2D787D8708DEB48A30CC7D8BDA3346FBAD651B8F122FF19FE2F0E53C950DD";//issue denom
-//        String hash = "5B3E65C3F366C4DE262A15F79B47132C846EC4C02EFF2E29B1E7200F0CB061B8";//nft mint
-//        String hash = "A004E49760E6D51D4C5023B87352D05ED5865CEC7B8E3FF0D46543F94C3BD700";//nft edit
-//        String hash = "E35ECD97D21D4560AEF353A6471B8ABA69B821A877C1E9DED0A97183FF7AA2FF";//nft transfer
+    public void queryTx() throws IOException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        String hash = "D49C463FAB1273ADE4D3CABE61E069DE56BBDF778200CB2B78E26A2659035127";//tibc
         ResultQueryTx resultQueryTx = client.getBaseClient().queryTx(hash);
         assertNotNull(resultQueryTx);
     }
 
     @Test
     @Disabled
-    public void queryTxs() throws IOException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    public void queryTxs() throws IOException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         EventQueryBuilder builder = EventQueryBuilder.newEventQueryBuilder()
                 .AddCondition(Condition.newCond("tibc_nft_transfer", "sender").eq("iaa18e23vvukxgatgzm4fgqkdggxecurkf39ytw7ue"));
 //                .AddCondition(Condition.newCond("send_packet", "packet_sequence").eq(4));
@@ -99,7 +95,7 @@ public class ClientTest {
 
     @Test
     @Disabled
-    public void queryBlock() throws IOException, ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+    public void queryBlock() throws IOException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         BlockDetail blockDetail = client.getBaseClient().queryBlock("33105");
         assertNotNull(blockDetail);
     }

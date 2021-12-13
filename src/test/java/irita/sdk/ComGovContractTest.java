@@ -1,6 +1,7 @@
 package irita.sdk;
 
 import irita.sdk.client.BaseClient;
+import irita.sdk.client.IritaClient;
 import irita.sdk.config.ClientConfig;
 import irita.sdk.config.OpbConfig;
 import irita.sdk.constant.ContractAddress;
@@ -25,6 +26,7 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -33,23 +35,26 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ComGovContractTest {
     private CommunityGovClient comGovClient;
     private WasmClient wasmClient;
+    private BaseTx txBaseTx = new BaseTx(200000, new Fee("200000", "uirita"), BroadcastMode.Commit);
+
 
     @BeforeEach
     public void init() {
-        String mnemonic = "opera vivid pride shallow brick crew found resist decade neck expect apple chalk belt sick author know try tank detail tree impact hand best";
+        Properties properties = Config.getTestConfig();
+        String mnemonic = properties.getProperty("mnemonic");
         KeyManager km = KeyManagerFactory.createDefault();
         km.recover(mnemonic);
 
-        String nodeUri = "http://101.132.138.109:26657";
-        String grpcAddr = "http://101.132.138.109:9090";
-        String chainId = "irita";
+        String nodeUri = properties.getProperty("node_uri");
+        String grpcAddr = properties.getProperty("grpc_addr");
+        String chainId = properties.getProperty("chain_id");
         ClientConfig clientConfig = new ClientConfig(nodeUri, grpcAddr, chainId);
-//        OpbConfig opbConfig = new OpbConfig("", "", "");
         OpbConfig opbConfig = null;
 
-        wasmClient = new WasmClient(new BaseClient(clientConfig, opbConfig, km));
-        comGovClient = new CommunityGovClient(wasmClient);
-        assertEquals("iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3", km.getCurrentKeyInfo().getAddress());
+        IritaClient client = new IritaClient(clientConfig, opbConfig, km);
+        wasmClient = client.getWasmClient();
+        comGovClient = client.getComGovClient();
+        assertEquals(properties.getProperty("address"), km.getCurrentKeyInfo().getAddress());
     }
 
     // it is ignore unless you want to new community_governance contract to block-chain.
@@ -58,7 +63,7 @@ public class ComGovContractTest {
         // store contract
         StoreRequest storeReq = new StoreRequest();
         storeReq.setWasmFile("src/test/resources/community_governance.wasm");
-        BaseTx baseTx = new BaseTx(2000000, new Fee("120", "stake"), BroadcastMode.Commit);
+        BaseTx baseTx = new BaseTx(2378678, new Fee("2378678", "uirita"), BroadcastMode.Commit);
 
         String codeId = wasmClient.store(storeReq, baseTx);
         assertTrue(StringUtils.isNotEmpty(codeId));
@@ -79,11 +84,11 @@ public class ComGovContractTest {
     @Test
     public void addDepartment() {
         // publicKey == address in this version
-        final String publicKey = "iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3";
+        final String publicKey = "iaa1d2aqqhsqp3lcwg55kyg6rclefe2zgfqmttfh8w";
         final String department = "测试部门";
 
         try {
-            comGovClient.addDepartment(department, publicKey);
+            comGovClient.addDepartment(department, publicKey, txBaseTx);
         } catch (ContractException e) {
             // you can use log to record
             e.printStackTrace();
@@ -94,8 +99,8 @@ public class ComGovContractTest {
 
         String v1 = map.get(department);
         assertEquals("{}", v1);
-        String v2 = map.get("iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3");
-        assertEquals("{\"department_name\":\"测试部门\",\"role\":0,\"public_key\":\"iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3\"}", v2);
+        String v2 = map.get("iaa1d2aqqhsqp3lcwg55kyg6rclefe2zgfqmttfh8w");
+        assertEquals("{\"department_name\":\"测试部门\",\"role\":0,\"public_key\":\"iaa1d2aqqhsqp3lcwg55kyg6rclefe2zgfqmttfh8w\"}", v2);
     }
 
     // first update will success
@@ -105,7 +110,7 @@ public class ComGovContractTest {
         // publicKey == address in this version
         String publicKey = "otherPerson";
         try {
-            comGovClient.updateDepartment(publicKey);
+            comGovClient.updateDepartment(publicKey, txBaseTx);
         } catch (ContractException e) {
             assertTrue(e.getMessage().contains("community_governance::state::Identity"));
         }
@@ -116,7 +121,7 @@ public class ComGovContractTest {
         String newAddr = "iaa1wfs050mv8taydn4cttsrhr5dq3tpdaemcm5sk2";
 
         try {
-            comGovClient.addMember(newAddr, Role.HASH_ADMIN);
+            comGovClient.addMember(newAddr, Role.HASH_ADMIN, txBaseTx);
         } catch (ContractException e) {
             e.printStackTrace();
         }
@@ -131,7 +136,7 @@ public class ComGovContractTest {
         String removeAddr = "iaa1wfs050mv8taydn4cttsrhr5dq3tpdaemcm5sk2";
 
         try {
-            comGovClient.removeMember(removeAddr);
+            comGovClient.removeMember(removeAddr, txBaseTx);
         } catch (ContractException e) {
             e.printStackTrace();
         }
@@ -148,9 +153,10 @@ public class ComGovContractTest {
         KeyManager km = KeyManagerFactory.createDefault();
         km.recover(mnemonic);
 
-        String nodeUri = "http://localhost:26657";
-        String grpcAddr = "http://localhost:9090";
-        String chainId = "irita";
+        Properties properties = Config.getTestConfig();
+        String nodeUri = properties.getProperty("node_uri");
+        String grpcAddr = properties.getProperty("grpc_addr");
+        String chainId = properties.getProperty("chain_id");
         ClientConfig clientConfig = new ClientConfig(nodeUri, grpcAddr, chainId);
         CommunityGovClient comGovClient1 = new CommunityGovClient(new WasmClient(new BaseClient(clientConfig, null, km)));
 
@@ -161,7 +167,7 @@ public class ComGovContractTest {
         String fileHash = "789";
 
         try {
-            ResultTx resultTx = comGovClient1.addHash(docType, docId, strHash, fileHash);
+            ResultTx resultTx = comGovClient1.addHash(docType, docId, strHash, fileHash, txBaseTx);
             System.out.println(resultTx.getResult().getHash());
         } catch (IOException e) {
             e.printStackTrace();
@@ -198,8 +204,8 @@ public class ComGovContractTest {
         int i = 0;
         while (i < 100) {
             try {
-                comGovClient.addMember(addr, Role.ADMIN);
-                comGovClient.removeMember(addr);
+                comGovClient.addMember(addr, Role.ADMIN, txBaseTx);
+                comGovClient.removeMember(addr, txBaseTx);
             } catch (ContractException e) {
                 e.printStackTrace();
             }

@@ -20,6 +20,7 @@ import proto.record.RecordOuterClass;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -28,22 +29,24 @@ public class RecordTest {
     private KeyManager km;
     private RecordClient recordClient;
     private IritaClient client;
-    private BaseTx baseTx = new BaseTx(200000, new Fee("300000", "uiris"), BroadcastMode.Commit);
+    private BaseTx baseTx = new BaseTx(200000, new Fee("300000", "uirita"), BroadcastMode.Commit);
 
     @BeforeEach
     public void init() {
-        String mnemonic = "recycle now echo fun balance sight clown memory coach pistol arctic soul dentist novel illness share such utility delay sing reunion used glow muffin";
-        km = KeyManagerFactory.createKeyManger(AlgoEnum.SECP256K1);
+        Properties properties = Config.getTestConfig();
+        String mnemonic = properties.getProperty("mnemonic");
+        km = KeyManagerFactory.createDefault();
         km.recover(mnemonic);
-        String nodeUri = "http://101.132.67.8:16657";
-        String grpcAddr = "http://101.132.67.8:19090";
-        String chainId = "irishub";
+
+        String nodeUri = properties.getProperty("node_uri");
+        String grpcAddr = properties.getProperty("grpc_addr");
+        String chainId = properties.getProperty("chain_id");
         ClientConfig clientConfig = new ClientConfig(nodeUri, grpcAddr, chainId);
         OpbConfig opbConfig = null;
 
         client = new IritaClient(clientConfig, opbConfig, km);
         recordClient = client.getRecordClient();
-        assertEquals("iaa1j2juc02z52c869tu7t8vy3j98r4u0vn88us5jm", km.getCurrentKeyInfo().getAddress());
+        assertEquals(properties.getProperty("address"), km.getCurrentKeyInfo().getAddress());
     }
 
     @Test

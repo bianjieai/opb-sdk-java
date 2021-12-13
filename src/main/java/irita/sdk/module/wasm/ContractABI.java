@@ -1,10 +1,10 @@
 package irita.sdk.module.wasm;
 
-import com.alibaba.fastjson.JSON;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import irita.sdk.exception.IritaSDKException;
 import org.apache.commons.lang3.StringUtils;
 
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,8 +25,11 @@ public class ContractABI {
         } else {
             map.put(method, args);
         }
-
-        return JSON.toJSONBytes(map);
+        try {
+            return new ObjectMapper().writeValueAsBytes(map);
+        } catch (JsonProcessingException e) {
+            throw new IritaSDKException(e.getMessage());
+        }
     }
 
     public String getMethod() {

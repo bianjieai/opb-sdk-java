@@ -1,5 +1,7 @@
 package irita.sdk.module.wasm;
 
+import proto.cosmwasm.wasm.v1.Types;
+
 // StoreRequest define a struct for Store method
 public class StoreRequest {
     /**
@@ -13,14 +15,7 @@ public class StoreRequest {
     private String wasmFile;
     private String source;
     private String builder;
-    private AccessConfig permission;
-
-    // AccessConfig access control type.
-    public static class AccessConfig {
-        // AccessType permission types
-        public int permission;
-        public String address;
-    }
+    private Types.AccessConfig permission;
 
     public byte[] getWasmByteCode() {
         return wasmByteCode;
@@ -54,11 +49,11 @@ public class StoreRequest {
         this.builder = builder;
     }
 
-    public AccessConfig getPermission() {
+    public Types.AccessConfig getPermission() {
         return permission;
     }
 
-    public void setPermission(AccessConfig permission) {
+    public void setPermission(Types.AccessConfig permission) {
         this.permission = permission;
     }
 }

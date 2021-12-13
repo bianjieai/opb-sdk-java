@@ -1,22 +1,12 @@
-/**
- * Copyright 2021 jb51.net
- */
 package irita.sdk.model.block;
 
-import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-/**
- * Auto-generated: 2021-11-01 9:42:4
- *
- * @author jb51.net (i@jb51.net)
- * @website http://tools.jb51.net/code/json2javabean
- */
 public class BlockDetail {
-
-    @JSONField(name = "block_id")
+    @JsonProperty(value = "block_id")
     private BlockId blockId;
     private Block block;
-    @JSONField(name = "block_result")
+    @JsonProperty(value = "block_result")
     private BlockResult blockResult;
 
     public void setBlockId(BlockId blockId) {

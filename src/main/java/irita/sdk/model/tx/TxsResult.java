@@ -1,12 +1,12 @@
 package irita.sdk.model.tx;
 
-import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
 public class TxsResult {
     private List<Result> txs;
-    @JSONField(name = "total_count")
+    @JsonProperty(value = "total_count")
     private int totalCount;
 
     public List<Result> getTxs() {

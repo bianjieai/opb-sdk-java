@@ -1,6 +1,6 @@
 package irita.sdk;
 
-import irita.sdk.client.BaseClient;
+import irita.sdk.client.OpbClient;
 import irita.sdk.config.ClientConfig;
 import irita.sdk.config.OpbConfig;
 import irita.sdk.constant.enums.BroadcastMode;
@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -26,19 +27,20 @@ public class WasmTest {
 
     @BeforeEach
     public void init() {
-        String mnemonic = "opera vivid pride shallow brick crew found resist decade neck expect apple chalk belt sick author know try tank detail tree impact hand best";
+        Properties properties = Config.getTestConfig();
+        String mnemonic = properties.getProperty("mnemonic");
         KeyManager km = KeyManagerFactory.createDefault();
         km.recover(mnemonic);
 
-        String nodeUri = "http://101.132.138.109:26657";
-        String grpcAddr = "http://101.132.138.109:9090";
-        String chainId = "irita";
+        String nodeUri = properties.getProperty("node_uri");
+        String grpcAddr = properties.getProperty("grpc_addr");
+        String chainId = properties.getProperty("chain_id");
         ClientConfig clientConfig = new ClientConfig(nodeUri, grpcAddr, chainId);
-//        OpbConfig opbConfig = new OpbConfig("", "", "");
         OpbConfig opbConfig = null;
 
-        wasmClient = new WasmClient(new BaseClient(clientConfig, opbConfig, km));
-        assertEquals("iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3", km.getCurrentKeyInfo().getAddress());
+        OpbClient opbClient = new OpbClient(clientConfig, opbConfig, km);
+        wasmClient = opbClient.getWasmClient();
+        assertEquals(properties.getProperty("address"), km.getCurrentKeyInfo().getAddress());
     }
 
 
@@ -49,7 +51,7 @@ public class WasmTest {
         StoreRequest req = new StoreRequest();
         req.setWasmFile("src/test/resources/test.wasm");
 
-        BaseTx baseTx = new BaseTx(2000000, new Fee("120", "stake"), BroadcastMode.Commit);
+        BaseTx baseTx = new BaseTx(2000000, new Fee("2000000", "uirita"), BroadcastMode.Commit);
         String codeId = wasmClient.store(req, baseTx);
         assertTrue(StringUtils.isNotEmpty(codeId));
         System.out.println(codeId);
@@ -59,18 +61,15 @@ public class WasmTest {
     @Disabled
     public void instantiate() throws IOException {
         // code_id is res of store
-        long codeId = 7L;
+        long codeId = 9L;
 
         Map<String, Object> initMsg = new HashMap<>();
-        initMsg.put("start", 1);
-        initMsg.put("end", 100);
-        initMsg.put("candidates", new String[]{"iaa1qvty8x0c78am8c44zv2n7tgm6gfqt78j0verqa", "iaa1zk2tse0pkk87p2v8tcsfs0ytfw3t88kejecye5"});
-
         InstantiateRequest req = new InstantiateRequest();
         req.setCodeId(codeId);
+        initMsg.put("count", 0);
         req.setInitMsg(initMsg);
         req.setLabel("test wasm");
-        BaseTx baseTx = new BaseTx(2000000, new Fee("120", "stake"),BroadcastMode.Commit);
+        BaseTx baseTx = new BaseTx(2000000, new Fee("2000", "uirita"), BroadcastMode.Commit);
 
         String contractAddress = wasmClient.instantiate(req, baseTx);
         assertTrue(StringUtils.isNotEmpty(contractAddress));
@@ -86,14 +85,10 @@ public class WasmTest {
     @Disabled
     public void execute() throws IOException {
         // contractAddress is res of instantiate
-        String contractAddress = "iaa1pcknsatx5ceyfu6zvtmz3yr8auumzrdtrn8h4v";
-        Map<String, Object> args = new HashMap<>();
-        args.put("candidate", "iaa1qvty8x0c78am8c44zv2n7tgm6gfqt78j0verqa");
-
+        String contractAddress = "iaa1plr28ztj64a47a32lw7tdae8vluzm2lmjylpnr";
         ContractABI execAbi = new ContractABI();
-        execAbi.setArgs(args);
-        execAbi.setMethod("vote");
-        BaseTx baseTx = new BaseTx(2000000, new Fee("120", "stake"),BroadcastMode.Commit);
+        execAbi.setMethod("increment");
+        BaseTx baseTx = new BaseTx(2000000, new Fee("2000", "uirita"), BroadcastMode.Commit);
 
         ResultTx resultTx = wasmClient.execute(contractAddress, execAbi, null, baseTx);
 
@@ -103,8 +98,7 @@ public class WasmTest {
 
         // test QueryContract
         ContractABI queryAbi = new ContractABI();
-        queryAbi.setMethod("get_vote_info");
-
+        queryAbi.setMethod("get_count");
         byte[] bytes = wasmClient.queryContract(contractAddress, queryAbi);
         assertNotNull(bytes);
         assertTrue(bytes.length > 0);
@@ -114,7 +108,7 @@ public class WasmTest {
     @Test
     @Disabled
     public void exportContractState() {
-        String contractAddress = "iaa1pcknsatx5ceyfu6zvtmz3yr8auumzrdtrn8h4v";
+        String contractAddress = "iaa1plr28ztj64a47a32lw7tdae8vluzm2lmjylpnr";
 
         Map<String, String> res = wasmClient.exportContractState(contractAddress);
         System.out.println(res);
