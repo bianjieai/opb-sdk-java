@@ -116,7 +116,7 @@ https://mvnrepository.com/artifact/io.github.bianjieai
         assertEquals("iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3", km.getAddr());
 ```
 
-## 2 构造 txBodyBz (construct txBodyBz)
+### 2 构造 txBodyBz (construct txBodyBz)
 
 ```java
         // 该 client 类型：opbClient
@@ -138,7 +138,7 @@ https://mvnrepository.com/artifact/io.github.bianjieai
         byte[] txBodyBz = txBody.toByteArray();
 ```
 
-## 3 构造 authInfoBz (construct authInfoBz)
+### 3 构造 authInfoBz (construct authInfoBz)
 
 参见前一下小结，需要先构造 txBody (see previous of this content, construct txBody first)
 
@@ -149,23 +149,7 @@ https://mvnrepository.com/artifact/io.github.bianjieai
         byte[] authInfoBz = authInfo.toByteArray();
 ```
 
-## 3 直接查询 / 直接发送交易 (tx send / query tx)
-
-```java
-        // 该 client 类型：opbClient
-        // 使用 nftClient 进行查询
-        NftClient nftClient = client.getNftClient();
-        QueryOwnerResp resp = nftClient.queryOwner(denomID);
-        System.out.println(resp);
-
-        // 使用 nftClient 发送交易
-        BaseTx baseTx = new BaseTx(10000, new Fee("10000", "uirita"), BroadcastMode.Commit);
-        ResultTx resultTx = nftClient.mintNft(mintNFTReq, baseTx);
-        String txHash = resultTx.getResult().getHash();
-```
-
-
-## 4 签名 / 其它发送交易的方法 (sign / user other method to send tx)
+### 4 签名 / 其它发送交易的方法 (sign / user other method to send tx)
 
 ```java
         // 使用 txEngine 签名交易
@@ -174,10 +158,9 @@ https://mvnrepository.com/artifact/io.github.bianjieai
         // 使用 rpcClient 将签名好的 txBz 直接发送到区块链
         RpcClient rpcClient = baseClient.getRpcClient();
         ResultTx resultTx = rpcClient.broadcastTx(txBz, BroadcastMode.Commit);
-
-        
+        // ---
         // 当然也可以自己使用 httpClient 进行发送，将 txBz 进行 base64 编码，并使用 jsonRpc 发送， 代码如下
-                JsonRpc jsonRpc = JsonRpc.WrapTxBytes(txBytes, "broadcast_tx_commit");
+        JsonRpc jsonRpc = JsonRpc.WrapTxBytes(txBytes, "broadcast_tx_commit");
         String str = httpUtils.post(rpcUri, JSON.toJSONString(jsonRpc)); // rpcUri: 链uri，第二个参数post 的body
 ```
 
