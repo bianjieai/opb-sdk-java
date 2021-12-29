@@ -80,7 +80,7 @@ https://mvnrepository.com/artifact/io.github.bianjieai
 
 ## 怎样使用opb-sdk-java(How to use opb-sdk-java)
 
-### 1 初始化OpbClient (连接测试网 connect testnet)
+### 1-1 初始化OpbClient (连接测试网 connect testnet)
 
 ```java
         String mnemonic = "opera vivid pride shallow brick crew found resist decade neck expect apple chalk belt sick author know try tank detail tree impact hand best";
@@ -98,7 +98,7 @@ https://mvnrepository.com/artifact/io.github.bianjieai
         assertEquals("iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3", km.getAddr());
 ```
 
-### 1 初始化OpbClient (连接开放联盟链 connect open alliance chain)
+### 1-2 初始化OpbClient (连接开放联盟链 connect open alliance chain)
 
 ```java
         String mnemonic = "opera vivid pride shallow brick crew found resist decade neck expect apple chalk belt sick author know try tank detail tree impact hand best";
