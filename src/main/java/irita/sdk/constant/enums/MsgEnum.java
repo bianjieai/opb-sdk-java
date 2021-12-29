@@ -1,6 +1,7 @@
 package irita.sdk.constant.enums;
 
 import irita.sdk.exception.IritaSDKException;
+import proto.cosmwasm.wasm.v1.Tx;
 
 public enum MsgEnum {
     //tibc
@@ -62,6 +63,11 @@ public enum MsgEnum {
     MSG_UNASSIGN_ROLES("iritamod.perm.MsgUnassignRoles", proto.perm.Tx.MsgUnassignRoles.class),
     MSG_BLOCK_ACCOUNT("iritamod.perm.MsgBlockAccount", proto.perm.Tx.MsgBlockAccount.class),
     MSG_UNBLOCK_ACCOUNT("iritamod.perm.MsgUnblockAccount", proto.perm.Tx.MsgUnblockAccount.class),
+    // wasm
+    MSG_EXECUTE_CONTRACT("cosmwasm.wasm.v1.MsgExecuteContract", proto.cosmwasm.wasm.v1.Tx.MsgExecuteContract.class),
+    MSG_INSTANTIATE_CONTRACT("cosmwasm.wasm.v1.MsgInstantiateContract", proto.cosmwasm.wasm.v1.Tx.MsgInstantiateContract.class),
+    MSG_STORE_CODE("cosmwasm.wasm.v1.MsgStoreCode", proto.cosmwasm.wasm.v1.Tx.MsgStoreCode.class),
+    MSG_MIGRATE_CONTRACT("cosmwasm.wasm.v1.MsgMigrateContract", proto.cosmwasm.wasm.v1.Tx.MsgMigrateContract.class),
 
     ;
 
