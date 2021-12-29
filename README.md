@@ -27,7 +27,7 @@ https://mvnrepository.com/artifact/io.github.bianjieai
 ```java
         KeyManager km = KeyManagerFactory.createDefault();
         km.add();
-        String mnemonic = km.getMnemonic();
+        String mnemonic = km.getCurrentKeyInfo().getAddress();
         System.out.println(mnemonic);
 ```
 
@@ -95,7 +95,7 @@ https://mvnrepository.com/artifact/io.github.bianjieai
         OpbConfig opbConfig = null;
 
         OpbClient client = new OpbClient(clientConfig, opbConfig, km);
-        assertEquals("iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3", km.getAddr());
+        assertEquals("iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3", km.getCurrentKeyInfo().getAddress());
 ```
 
 ### 1 初始化OpbClient (连接开放联盟链 connect open alliance chain)
@@ -106,11 +106,11 @@ https://mvnrepository.com/artifact/io.github.bianjieai
         km.recover(mnemonic);
 
         // projectID: 填你的 projectID
-        String nodeUri = "https://opbt.bsngate.com:18602/api/projectID/rpc";
-        String grpcAddr = "opbt.bsngate.com:18603";
+        String nodeUri = "https://opbningxia.bsngate.com:18602/api/${projectID}/rpc";
+        String grpcAddr = "opbningxia.bsngate.com:18603";
         String chainId = "wenchangchain";
         ClientConfig clientConfig = new ClientConfig(nodeUri, grpcAddr, chainId);
-        OpbConfig opbConfig = new OpbConfig(projectID, projectKey: 如果没有填null, km.getAddr());
+        OpbConfig opbConfig = new OpbConfig(${projectID}, ${projectKey}, km.getAddr()); // 如果没有 projectKey 传null
 
         OpbClient client = new OpbClient(clientConfig, opbConfig, km);
         assertEquals("iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3", km.getAddr());
