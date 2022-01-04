@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -131,5 +132,17 @@ public class NftDemoTest {
         queryCollectionResp = nftClient.queryCollection(denomID, null);
         assertNotNull(queryCollectionResp);
         assertEquals(queryCollectionResp.getNfts().size(), 1);
+
+        //query denoms
+        List<QueryDenomResp> queryDenomResps = nftClient.queryDenoms(null);
+        assertNotNull(queryDenomResps);
+        //query owner
+        QueryOwnerResp queryOwnerResp = nftClient.queryOwner(denomID, reci);
+        assertNotNull(queryOwnerResp);
+        queryOwnerResp = nftClient.queryOwner("", reci);
+        assertNotNull(queryOwnerResp);
+        //query supply
+        long supply = nftClient.querySupply(denomID, reci);
+        assertEquals(supply, 1);
     }
 }
