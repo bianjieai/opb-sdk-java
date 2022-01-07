@@ -22,32 +22,26 @@ import java.util.Random;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class NftDemoTest {
+public class NftDemo {
     private KeyManager km;
     private NftClient nftClient;
-    //baseTx 的 denom 可能会需要根据不同环境的链进行修改
-    private BaseTx baseTx = new BaseTx(200000, new Fee("300000", "upoint"), BroadcastMode.Commit);
+    private BaseTx baseTx = new BaseTx(200000, new Fee("200000", "uirita"), BroadcastMode.Commit);
 
     @BeforeEach
     public void init() {
-        //换成自己链上地址的助记词
-        String mnemonic = "code tattoo laundry ice chuckle priority immune rebuild dream prevent sibling inspire banner black shock page person brush oxygen sorry dilemma raccoon estate funny";
+        String mnemonic = "opera vivid pride shallow brick crew found resist decade neck expect apple chalk belt sick author know try tank detail tree impact hand best";
         km = KeyManagerFactory.createDefault();
         km.recover(mnemonic);
 
-        String nodeUri = "http://101.132.67.8:26657";
-        String grpcAddr = "101.132.67.8:9090";
-//        String nodeUri = "https://opbningxia.bsngate.com:18602/api/<your projectID>/rpc";
-//        String grpcAddr = "opbningxia.bsngate.com:18603";
-        String chainId = "wenchangchain";
+        String nodeUri = "http://47.100.192.234:26657";
+        String grpcAddr = "47.100.192.234:9090";
+        String chainId = "testing";
         ClientConfig clientConfig = new ClientConfig(nodeUri, grpcAddr, chainId);
         OpbConfig opbConfig = null;
-        //测试环境 opbConfig = null，正式环境需要使用自己的 projectID 和 projectKey
-//        OpbConfig opbConfig = new OpbConfig("your projectID", "your projectKey", "");
 
         IritaClient client = new IritaClient(clientConfig, opbConfig, km);
         nftClient = client.getNftClient();
-        assertEquals("iaa18e23vvukxgatgzm4fgqkdggxecurkf39ytw7ue", km.getCurrentKeyInfo().getAddress());
+        assertEquals("iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3", km.getCurrentKeyInfo().getAddress());
     }
 
     @Test
