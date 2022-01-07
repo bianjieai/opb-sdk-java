@@ -29,18 +29,22 @@ public class NftDemo {
 
     @BeforeEach
     public void init() {
+        //更换为自己链上地址的助记词
         String mnemonic = "opera vivid pride shallow brick crew found resist decade neck expect apple chalk belt sick author know try tank detail tree impact hand best";
         km = KeyManagerFactory.createDefault();
         km.recover(mnemonic);
 
+        //连接测试网（连接主网请参考README.md）
         String nodeUri = "http://47.100.192.234:26657";
         String grpcAddr = "47.100.192.234:9090";
         String chainId = "testing";
         ClientConfig clientConfig = new ClientConfig(nodeUri, grpcAddr, chainId);
+        //测试网为null，主网请参考README.md
         OpbConfig opbConfig = null;
 
         IritaClient client = new IritaClient(clientConfig, opbConfig, km);
         nftClient = client.getNftClient();
+        //判断由助记词恢复的是否为预期的链上地址
         assertEquals("iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3", km.getCurrentKeyInfo().getAddress());
     }
 
@@ -51,7 +55,7 @@ public class NftDemo {
         String denomName = "test_name";
         String schema = "no shcema";
 
-        //issue denom
+        //issue denom 创建 denom
         IssueDenomRequest req = new IssueDenomRequest()
                 .setId(denomID)
                 .setName(denomName)
@@ -59,7 +63,7 @@ public class NftDemo {
         ResultTx resultTx = nftClient.issueDenom(req, baseTx);
         assertNotNull(resultTx.getResult().getHash());
 
-        //query denom
+        //query denom 通过denomID查询denom信息
         QueryDenomResp denom = nftClient.queryDenom(denomID);
         assertEquals(denomID, denom.getId());
         assertEquals(denomName, denom.getName());
@@ -68,7 +72,7 @@ public class NftDemo {
         KeyInfo keyInfo = km.getCurrentKeyInfo();
         assertEquals(keyInfo.getAddress(), denom.getCreator());
 
-        //mint nft
+        //mint nft 在上面创建的denom下发行2个nft
         String nftID1 = "test1" + new Random().nextInt(1000);
         String nftID2 = "test2" + new Random().nextInt(1000);
         String nftName = "test_name";
@@ -80,7 +84,7 @@ public class NftDemo {
                 .setName(nftName)
                 .setUri(uri)
                 .setData(data)
-                .setRecipient(keyInfo.getAddress());
+                .setRecipient(keyInfo.getAddress());//nft的接收地址
         //mint nft1
         resultTx = nftClient.mintNft(mintReq, baseTx);
         assertNotNull(resultTx.getResult().getHash());
@@ -89,7 +93,7 @@ public class NftDemo {
         resultTx = nftClient.mintNft(mintReq, baseTx);
         assertNotNull(resultTx.getResult().getHash());
 
-        //query nft1
+        //query nft1 通过denomID和nftID查询nft信息
         QueryNFTResp nft = nftClient.queryNFT(denomID, nftID1);
         assertEquals(nftID1, nft.getId());
         assertEquals(nftName, nft.getName());
@@ -97,7 +101,7 @@ public class NftDemo {
         assertEquals(data, nft.getData());
         assertEquals(keyInfo.getAddress(), nft.getOwner());
 
-        //transfer nft1
+        //transfer nft1 交易nft1到其他链上地址
         String reci = "iaa14s9hekvzhtf3y3962zn3vzv45k0ay7mguyqhrl";
         TransferNFTRequest transferReq = new TransferNFTRequest()
                 .setDenom(denomID)
@@ -106,37 +110,52 @@ public class NftDemo {
         resultTx = nftClient.transferNFt(transferReq, baseTx);
         assertNotNull(resultTx.getResult().getHash());
 
-        //query nft1
+        //query nft1 查询nft1的信息 判断nft的owner地址是否已改变
         nft = nftClient.queryNFT(denomID, nftID1);
         assertEquals(reci, nft.getOwner());
 
-        //query collection
+        //edit nft2 通过denomID和nftID修改nft的name/uri/data
+        String newNftName = "test_name_new";
+        String newUri = "https://www.baidu.com/new";
+        String newData = "any data new";
+        EditNFTRequest editReq = new EditNFTRequest()
+                .setDenom(denomID)
+                .setId(nftID2)
+                .setName(newNftName)
+                .setUri(newUri)
+                .setData(newData);
+        resultTx = nftClient.editNft(editReq, baseTx);
+        assertNotNull(resultTx.getResult().getHash());
+
+        //query collection 通过denomID查询集合 即该denom信息和其nft列表信息
         QueryCollectionResp queryCollectionResp = nftClient.queryCollection(denomID, null);
         assertNotNull(queryCollectionResp);
-        assertEquals(queryCollectionResp.getNfts().size(), 2);
+        assertEquals(2, queryCollectionResp.getNfts().size());
 
-        //burn nft2
+        //burn nft2 通过denomID和nftID销毁nft2
         BurnNFTRequest burnNFTReq = new BurnNFTRequest()
                 .setDenom(denomID)
                 .setId(nftID2);
         resultTx = nftClient.burnNft(burnNFTReq, baseTx);
         assertNotNull(resultTx.getResult().getHash());
 
-        //query collection
+        //query collection 查询集合，nft列表的数量减少1个
         queryCollectionResp = nftClient.queryCollection(denomID, null);
         assertNotNull(queryCollectionResp);
-        assertEquals(queryCollectionResp.getNfts().size(), 1);
+        assertEquals(1, queryCollectionResp.getNfts().size());
 
-        //query denoms
+        //query denoms 查询所有denom列表
         List<QueryDenomResp> queryDenomResps = nftClient.queryDenoms(null);
         assertNotNull(queryDenomResps);
-        //query owner
+
+        //query owner 通过地址查询该地址拥有的nft列表 denomID可以指定也可以传空
         QueryOwnerResp queryOwnerResp = nftClient.queryOwner(denomID, reci);
         assertNotNull(queryOwnerResp);
         queryOwnerResp = nftClient.queryOwner("", reci);
         assertNotNull(queryOwnerResp);
-        //query supply
+
+        //query supply 查询该地址在该denom下拥有的nft数量
         long supply = nftClient.querySupply(denomID, reci);
-        assertEquals(supply, 1);
+        assertEquals(1, supply);
     }
 }
