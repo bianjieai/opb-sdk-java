@@ -110,10 +110,10 @@ https://mvnrepository.com/artifact/io.github.bianjieai
         String grpcAddr = "opbningxia.bsngate.com:18603";
         String chainId = "wenchangchain";
         ClientConfig clientConfig = new ClientConfig(nodeUri, grpcAddr, chainId);
-        OpbConfig opbConfig = new OpbConfig(${projectID}, ${projectKey}, km.getAddr()); // 如果没有 projectKey 传null
+        OpbConfig opbConfig = new OpbConfig(${projectID}, ${projectKey}, km.getCurrentKeyInfo().getAddress()); // 如果没有 projectKey 传null
 
         OpbClient client = new OpbClient(clientConfig, opbConfig, km);
-        assertEquals("iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3", km.getAddr());
+        assertEquals("iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3", km.getCurrentKeyInfo().getAddress());
 ```
 
 ### 2 构造 txBodyBz (construct txBodyBz)
@@ -290,3 +290,32 @@ https://mvnrepository.com/artifact/io.github.bianjieai
 ### 4. perm模块的其他查询和交易 (other query and tx in this module)
 
 查看 permClient 下的方法 (see method in perClient.java)
+
+## 单元测试 (Unit Test Demo)
+[MsgsDemo.java](./src/test/java/irita/sdk/MsgsDemo.java)
+
+[NftDemo.java](./src/test/java/irita/sdk/NftDemo.java)
+
+[ClientTest.java](./src/test/java/irita/sdk/ClientTest.java)
+
+[ComGovContractTest.java](./src/test/java/irita/sdk/ComGovContractTest.java)
+
+[HttpUtilsTest.java](./src/test/java/irita/sdk/HttpUtilsTest.java)
+
+[IdentityClientTest.java](./src/test/java/irita/sdk/IdentityClientTest.java)
+
+[IOUtilTest.java](./src/test/java/irita/sdk/IOUtilTest.java)
+
+[KeyManagerTest.java](./src/test/java/irita/sdk/KeyManagerTest.java)
+
+[MsgsTest.java](./src/test/java/irita/sdk/MsgsTest.java)
+
+[NftTest.java](./src/test/java/irita/sdk/NftTest.java)
+
+[PermTest.java](./src/test/java/irita/sdk/PermTest.java)
+
+[RecordTest.java](./src/test/java/irita/sdk/RecordTest.java)
+
+[TibcTest.java](./src/test/java/irita/sdk/TibcTest.java)
+
+[WasmTest.java](./src/test/java/irita/sdk/WasmTest.java)
