@@ -26,9 +26,9 @@ https://mvnrepository.com/artifact/io.github.bianjieai
 
 ```java
         KeyManager km = KeyManagerFactory.createDefault();
-        km.add();
-        String mnemonic = km.getCurrentKeyInfo().getAddress();
-        System.out.println(mnemonic);
+        String mnemonic = km.add();
+        System.out.println("助记词：" + mnemonic);
+        System.out.println("地址：" + km.getCurrentKeyInfo().getAddress());
 ```
 
 ### 1 恢复私钥 (recover privKey)
