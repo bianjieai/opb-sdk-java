@@ -1,302 +1,505 @@
 package irita.sdk.crypto;
 
-import org.bouncycastle.util.StringList;
-import org.bouncycastle.util.Strings;
-
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class ArmoredInputStream extends InputStream {
-    private static final byte[] decodingTable = new byte[128];
-    InputStream in;
-    boolean start;
-    int[] outBuf;
-    int bufPtr;
-    CRC24 crc;
-    boolean crcFound;
-    boolean hasHeaders;
-    String header;
-    boolean newLineFound;
-    boolean clearText;
-    boolean restart;
-    StringList headerList;
-    int lastC;
-    boolean isEndOfStream;
+import org.bouncycastle.util.StringList;
+import org.bouncycastle.util.Strings;
 
-    private int decode(int var1, int var2, int var3, int var4, int[] var5) throws EOFException {
-        if (var4 < 0) {
-            throw new EOFException("unexpected end of file in armored stream.");
-        } else if (var3 == 61) {
-            int var10 = decodingTable[var1] & 255;
-            int var11 = decodingTable[var2] & 255;
-            var5[2] = (var10 << 2 | var11 >> 4) & 255;
-            return 2;
-        } else {
-            byte var6;
-            byte var7;
-            byte var8;
-            if (var4 == 61) {
-                var6 = decodingTable[var1];
-                var7 = decodingTable[var2];
-                var8 = decodingTable[var3];
-                var5[1] = (var6 << 2 | var7 >> 4) & 255;
-                var5[2] = (var7 << 4 | var8 >> 2) & 255;
-                return 1;
-            } else {
-                var6 = decodingTable[var1];
-                var7 = decodingTable[var2];
-                var8 = decodingTable[var3];
-                byte var9 = decodingTable[var4];
-                var5[0] = (var6 << 2 | var7 >> 4) & 255;
-                var5[1] = (var7 << 4 | var8 >> 2) & 255;
-                var5[2] = (var8 << 6 | var9) & 255;
-                return 0;
-            }
-        }
-    }
-
-    public ArmoredInputStream(InputStream var1) throws IOException {
-        this(var1, true);
-    }
-
-    public ArmoredInputStream(InputStream var1, boolean var2) throws IOException {
-        this.start = true;
-        this.outBuf = new int[3];
-        this.bufPtr = 3;
-        this.crc = new CRC24();
-        this.crcFound = false;
-        this.hasHeaders = true;
-        this.header = null;
-        this.newLineFound = false;
-        this.clearText = false;
-        this.restart = false;
-        this.headerList = Strings.newList();
-        this.lastC = 0;
-        this.in = var1;
-        this.hasHeaders = var2;
-        if (var2) {
-            this.parseHeaders();
-        }
-
-        this.start = false;
-    }
-
-    public int available() throws IOException {
-        return this.in.available();
-    }
-
-    private boolean parseHeaders() throws IOException {
-        this.header = null;
-        int var2 = 0;
-        boolean var3 = false;
-        this.headerList = Strings.newList();
-        int var1;
-        if (this.restart) {
-            var3 = true;
-        } else {
-            while((var1 = this.in.read()) >= 0) {
-                if (var1 == 45 && (var2 == 0 || var2 == 10 || var2 == 13)) {
-                    var3 = true;
-                    break;
-                }
-
-                var2 = var1;
-            }
-        }
-
-        if (var3) {
-            StringBuffer var4 = new StringBuffer("-");
-            boolean var5 = false;
-            boolean var6 = false;
-            if (this.restart) {
-                var4.append('-');
-            }
-
-            for(; (var1 = this.in.read()) >= 0; var2 = var1) {
-                if (var2 == 13 && var1 == 10) {
-                    var6 = true;
-                }
-
-                if (var5 && var2 != 13 && var1 == 10 || var5 && var1 == 13) {
-                    break;
-                }
-
-                if (var1 == 13 || var2 != 13 && var1 == 10) {
-                    String var7 = var4.toString();
-                    if (var7.trim().length() == 0) {
-                        break;
-                    }
-
-                    this.headerList.add(var7);
-                    var4.setLength(0);
-                }
-
-                if (var1 != 10 && var1 != 13) {
-                    var4.append((char)var1);
-                    var5 = false;
-                } else if (var1 == 13 || var2 != 13 && var1 == 10) {
-                    var5 = true;
-                }
-            }
-
-            if (var6) {
-                this.in.read();
-            }
-        }
-
-        if (this.headerList.size() > 0) {
-            this.header = this.headerList.get(0);
-        }
-
-        this.clearText = "-----BEGIN PGP SIGNED MESSAGE-----".equals(this.header);
-        this.newLineFound = true;
-        return var3;
-    }
-
-    public boolean isClearText() {
-        return this.clearText;
-    }
-
-    public boolean isEndOfStream() {
-        return this.isEndOfStream;
-    }
-
-    public String getArmorHeaderLine() {
-        return this.header;
-    }
-
-    public String[] getArmorHeaders() {
-        return this.headerList.size() <= 1 ? null : this.headerList.toStringArray(1, this.headerList.size());
-    }
-
-    private int readIgnoreSpace() throws IOException {
-        int var1;
-        for(var1 = this.in.read(); var1 == 32 || var1 == 9; var1 = this.in.read()) {
-        }
-
-        return var1;
-    }
-
-    public int read() throws IOException {
-        if (this.start) {
-            if (this.hasHeaders) {
-                this.parseHeaders();
-            }
-
-            this.crc.reset();
-            this.start = false;
-        }
-
-        int var1;
-        if (this.clearText) {
-            var1 = this.in.read();
-            if (var1 != 13 && (var1 != 10 || this.lastC == 13)) {
-                if (this.newLineFound && var1 == 45) {
-                    var1 = this.in.read();
-                    if (var1 == 45) {
-                        this.clearText = false;
-                        this.start = true;
-                        this.restart = true;
-                    } else {
-                        var1 = this.in.read();
-                    }
-
-                    this.newLineFound = false;
-                } else if (var1 != 10 && this.lastC != 13) {
-                    this.newLineFound = false;
-                }
-            } else {
-                this.newLineFound = true;
-            }
-
-            this.lastC = var1;
-            if (var1 < 0) {
-                this.isEndOfStream = true;
-            }
-
-            return var1;
-        } else {
-            if (this.bufPtr > 2 || this.crcFound) {
-                var1 = this.readIgnoreSpace();
-                if (var1 != 13 && var1 != 10) {
-                    if (var1 < 0) {
-                        this.isEndOfStream = true;
-                        return -1;
-                    }
-
-                    this.bufPtr = this.decode(var1, this.readIgnoreSpace(), this.readIgnoreSpace(), this.readIgnoreSpace(), this.outBuf);
-                } else {
-                    for(var1 = this.readIgnoreSpace(); var1 == 10 || var1 == 13; var1 = this.readIgnoreSpace()) {
-                    }
-
-                    if (var1 < 0) {
-                        this.isEndOfStream = true;
-                        return -1;
-                    }
-
-                    if (var1 == 61) {
-                        this.bufPtr = this.decode(this.readIgnoreSpace(), this.readIgnoreSpace(), this.readIgnoreSpace(), this.readIgnoreSpace(), this.outBuf);
-                        if (this.bufPtr == 0) {
-                            int var2 = (this.outBuf[0] & 255) << 16 | (this.outBuf[1] & 255) << 8 | this.outBuf[2] & 255;
-                            this.crcFound = true;
-                            if (var2 != this.crc.getValue()) {
-                                throw new IOException("crc check failed in armored message.");
-                            }
-
-                            return this.read();
-                        }
-
-                        throw new IOException("no crc found in armored message.");
-                    }
-
-                    if (var1 == 45) {
-                        while((var1 = this.in.read()) >= 0 && var1 != 10 && var1 != 13) {
-                        }
-
-                        if (!this.crcFound) {
-                            throw new IOException("crc check not found.");
-                        }
-
-                        this.crcFound = false;
-                        this.start = true;
-                        this.bufPtr = 3;
-                        if (var1 < 0) {
-                            this.isEndOfStream = true;
-                        }
-
-                        return -1;
-                    }
-
-                    this.bufPtr = this.decode(var1, this.readIgnoreSpace(), this.readIgnoreSpace(), this.readIgnoreSpace(), this.outBuf);
-                }
-            }
-
-            var1 = this.outBuf[this.bufPtr++];
-            this.crc.update(var1);
-            return var1;
-        }
-    }
-
-    public void close() throws IOException {
-        this.in.close();
-    }
+/**
+ * reader for Base64 armored objects - read the headers and then start returning
+ * bytes when the data is reached. An IOException is thrown if the CRC check
+ * is detected and fails.
+ * <p>
+ * By default a missing CRC will not cause an exception. To force CRC detection use:
+ * <pre>
+ *     ArmoredInputStream aIn = ...
+ *
+ *     aIn.setDetectMissingCRC(true);
+ * </pre>
+ * </p>
+ */
+public class ArmoredInputStream
+        extends InputStream {
+    /*
+     * set up the decoding table.
+     */
+    private static final byte[] decodingTable;
 
     static {
-        int var0;
-        for(var0 = 65; var0 <= 90; ++var0) {
-            decodingTable[var0] = (byte)(var0 - 65);
+        decodingTable = new byte[128];
+
+        for (int i = 0; i < decodingTable.length; i++) {
+            decodingTable[i] = (byte) 0xff;
         }
 
-        for(var0 = 97; var0 <= 122; ++var0) {
-            decodingTable[var0] = (byte)(var0 - 97 + 26);
+        for (int i = 'A'; i <= 'Z'; i++) {
+            decodingTable[i] = (byte) (i - 'A');
         }
 
-        for(var0 = 48; var0 <= 57; ++var0) {
-            decodingTable[var0] = (byte)(var0 - 48 + 52);
+        for (int i = 'a'; i <= 'z'; i++) {
+            decodingTable[i] = (byte) (i - 'a' + 26);
         }
 
-        decodingTable[43] = 62;
-        decodingTable[47] = 63;
+        for (int i = '0'; i <= '9'; i++) {
+            decodingTable[i] = (byte) (i - '0' + 52);
+        }
+
+        decodingTable['+'] = 62;
+        decodingTable['/'] = 63;
+    }
+
+    /**
+     * decode the base 64 encoded input data.
+     *
+     * @return the offset the data starts in out.
+     */
+    private static int decode(
+            int in0,
+            int in1,
+            int in2,
+            int in3,
+            int[] out)
+            throws IOException {
+        int b1, b2, b3, b4;
+
+        if (in3 < 0) {
+            throw new EOFException("unexpected end of file in armored stream.");
+        }
+
+        if (in2 == '=') {
+            b1 = decodingTable[in0] & 0xff;
+            b2 = decodingTable[in1] & 0xff;
+
+            if ((b1 | b2) < 0) {
+                throw new IOException("invalid armor");
+            }
+
+            out[2] = ((b1 << 2) | (b2 >> 4)) & 0xff;
+
+            return 2;
+        } else if (in3 == '=') {
+            b1 = decodingTable[in0];
+            b2 = decodingTable[in1];
+            b3 = decodingTable[in2];
+
+            if ((b1 | b2 | b3) < 0) {
+                throw new IOException("invalid armor");
+            }
+
+            out[1] = ((b1 << 2) | (b2 >> 4)) & 0xff;
+            out[2] = ((b2 << 4) | (b3 >> 2)) & 0xff;
+
+            return 1;
+        } else {
+            b1 = decodingTable[in0];
+            b2 = decodingTable[in1];
+            b3 = decodingTable[in2];
+            b4 = decodingTable[in3];
+
+            if ((b1 | b2 | b3 | b4) < 0) {
+                throw new IOException("invalid armor");
+            }
+
+            out[0] = ((b1 << 2) | (b2 >> 4)) & 0xff;
+            out[1] = ((b2 << 4) | (b3 >> 2)) & 0xff;
+            out[2] = ((b3 << 6) | b4) & 0xff;
+
+            return 0;
+        }
+    }
+
+    /*
+     * Ignore missing CRC checksums.
+     * https://tests.sequoia-pgp.org/#ASCII_Armor suggests that missing CRC sums do not invalidate the message.
+     */
+    private boolean detectMissingChecksum = false;
+
+    InputStream in;
+    boolean start = true;
+    int[] outBuf = new int[3];
+    int bufPtr = 3;
+    CRC24 crc = new CRC24();
+    boolean crcFound = false;
+    boolean hasHeaders = true;
+    String header = null;
+    boolean newLineFound = false;
+    boolean clearText = false;
+    boolean restart = false;
+    StringList headerList = Strings.newList();
+    int lastC = 0;
+    boolean isEndOfStream;
+
+    /**
+     * Create a stream for reading a PGP armoured message, parsing up to a header
+     * and then reading the data that follows.
+     *
+     * @param in
+     */
+    public ArmoredInputStream(
+            InputStream in)
+            throws IOException {
+        this(in, true);
+    }
+
+    /**
+     * Create an armoured input stream which will assume the data starts
+     * straight away, or parse for headers first depending on the value of
+     * hasHeaders.
+     *
+     * @param in
+     * @param hasHeaders true if headers are to be looked for, false otherwise.
+     */
+    public ArmoredInputStream(
+            InputStream in,
+            boolean hasHeaders)
+            throws IOException {
+        this.in = in;
+        this.hasHeaders = hasHeaders;
+
+        if (hasHeaders) {
+            parseHeaders();
+        }
+
+        start = false;
+    }
+
+    public int available()
+            throws IOException {
+        return in.available();
+    }
+
+    private boolean parseHeaders()
+            throws IOException {
+        header = null;
+
+        int c;
+        int last = 0;
+        boolean headerFound = false;
+
+        headerList = Strings.newList();
+
+        //
+        // if restart we already have a header
+        //
+        if (restart) {
+            headerFound = true;
+        } else {
+            while ((c = in.read()) >= 0) {
+                if (c == '-' && (last == 0 || last == '\n' || last == '\r')) {
+                    headerFound = true;
+                    break;
+                }
+
+                last = c;
+            }
+        }
+
+        if (headerFound) {
+            StringBuffer buf = new StringBuffer("-");
+            boolean eolReached = false;
+            boolean crLf = false;
+
+            if (restart)    // we've had to look ahead two '-'
+            {
+                buf.append('-');
+            }
+
+            while ((c = in.read()) >= 0) {
+                if (last == '\r' && c == '\n') {
+                    crLf = true;
+                }
+                if (eolReached && (last != '\r' && c == '\n')) {
+                    break;
+                }
+                if (eolReached && c == '\r') {
+                    break;
+                }
+                if (c == '\r' || (last != '\r' && c == '\n')) {
+                    String line = buf.toString();
+                    if (line.trim().length() == 0) {
+                        break;
+                    }
+                    if (headerList.size() != 0 && line.indexOf(':') < 0) {
+                        throw new IOException("invalid armor header");
+                    }
+                    headerList.add(line);
+                    buf.setLength(0);
+                }
+
+                if (c != '\n' && c != '\r') {
+                    buf.append((char) c);
+                    eolReached = false;
+                } else {
+                    if (c == '\r' || (last != '\r' && c == '\n')) {
+                        eolReached = true;
+                    }
+                }
+
+                last = c;
+            }
+
+            if (crLf) {
+                int nl = in.read(); // skip last \n
+                if (nl != '\n') {
+                    throw new IOException("inconsistent line endings in headers");
+                }
+            }
+        }
+
+        if (headerList.size() > 0) {
+            header = headerList.get(0);
+        }
+
+        clearText = "-----BEGIN PGP SIGNED MESSAGE-----".equals(header);
+        newLineFound = true;
+
+        return headerFound;
+    }
+
+    /**
+     * @return true if we are inside the clear text section of a PGP
+     * signed message.
+     */
+    public boolean isClearText() {
+        return clearText;
+    }
+
+    /**
+     * @return true if the stream is actually at end of file.
+     */
+    public boolean isEndOfStream() {
+        return isEndOfStream;
+    }
+
+    /**
+     * Return the armor header line (if there is one)
+     *
+     * @return the armor header line, null if none present.
+     */
+    public String getArmorHeaderLine() {
+        return header;
+    }
+
+    /**
+     * Return the armor headers (the lines after the armor header line),
+     *
+     * @return an array of armor headers, null if there aren't any.
+     */
+    public String[] getArmorHeaders() {
+        if (headerList.size() <= 1) {
+            return null;
+        }
+
+        return headerList.toStringArray(1, headerList.size());
+    }
+
+    private int readIgnoreSpace()
+            throws IOException {
+        int c = in.read();
+
+        while (c == ' ' || c == '\t' || c == '\f' || c == '\u000B') // \u000B ~ \v
+        {
+            c = in.read();
+        }
+
+        if (c >= 128) {
+            throw new IOException("invalid armor");
+        }
+
+        return c;
+    }
+
+    public int read()
+            throws IOException {
+        int c;
+
+        if (start) {
+            if (hasHeaders) {
+                parseHeaders();
+            }
+
+            crc.reset();
+            start = false;
+        }
+
+        if (clearText) {
+            c = in.read();
+
+            if (c == '\r' || (c == '\n' && lastC != '\r')) {
+                newLineFound = true;
+            } else if (newLineFound && c == '-') {
+                c = in.read();
+                if (c == '-')            // a header, not dash escaped
+                {
+                    clearText = false;
+                    start = true;
+                    restart = true;
+                } else                   // a space - must be a dash escape
+                {
+                    c = in.read();
+                }
+                newLineFound = false;
+            } else {
+                if (c != '\n' && lastC != '\r') {
+                    newLineFound = false;
+                }
+            }
+
+            lastC = c;
+
+            if (c < 0) {
+                isEndOfStream = true;
+            }
+
+            return c;
+        }
+
+        if (bufPtr > 2 || crcFound) {
+            c = readIgnoreSpace();
+
+            if (c == '\r' || c == '\n') {
+                c = readIgnoreSpace();
+
+                while (c == '\n' || c == '\r') {
+                    c = readIgnoreSpace();
+                }
+
+                if (c < 0)                // EOF
+                {
+                    isEndOfStream = true;
+                    return -1;
+                }
+
+                if (c == '=')            // crc reached
+                {
+                    bufPtr = decode(readIgnoreSpace(), readIgnoreSpace(), readIgnoreSpace(), readIgnoreSpace(), outBuf);
+                    if (bufPtr == 0) {
+                        int i = ((outBuf[0] & 0xff) << 16)
+                                | ((outBuf[1] & 0xff) << 8)
+                                | (outBuf[2] & 0xff);
+
+                        crcFound = true;
+
+                        if (i != crc.getValue()) {
+                            throw new IOException("crc check failed in armored message.");
+                        }
+                        return read();
+                    } else {
+                        if (detectMissingChecksum) {
+                            throw new IOException("no crc found in armored message");
+                        }
+                    }
+                } else if (c == '-')        // end of record reached
+                {
+                    while ((c = in.read()) >= 0) {
+                        if (c == '\n' || c == '\r') {
+                            break;
+                        }
+                    }
+
+                    if (!crcFound && detectMissingChecksum) {
+                        throw new IOException("crc check not found");
+                    }
+
+                    crcFound = false;
+                    start = true;
+                    bufPtr = 3;
+
+                    if (c < 0) {
+                        isEndOfStream = true;
+                    }
+
+                    return -1;
+                } else                   // data
+                {
+                    bufPtr = decode(c, readIgnoreSpace(), readIgnoreSpace(), readIgnoreSpace(), outBuf);
+                }
+            } else {
+                if (c >= 0) {
+                    bufPtr = decode(c, readIgnoreSpace(), readIgnoreSpace(), readIgnoreSpace(), outBuf);
+                } else {
+                    isEndOfStream = true;
+                    return -1;
+                }
+            }
+        }
+
+        c = outBuf[bufPtr++];
+
+        crc.update(c);
+
+        return c;
+    }
+
+    /**
+     * Reads up to <code>len</code> bytes of data from the input stream into
+     * an array of bytes.  An attempt is made to read as many as
+     * <code>len</code> bytes, but a smaller number may be read.
+     * The number of bytes actually read is returned as an integer.
+     * <p>
+     * The first byte read is stored into element <code>b[off]</code>, the
+     * next one into <code>b[off+1]</code>, and so on. The number of bytes read
+     * is, at most, equal to <code>len</code>.
+     * <p>
+     * NOTE: We need to override the custom behavior of Java's {@link InputStream#read(byte[], int, int)},
+     * as the upstream method silently swallows {@link IOException IOExceptions}.
+     * This would cause CRC checksum errors to go unnoticed.
+     *
+     * @param b   byte array
+     * @param off offset at which we start writing data to the array
+     * @param len number of bytes we write into the array
+     * @return total number of bytes read into the buffer
+     * @throws IOException if an exception happens AT ANY POINT
+     * @see <a href="https://github.com/bcgit/bc-java/issues/998">Related BC bug report</a>
+     */
+    public int read(byte[] b, int off, int len) throws IOException {
+        checkIndexSize(b.length, off, len);
+
+        if (len == 0) {
+            return 0;
+        }
+
+        int c = read();
+        if (c == -1) {
+            return -1;
+        }
+        b[off] = (byte) c;
+
+        int i = 1;
+        for (; i < len; i++) {
+            c = read();
+            if (c == -1) {
+                break;
+            }
+            b[off + i] = (byte) c;
+        }
+        return i;
+    }
+
+    private void checkIndexSize(int size, int off, int len) {
+        if (off < 0 || len < 0) {
+            throw new IndexOutOfBoundsException("Offset and length cannot be negative.");
+        }
+        if (off > size - len) {
+            throw new IndexOutOfBoundsException("Invalid offset and length.");
+        }
+    }
+
+    public void close()
+            throws IOException {
+        in.close();
+    }
+
+    /**
+     * Change how the stream should react if it encounters missing CRC checksum.
+     * The default value is false (ignore missing CRC checksums). If the behavior is set to true,
+     * an {@link IOException} will be thrown if a missing CRC checksum is encountered.
+     *
+     * @param detectMissing ignore missing CRC sums
+     */
+    public void setDetectMissingCRC(boolean detectMissing) {
+        this.detectMissingChecksum = detectMissing;
     }
 }

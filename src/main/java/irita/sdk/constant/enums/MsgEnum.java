@@ -1,7 +1,6 @@
 package irita.sdk.constant.enums;
 
 import irita.sdk.exception.IritaSDKException;
-import proto.cosmwasm.wasm.v1.Tx;
 
 public enum MsgEnum {
     //tibc

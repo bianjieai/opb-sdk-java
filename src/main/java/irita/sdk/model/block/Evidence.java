@@ -1,7 +1,6 @@
 package irita.sdk.model.block;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Evidence {

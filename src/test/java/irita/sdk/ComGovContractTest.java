@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ComGovContractTest {
     private CommunityGovClient comGovClient;
     private WasmClient wasmClient;
-    private BaseTx txBaseTx = new BaseTx(200000, new Fee("200000", "uirita"), BroadcastMode.Commit);
+    private final BaseTx txBaseTx = new BaseTx(200000, new Fee("200000", "uirita"), BroadcastMode.Commit);
 
 
     @BeforeEach

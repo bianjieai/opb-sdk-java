@@ -1,6 +1,3 @@
-/**
- * Copyright 2021 jb51.net
- */
 package irita.sdk.model.block;
 
 import com.fasterxml.jackson.annotation.JsonProperty;

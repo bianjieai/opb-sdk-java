@@ -16,7 +16,7 @@ import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class KeyManagerTest {
+public class Sm2KeyManagerTest {
     @Test
     public void recoverFromMnemonic() {
         String mnemonic = "opera vivid pride shallow brick crew found resist decade neck expect apple chalk belt sick author know try tank detail tree impact hand best";
@@ -45,26 +45,26 @@ public class KeyManagerTest {
         KeyManager km = KeyManagerFactory.createDefault();
         km.recover(privKey);
 
-        String keystore = km.export("123456");
+        String keystore = km.export("1234567890");
         System.out.println(keystore);
     }
 
     @Test
     @Tag("read keystore from str")
-    public void recoverFromKeystore1() throws IOException {
+    public void recoverFromKeystore1() {
         String keystore = "-----BEGIN TENDERMINT PRIVATE KEY-----\n" +
-                "salt: 183EF9B57DEF8EF8C3AD9D21DE672E1B\n" +
+                "salt: 4C36B74DE23723FD901959F38A98B265\n" +
                 "type: sm2\n" +
                 "kdf: bcrypt\n" +
                 "\n" +
-                "cpreEPwi0X3yIdsAIf94fR6s8L1TnDAQd/r4ifID6GmQX5a+4ehMmnTp2JjDpUe5\n" +
-                "kpgRI7CzF0DjKpPLvY9V9ZSXJFN42LHWscxqQ1E=\n" +
-                "=nJvd\n" +
+                "tqltk3bgDpJZuAtw2GDNfuJ7lybzcMdDJGWa5DuMZp/BMITl8yI2eoApNt1oenCg\n" +
+                "3Ts31l03VQcHvoqloQ/rNOfKBoDrKVbt8QSodKI=\n" +
+                "=1gIS\n" +
                 "-----END TENDERMINT PRIVATE KEY-----";
 
         InputStream input = new ByteArrayInputStream(keystore.getBytes(StandardCharsets.UTF_8));
         KeyManager km = KeyManagerFactory.createDefault();
-        km.recover(input, "123456");
+        km.recover(input, "1234567890");
 
         KeyInfo keyInfo = km.getCurrentKeyInfo();
         assertEquals("iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3", keyInfo.getAddress());
@@ -76,7 +76,7 @@ public class KeyManagerTest {
     public void recoverFromKeystore2() throws IOException {
         FileInputStream input = new FileInputStream("src/test/resources/priv.key");
         KeyManager km = KeyManagerFactory.createDefault();
-        km.recover(input, "123456");
+        km.recover(input, "1234567890");
 
         KeyInfo keyInfo = km.getCurrentKeyInfo();
         assertEquals("iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3", keyInfo.getAddress());

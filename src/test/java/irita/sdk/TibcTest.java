@@ -10,7 +10,6 @@ import irita.sdk.key.KeyManagerFactory;
 import irita.sdk.model.BaseTx;
 import irita.sdk.model.Fee;
 import irita.sdk.model.ResultTx;
-import irita.sdk.module.nft.MintNFTRequest;
 import irita.sdk.module.tibc.TibcClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -23,15 +22,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TibcTest {
-    private KeyManager km;
     private TibcClient tibcClient;
-    private IritaClient client;
-    private BaseTx baseTx = new BaseTx(200000, new Fee("300000", "stake"), BroadcastMode.Commit);
+    private final BaseTx baseTx = new BaseTx(200000, new Fee("300000", "stake"), BroadcastMode.Commit);
 
     @BeforeEach
     public void init() {
         String mnemonic = "genre stamp head slam drop chuckle patrol mushroom staff range bomb accuse donor bounce main ancient home guide account floor label trigger wife doctor";
-        km = KeyManagerFactory.createKeyManger(AlgoEnum.SECP256K1);
+        KeyManager km = KeyManagerFactory.createKeyManger(AlgoEnum.SECP256K1);
         km.recover(mnemonic);
 //        String keystore="-----BEGIN TENDERMINT PRIVATE KEY-----\n"+
 //                "salt: 183EF9B57DEF8EF8C3AD9D21DE672E1B\n"+
@@ -52,7 +49,7 @@ public class TibcTest {
         ClientConfig clientConfig = new ClientConfig(nodeUri, grpcAddr, chainId);
         OpbConfig opbConfig = null;
 
-        client = new IritaClient(clientConfig, opbConfig, km);
+        IritaClient client = new IritaClient(clientConfig, opbConfig, km);
         tibcClient = client.getTibcClient();
         assertEquals("iaa1qvek4n2awq3zgpwqtr5tcp8mj6u2hpqf0r4x0l", km.getCurrentKeyInfo().getAddress());
     }

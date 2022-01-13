@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class NftTest {
     private KeyManager km;
     private NftClient nftClient;
-    private BaseTx baseTx = new BaseTx(200000, new Fee("300000", "uirita"), BroadcastMode.Commit);
+    private final BaseTx baseTx = new BaseTx(200000, new Fee("300000", "uirita"), BroadcastMode.Commit);
 
     @BeforeEach
     public void init() {

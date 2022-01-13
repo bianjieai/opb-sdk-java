@@ -5,10 +5,8 @@ import org.bouncycastle.util.Strings;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.Iterator;
 
 /**
  * Output stream that writes data in ASCII Armored format.
@@ -18,7 +16,8 @@ import java.util.Iterator;
  * Note 2: as multiple PGP blobs are often written to the same stream, close() does not close the underlying stream.
  * </p>
  */
-public class ArmoredOutputStreamImpl extends OutputStream {
+public class ArmoredOutputStream
+        extends OutputStream {
     public static final String VERSION_HDR = "Version";
 
     private static final byte[] encodingTable =
@@ -108,7 +107,7 @@ public class ArmoredOutputStreamImpl extends OutputStream {
      *
      * @param out the OutputStream to wrap.
      */
-    public ArmoredOutputStreamImpl(
+    public ArmoredOutputStream(
             OutputStream out) {
         this.out = out;
 
@@ -118,8 +117,28 @@ public class ArmoredOutputStreamImpl extends OutputStream {
     }
 
     /**
-     * Set an additional header entry. Any current value(s) under the same name will be
-     * replaced by the new one. A null value will clear the entry for name.
+     * Constructs an armored output stream with default and custom headers.
+     *
+     * @param out     the OutputStream to wrap.
+     * @param headers additional headers that add to or override the {@link #resetHeaders() default
+     *                headers}.
+     */
+    public ArmoredOutputStream(
+            OutputStream out,
+            Hashtable headers) {
+        this(out);
+
+        Enumeration e = headers.keys();
+
+        while (e.hasMoreElements()) {
+            Object key = e.nextElement();
+
+            this.headers.put(key, headers.get(key));
+        }
+    }
+
+    /**
+     * Set an additional header entry. A null value will clear the entry for name.
      *
      * @param name  the name of the header entry.
      * @param value the value of the header entry.
@@ -130,14 +149,7 @@ public class ArmoredOutputStreamImpl extends OutputStream {
         if (value == null) {
             this.headers.remove(name);
         } else {
-            ArrayList valueList = (ArrayList) headers.get(name);
-            if (valueList == null) {
-                valueList = new ArrayList();
-                headers.put(name, valueList);
-            } else {
-                valueList.clear();
-            }
-            valueList.add(value);
+            this.headers.put(name, value);
         }
     }
 
@@ -145,13 +157,17 @@ public class ArmoredOutputStreamImpl extends OutputStream {
      * Reset the headers to only contain a Version string (if one is present)
      */
     public void resetHeaders() {
-        ArrayList versions = (ArrayList) headers.get(VERSION_HDR);
+        String version = (String) headers.get(VERSION_HDR);
 
         headers.clear();
 
-        if (versions != null) {
-            headers.put(VERSION_HDR, versions);
+        if (version != null) {
+            headers.put(VERSION_HDR, version);
         }
+    }
+
+    public void endClearText() {
+        clearText = false;
     }
 
     private void writeHeaderEntry(
@@ -225,7 +241,7 @@ public class ArmoredOutputStreamImpl extends OutputStream {
             }
 
             if (headers.containsKey(VERSION_HDR)) {
-                writeHeaderEntry(VERSION_HDR, ((ArrayList) headers.get(VERSION_HDR)).get(0).toString());
+                writeHeaderEntry(VERSION_HDR, (String) headers.get(VERSION_HDR));
             }
 
             Enumeration e = headers.keys();
@@ -233,10 +249,7 @@ public class ArmoredOutputStreamImpl extends OutputStream {
                 String key = (String) e.nextElement();
 
                 if (!key.equals(VERSION_HDR)) {
-                    ArrayList values = (ArrayList) headers.get(key);
-                    for (Iterator it = values.iterator(); it.hasNext(); ) {
-                        writeHeaderEntry(key, it.next().toString());
-                    }
+                    writeHeaderEntry(key, (String) headers.get(key));
                 }
             }
 
@@ -312,34 +325,5 @@ public class ArmoredOutputStreamImpl extends OutputStream {
             type = null;
             start = true;
         }
-    }
-}
-
-class CRC24 {
-    private static final int CRC24_INIT = 11994318;
-    private static final int CRC24_POLY = 25578747;
-    private int crc = 11994318;
-
-    public CRC24() {
-    }
-
-    public void update(int var1) {
-        this.crc ^= var1 << 16;
-
-        for (int var2 = 0; var2 < 8; ++var2) {
-            this.crc <<= 1;
-            if ((this.crc & 16777216) != 0) {
-                this.crc ^= 25578747;
-            }
-        }
-
-    }
-
-    public int getValue() {
-        return this.crc;
-    }
-
-    public void reset() {
-        this.crc = 11994318;
     }
 }
