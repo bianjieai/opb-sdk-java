@@ -16,6 +16,7 @@ import irita.sdk.model.tx.EventQueryBuilder;
 import irita.sdk.tx.TxEngine;
 import irita.sdk.tx.TxEngineFactory;
 import irita.sdk.util.HashUtils;
+import irita.sdk.util.HttpClientGetServerCertificate;
 import org.bouncycastle.util.Strings;
 import org.bouncycastle.util.encoders.Hex;
 import proto.cosmos.auth.v1beta1.Auth;
@@ -24,6 +25,7 @@ import proto.cosmos.auth.v1beta1.QueryOuterClass;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.security.cert.X509Certificate;
 import java.util.List;
 
 public class BaseClient {
@@ -44,7 +46,17 @@ public class BaseClient {
         this.km = keyManager;
 
         this.txEngine = TxEngineFactory.createTxEngine(km, clientConfig.getChainID());
-        this.grpcClient = GrpcFactory.createGrpcClient(clientConfig, opbConfig);
+        if (opbConfig.isEnableTLS()) {
+            X509Certificate[] certificates;
+            try {
+                certificates = HttpClientGetServerCertificate.getGateWayTlsCertPool(clientConfig.getRpcUri());
+                this.grpcClient = GrpcFactory.createGrpcClient(clientConfig, opbConfig, certificates);
+            } catch (IOException e) {
+                throw new IritaSDKException(e.getMessage());
+            }
+        } else {
+            this.grpcClient = GrpcFactory.createGrpcClient(clientConfig, opbConfig);
+        }
         this.rpcClient = new RpcClient(clientConfig, opbConfig);
     }
 

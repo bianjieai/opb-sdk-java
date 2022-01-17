@@ -111,6 +111,8 @@ https://mvnrepository.com/artifact/io.github.bianjieai
         String chainId = "wenchangchain";
         ClientConfig clientConfig = new ClientConfig(nodeUri, grpcAddr, chainId);
         OpbConfig opbConfig = new OpbConfig(${projectID}, ${projectKey}, km.getCurrentKeyInfo().getAddress()); // 如果没有 projectKey 传null
+        // 开启 TLS 连接
+        opbConfig.setRequireTransportSecurity(true);
 
         OpbClient client = new OpbClient(clientConfig, opbConfig, km);
         assertEquals("iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3", km.getCurrentKeyInfo().getAddress());
