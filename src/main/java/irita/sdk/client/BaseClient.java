@@ -46,7 +46,7 @@ public class BaseClient {
         this.km = keyManager;
 
         this.txEngine = TxEngineFactory.createTxEngine(km, clientConfig.getChainID());
-        if (opbConfig.isEnableTLS()) {
+        if (opbConfig != null && opbConfig.isEnableTLS()) {
             X509Certificate[] certificates;
             try {
                 certificates = HttpClientGetServerCertificate.getGateWayTlsCertPool(clientConfig.getRpcUri());
