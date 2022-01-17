@@ -2,19 +2,11 @@ package irita.sdk.key;
 
 import irita.sdk.exception.IritaSDKException;
 import irita.sdk.util.Bech32Utils;
-import irita.sdk.util.Bip44Utils;
 import irita.sdk.util.HashUtils;
 import irita.sdk.util.SecP256K1Utils;
-import org.bitcoinj.crypto.DeterministicKey;
-import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPrivateKey;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.math.ec.ECPoint;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.math.BigInteger;
-import java.security.*;
-import java.security.cert.CertificateException;
 
 /**
  * Secp256k1KeyManger will implement in the future
@@ -28,18 +20,19 @@ public class Secp256k1KeyManger extends KeyManager {
     }
 
     @Override
-    public void recover(InputStream keystore, String password) {
-        throw new RuntimeException("TODO");
-    }
-
-    @Override
     public String export(String password) {
-        throw new RuntimeException("TODO");
+        return export(password, getCurrentKeyInfo().getPrivKey().toByteArray());
     }
 
     @Override
     public String export(String name, String password) {
-        throw new RuntimeException("TODO");
+        if (!keyDAO.has(name)) {
+            throw new IritaSDKException(String.format("name %s hasn't existed", name));
+        }
+        KeyInfo keyInfo = keyDAO.read(name, password);
+
+        byte[] privKey = keyInfo.getPrivKey().toByteArray();
+        return super.export(password, privKey);
     }
 
     @Override

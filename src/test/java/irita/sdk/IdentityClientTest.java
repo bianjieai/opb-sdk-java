@@ -4,7 +4,6 @@ import irita.sdk.client.IritaClient;
 import irita.sdk.config.ClientConfig;
 import irita.sdk.config.OpbConfig;
 import irita.sdk.constant.enums.BroadcastMode;
-import irita.sdk.key.AlgoEnum;
 import irita.sdk.key.KeyManager;
 import irita.sdk.key.KeyManagerFactory;
 import irita.sdk.model.BaseTx;
@@ -18,9 +17,6 @@ import proto.identity.IdentityOuterClass;
 import proto.identity.QueryGrpc;
 import proto.identity.QueryOuterClass;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
