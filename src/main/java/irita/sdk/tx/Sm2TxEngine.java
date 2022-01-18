@@ -62,19 +62,22 @@ public class Sm2TxEngine implements TxEngine {
         ECPoint publicKey = keyInfo.getPublicKey();
         byte[] publicKeyEncoded = publicKey.getEncoded(true);
 
+        long sequence = baseTx.getSequence() != 0 ? baseTx.getSequence() : account.getSequence();
+        long accountNumber = baseTx.getAccountNumber() != 0 ? baseTx.getAccountNumber() : account.getAccountNumber();
+
         TxOuterClass.AuthInfo ai = TxOuterClass.AuthInfo.newBuilder()
                 .addSignerInfos(
                         TxOuterClass.SignerInfo.newBuilder()
                                 .setPublicKey(Any.pack(Keys.PubKey.newBuilder().setKey(ByteString.copyFrom(publicKeyEncoded)).build(), "/"))
                                 .setModeInfo(TxOuterClass.ModeInfo.newBuilder().setSingle(TxOuterClass.ModeInfo.Single.newBuilder().setMode(Signing.SignMode.SIGN_MODE_DIRECT)))
-                                .setSequence(account.getSequence()))
+                                .setSequence(sequence))
                 .setFee(TxOuterClass.Fee.newBuilder().setGasLimit(baseTx.getGas()).addAmount(CoinOuterClass.Coin.newBuilder().setAmount(baseTx.getFee().getAmount()).setDenom(baseTx.getFee().getDenom()))).build();
 
 
         TxOuterClass.SignDoc signDoc = TxOuterClass.SignDoc.newBuilder()
                 .setBodyBytes(txBody.toByteString())
                 .setAuthInfoBytes(ai.toByteString())
-                .setAccountNumber(account.getAccountNumber())
+                .setAccountNumber(accountNumber)
                 .setChainId(chainID)
                 .build();
 
