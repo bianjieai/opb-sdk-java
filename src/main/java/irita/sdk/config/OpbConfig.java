@@ -5,6 +5,8 @@ public class OpbConfig {
     private final String projectKey;
     private final String chainAccountAddr;
 
+    private boolean enableTLS;
+
     public OpbConfig(String projectID, String projectKey, String chainAccountAddr) {
         this.projectID = projectID;
         this.projectKey = projectKey;
@@ -21,5 +23,13 @@ public class OpbConfig {
 
     public String getChainAccountAddr() {
         return chainAccountAddr;
+    }
+
+    public boolean isEnableTLS() {
+        return enableTLS;
+    }
+
+    public void setRequireTransportSecurity(boolean enabled) {
+        this.enableTLS = enabled;
     }
 }
