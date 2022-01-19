@@ -17,73 +17,110 @@ import proto.perm.Perm;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class PermTest {
     private IritaClient client;
-    private final BaseTx baseTx = new BaseTx(200000, new Fee("300000", "uirita"), BroadcastMode.Commit);
-
+    private final BaseTx baseTx = new BaseTx(200000, new Fee("200000", "uirita"), BroadcastMode.Commit);
 
     @BeforeEach
     public void init() {
-        Properties properties = Config.getTestConfig();
-        String mnemonic = properties.getProperty("mnemonic");
+        String mnemonic = "razor educate ostrich pave ...";
         KeyManager km = KeyManagerFactory.createDefault();
         km.recover(mnemonic);
 
-        String nodeUri = properties.getProperty("node_uri");
-        String grpcAddr = properties.getProperty("grpc_addr");
-        String chainId = properties.getProperty("chain_id");
+        String nodeUri = "http://192.168.150.43:26657";
+        String grpcAddr = "192.168.150.43:9090";
+        String chainId = "dev";
         ClientConfig clientConfig = new ClientConfig(nodeUri, grpcAddr, chainId);
         OpbConfig opbConfig = null;
 
         client = new IritaClient(clientConfig, opbConfig, km);
-        assertEquals(properties.getProperty("address"), km.getCurrentKeyInfo().getAddress());
+        assertEquals("iaa1v8xgh04q7axgn9kstudkeg7rj08ccg4eks8c8r", km.getCurrentKeyInfo().getAddress());
     }
 
     @Test
     @Disabled
     public void testTerm() throws Exception {
         PermClient permClient = client.getPermClient();
-        String acc = getRandomAddress();
+
+        String address = getRandomAddress();
+        String contractAddress = "0x7Ea6EEbDE8E360Bb7ceF58331462fb2B6B4BB674";
+
+        /**
+         * role
+         */
         //test AddRoles
         Perm.Role role = Perm.Role.BLACKLIST_ADMIN;
-        ResultTx resultTx = permClient.assignRoles(acc, Collections.singletonList(role), baseTx);
+        ResultTx resultTx = permClient.assignRoles(address, Collections.singletonList(role), baseTx);
         assertNotNull(resultTx.getResult().getHash());
 
         // test QueryRoles
-        List<Perm.Role> roles = permClient.queryRoles(acc);
+        List<Perm.Role> roles = permClient.queryRoles(address);
         assertNotNull(roles);
         assertEquals(1, roles.size());
         assertEquals(role, roles.get(0));
 
         // test RemoveRoles
-        permClient.unAssignRoles(acc, Collections.singletonList(role), baseTx);
+        permClient.unAssignRoles(address, Collections.singletonList(role), baseTx);
         assertNotNull(resultTx.getResult().getHash());
 
         // test QueryRoles again
-        roles = permClient.queryRoles(acc);
+        roles = permClient.queryRoles(address);
         assertTrue(roles == null || roles.size() == 0);
 
-        // test BlockAccount
-        resultTx = permClient.blockAccount(acc, baseTx);
-        assertNotNull(resultTx.getResult().getHash());
+        /**
+         * account
+         */
+        //query block account list
+        List<String> accounts = permClient.queryBlockListAccount();
+        assertNotNull(accounts);
+        int size = accounts.size();
 
-        // test QueryBlacklist
-        List<String> bls = permClient.queryBlacklist();
-        assertNotNull(roles);
-        assertEquals(1, bls.size());
-        assertEquals(acc, bls.get(0));
+        //block account
+        resultTx = permClient.blockAccount(address, baseTx);
+        assertNotNull(resultTx);
 
-        // test UnblockAccount
-        resultTx = permClient.unblockAccount(acc, baseTx);
-        assertNotNull(resultTx.getResult().getHash());
+        //query block account list
+        accounts = permClient.queryBlockListAccount();
+        assertNotNull(accounts);
+        assertEquals(size + 1, accounts.size());
 
-        // test QueryBlacklist again
-        bls = permClient.queryBlacklist();
-        assertTrue(bls == null || bls.size() == 0);
+        //unblock account
+        resultTx = permClient.unblockAccount(address, baseTx);
+        assertNotNull(resultTx);
+
+        //query block account list
+        accounts = permClient.queryBlockListAccount();
+        assertNotNull(accounts);
+        assertEquals(size, accounts.size());
+
+        /**
+         * contract
+         */
+        //query block contract list
+        List<String> contracts = permClient.queryBlockListContract();
+        assertNotNull(contracts);
+        size = contracts.size();
+
+        //block contract
+        resultTx = permClient.blockContract(contractAddress, baseTx);
+        assertNotNull(resultTx);
+
+        //query block contract list
+        contracts = permClient.queryBlockListContract();
+        assertNotNull(contracts);
+        assertEquals(size + 1, contracts.size());
+
+        //unblock contract
+        resultTx = permClient.unblockContract(contractAddress, baseTx);
+        assertNotNull(resultTx);
+
+        //query block contract list
+        contracts = permClient.queryBlockListContract();
+        assertNotNull(contracts);
+        assertEquals(size, contracts.size());
     }
 
     public String getRandomAddress() throws Exception {

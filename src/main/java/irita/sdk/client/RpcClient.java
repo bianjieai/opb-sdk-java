@@ -155,8 +155,10 @@ public class RpcClient {
             for (int j = 0; j < result.getTxResult().getEvents().get(i).getAttributes().size(); j++) {
                 result.getTxResult().getEvents().get(i).getAttributes().get(j).setKey(
                         new String(Base64.getDecoder().decode(result.getTxResult().getEvents().get(i).getAttributes().get(j).getKey())));
-                result.getTxResult().getEvents().get(i).getAttributes().get(j).setValue(
-                        new String(Base64.getDecoder().decode(result.getTxResult().getEvents().get(i).getAttributes().get(j).getValue())));
+                if (StringUtils.isNotEmpty(result.getTxResult().getEvents().get(i).getAttributes().get(j).getValue())) {
+                    result.getTxResult().getEvents().get(i).getAttributes().get(j).setValue(
+                            new String(Base64.getDecoder().decode(result.getTxResult().getEvents().get(i).getAttributes().get(j).getValue())));
+                }
             }
         }
         ResultQueryTx resultQueryTx = new ResultQueryTx();

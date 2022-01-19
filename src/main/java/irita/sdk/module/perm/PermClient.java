@@ -7,10 +7,7 @@ import irita.sdk.model.Account;
 import irita.sdk.model.BaseTx;
 import irita.sdk.model.ResultTx;
 import irita.sdk.util.AddressUtils;
-import proto.perm.Perm;
-import proto.perm.QueryGrpc;
-import proto.perm.QueryOuterClass;
-import proto.perm.Tx;
+import proto.perm.*;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -77,6 +74,30 @@ public class PermClient {
         return baseClient.buildAndSend(msgs, baseTx, sender);
     }
 
+    public ResultTx blockContract(String contractAddress, BaseTx baseTx) throws IOException {
+        Account sender = baseClient.queryAccount(baseTx);
+
+        Tx.MsgBlockContract msg = Tx.MsgBlockContract
+                .newBuilder()
+                .setContractAddress(contractAddress)
+                .setOperator(sender.getAddress())
+                .build();
+        List<GeneratedMessageV3> msgs = Collections.singletonList(msg);
+        return baseClient.buildAndSend(msgs, baseTx, sender);
+    }
+
+    public ResultTx unblockContract(String contractAddress, BaseTx baseTx) throws IOException {
+        Account sender = baseClient.queryAccount(baseTx);
+
+        Tx.MsgUnblockContract msg = Tx.MsgUnblockContract
+                .newBuilder()
+                .setContractAddress(contractAddress)
+                .setOperator(sender.getAddress())
+                .build();
+        List<GeneratedMessageV3> msgs = Collections.singletonList(msg);
+        return baseClient.buildAndSend(msgs, baseTx, sender);
+    }
+
     public List<Perm.Role> queryRoles(String address) {
         AddressUtils.validAddress(address);
 
@@ -89,12 +110,21 @@ public class PermClient {
         return resp.getRolesList();
     }
 
-    public List<String> queryBlacklist() {
+    public List<String> queryBlockListAccount() {
         Channel channel = baseClient.getGrpcClient();
-        QueryOuterClass.QueryBlacklistRequest req = QueryOuterClass.QueryBlacklistRequest
+        QueryOuterClass.QueryBlockListRequest req = QueryOuterClass.QueryBlockListRequest
                 .newBuilder()
                 .build();
-        QueryOuterClass.QueryBlacklistResponse resp = QueryGrpc.newBlockingStub(channel).blacklist(req);
+        QueryOuterClass.QueryBlockListResponse resp = QueryGrpc.newBlockingStub(channel).accountBlockList(req);
+        return resp.getAddressesList();
+    }
+
+    public List<String> queryBlockListContract() {
+        Channel channel = baseClient.getGrpcClient();
+        QueryOuterClass.QueryContractDenyList req = QueryOuterClass.QueryContractDenyList
+                .newBuilder()
+                .build();
+        QueryOuterClass.QueryContractDenyListResponse resp = QueryGrpc.newBlockingStub(channel).contractDenyList(req);
         return resp.getAddressesList();
     }
 }
