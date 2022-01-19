@@ -1,8 +1,8 @@
 package irita.sdk.module.nft;
 
 public class BurnNFTRequest {
-    private String denom;
-    private String id;
+    private String denom = "";
+    private String id = "";
 
     public String getDenom() {
         return denom;

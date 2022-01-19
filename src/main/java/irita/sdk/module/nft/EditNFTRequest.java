@@ -1,11 +1,11 @@
 package irita.sdk.module.nft;
 
 public class EditNFTRequest {
-    private String denom;
-    private String id;
-    private String name;
-    private String uri;
-    private String data;
+    private String denom = "";
+    private String id = "";
+    private String name = "";
+    private String uri = "";
+    private String data = "";
 
     public String getDenom() {
         return denom;

@@ -4,6 +4,9 @@ public class QueryDenomResp {
     private String id;
     private String name;
     private String schema;
+    private String symbol;
+    private boolean mintRestricted;
+    private boolean updateRestricted;
     private String creator;
 
     public QueryDenomResp() {
@@ -46,5 +49,29 @@ public class QueryDenomResp {
 
     public void setCreator(String creator) {
         this.creator = creator;
+    }
+
+    public String getSymbol() {
+        return symbol;
+    }
+
+    public void setSymbol(String symbol) {
+        this.symbol = symbol;
+    }
+
+    public boolean isMintRestricted() {
+        return mintRestricted;
+    }
+
+    public void setMintRestricted(boolean mintRestricted) {
+        this.mintRestricted = mintRestricted;
+    }
+
+    public boolean isUpdateRestricted() {
+        return updateRestricted;
+    }
+
+    public void setUpdateRestricted(boolean updateRestricted) {
+        this.updateRestricted = updateRestricted;
     }
 }
