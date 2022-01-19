@@ -294,6 +294,8 @@ https://mvnrepository.com/artifact/io.github.bianjieai
 查看 permClient 下的方法 (see method in perClient.java)
 
 ## 单元测试 (Unit Test Demo)
+[ServiceDemo.java](./src/test/java/irita/sdk/ServiceDemo.java)
+
 [MsgsDemo.java](./src/test/java/irita/sdk/MsgsDemo.java)
 
 [NftDemo.java](./src/test/java/irita/sdk/NftDemo.java)
