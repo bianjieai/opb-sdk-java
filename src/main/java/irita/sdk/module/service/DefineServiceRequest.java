@@ -14,39 +14,44 @@ public class DefineServiceRequest {
         return serviceName;
     }
 
-    public void setServiceName(String serviceName) {
+    public DefineServiceRequest setServiceName(String serviceName) {
         this.serviceName = serviceName;
+        return this;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
+    public DefineServiceRequest setDescription(String description) {
         this.description = description;
+        return this;
     }
 
     public List<String> getTags() {
         return tags;
     }
 
-    public void setTags(List<String> tags) {
+    public DefineServiceRequest setTags(List<String> tags) {
         this.tags = tags;
+        return this;
     }
 
     public String getAuthorDescription() {
         return authorDescription;
     }
 
-    public void setAuthorDescription(String authorDescription) {
+    public DefineServiceRequest setAuthorDescription(String authorDescription) {
         this.authorDescription = authorDescription;
+        return this;
     }
 
     public String getSchemas() {
         return schemas;
     }
 
-    public void setSchemas(String schemas) {
+    public DefineServiceRequest setSchemas(String schemas) {
         this.schemas = schemas;
+        return this;
     }
 }

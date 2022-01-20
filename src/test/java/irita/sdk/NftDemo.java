@@ -54,12 +54,24 @@ public class NftDemo {
         String denomID = "testdenom" + new Random().nextInt(1000);
         String denomName = "test_name";
         String schema = "no shcema";
+        String symbol = "symbol";
+        //是否限制发行
+        //true  只有 Denom 的所有者可以发行此类别的 NFT 给自己（发行到别的地址也是不可以的）
+        //false 任何人都可以发行 NFT
+        boolean mintRestricted = false;
+        //是否限制更新 NFT
+        //true  任何人都不可以更新 NFT
+        //false 只有此 NFT 的所有者才能更新
+        boolean updateRestricted = false;
 
         //issue denom 创建 denom
         IssueDenomRequest req = new IssueDenomRequest()
                 .setId(denomID)
                 .setName(denomName)
-                .setSchema(schema);
+                .setSchema(schema)
+                .setSymbol(symbol)
+                .setMintRestricted(mintRestricted)
+                .setUpdateRestricted(updateRestricted);
         ResultTx resultTx = nftClient.issueDenom(req, baseTx);
         assertNotNull(resultTx.getResult().getHash());
 
@@ -68,9 +80,24 @@ public class NftDemo {
         assertEquals(denomID, denom.getId());
         assertEquals(denomName, denom.getName());
         assertEquals(schema, denom.getSchema());
+        assertEquals(symbol, denom.getSymbol());
+        assertEquals(mintRestricted, denom.isMintRestricted());
+        assertEquals(updateRestricted, denom.isUpdateRestricted());
 
         KeyInfo keyInfo = km.getCurrentKeyInfo();
         assertEquals(keyInfo.getAddress(), denom.getCreator());
+
+        //transfer denom 更改denom的owner
+        String denomOwnerNew = "iaa14s9hekvzhtf3y3962zn3vzv45k0ay7mguyqhrl";
+        TransferDenomRequest transferDenomReq = new TransferDenomRequest()
+                .setId(denomID)
+                .setRecipient(denomOwnerNew);
+        resultTx = nftClient.transferDenom(transferDenomReq, baseTx);
+        assertNotNull(resultTx);
+
+        //query denom 通过denomID查询denom信息
+        denom = nftClient.queryDenom(denomID);
+        assertEquals(denomOwnerNew, denom.getCreator());
 
         //mint nft 在上面创建的denom下发行2个nft
         String nftID1 = "test1" + new Random().nextInt(1000);

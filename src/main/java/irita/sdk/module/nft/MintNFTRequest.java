@@ -1,12 +1,12 @@
 package irita.sdk.module.nft;
 
 public class MintNFTRequest {
-    private String denom;
-    private String id;
-    private String name;
-    private String uri;
-    private String data;
-    private String recipient;
+    private String denom = "";
+    private String id = "";
+    private String name = "";
+    private String uri = "";
+    private String data = "";
+    private String recipient = "";
 
     public String getDenom() {
         return denom;

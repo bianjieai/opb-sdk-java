@@ -36,7 +36,22 @@ public class NftClient {
                 .setId(req.getId())
                 .setName(req.getName())
                 .setSchema(req.getSchema())
+                .setSymbol(req.getSymbol())
+                .setMintRestricted(req.isMintRestricted())
+                .setUpdateRestricted(req.isUpdateRestricted())
                 .setSender(account.getAddress())
+                .build();
+        List<GeneratedMessageV3> msgs = Collections.singletonList(msg);
+        return baseClient.buildAndSend(msgs, baseTx, account);
+    }
+
+    public ResultTx transferDenom(TransferDenomRequest req, BaseTx baseTx) throws IOException {
+        Account account = baseClient.queryAccount(baseTx);
+        Tx.MsgTransferDenom msg = Tx.MsgTransferDenom
+                .newBuilder()
+                .setId(req.getId())
+                .setSender(account.getAddress())
+                .setRecipient(req.getRecipient())
                 .build();
         List<GeneratedMessageV3> msgs = Collections.singletonList(msg);
         return baseClient.buildAndSend(msgs, baseTx, account);
@@ -246,6 +261,9 @@ public class NftClient {
             res.setName(denom.getName());
             res.setSchema(denom.getSchema());
             res.setCreator(denom.getCreator());
+            res.setSymbol(denom.getSymbol());
+            res.setMintRestricted(denom.getMintRestricted());
+            res.setUpdateRestricted(denom.getUpdateRestricted());
             return res;
         }
 

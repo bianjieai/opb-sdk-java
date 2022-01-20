@@ -9,6 +9,7 @@ import irita.sdk.module.identity.IdentityClient;
 import irita.sdk.module.nft.NftClient;
 import irita.sdk.module.perm.PermClient;
 import irita.sdk.module.record.RecordClient;
+import irita.sdk.module.service.ServiceClient;
 import irita.sdk.module.tibc.TibcClient;
 import irita.sdk.module.wasm.WasmClient;
 
@@ -22,6 +23,7 @@ public class IritaClient {
     private RecordClient recordClient;
     private WasmClient wasmClient;
     private CommunityGovClient comGovClient;
+    private ServiceClient serviceClient;
 
     private IritaClient() {
     }
@@ -37,6 +39,7 @@ public class IritaClient {
         this.recordClient = new RecordClient(baseClient);
         this.wasmClient = new WasmClient(baseClient);
         this.comGovClient = new CommunityGovClient(this.wasmClient);
+        this.serviceClient = new ServiceClient(baseClient);
     }
 
     public BaseClient getBaseClient() {
@@ -117,6 +120,16 @@ public class IritaClient {
 
     public IritaClient setComGovClient(CommunityGovClient comGovClient) {
         this.comGovClient = comGovClient;
+        return this;
+    }
+
+
+    public ServiceClient getServiceClient() {
+        return serviceClient;
+    }
+
+    public IritaClient setServiceClient(ServiceClient serviceClient) {
+        this.serviceClient = serviceClient;
         return this;
     }
 }

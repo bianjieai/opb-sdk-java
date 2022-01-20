@@ -1,12 +1,12 @@
 package irita.sdk.module.nft;
 
 public class TransferNFTRequest {
-    private String denom;
-    private String id;
-    private String uri;
-    private String data;
-    private String name;
-    private String recipient;
+    private String denom = "";
+    private String id = "";
+    private String uri = "";
+    private String data = "";
+    private String name = "";
+    private String recipient = "";
 
     public String getDenom() {
         return denom;
