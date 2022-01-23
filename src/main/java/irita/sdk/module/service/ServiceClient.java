@@ -1,16 +1,24 @@
 package irita.sdk.module.service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.protobuf.GeneratedMessageV3;
 import io.grpc.Channel;
 import irita.sdk.client.BaseClient;
+import irita.sdk.client.ListenChainUtil;
+import irita.sdk.constant.AttributeKey;
+import irita.sdk.constant.EventType;
 import irita.sdk.constant.enums.EventEnum;
-import irita.sdk.model.Account;
-import irita.sdk.model.BaseTx;
-import irita.sdk.model.Coin;
-import irita.sdk.model.ResultTx;
+import irita.sdk.exception.IritaSDKException;
+import irita.sdk.function.InvokeCallback;
+import irita.sdk.function.RespondCallback;
+import irita.sdk.model.*;
 import irita.sdk.model.tx.Condition;
 import irita.sdk.model.tx.EventQueryBuilder;
 import irita.sdk.util.AddressUtils;
+import irita.sdk.util.LogUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.bouncycastle.util.encoders.Hex;
 import proto.cosmos.base.query.v1beta1.Pagination;
 import proto.cosmos.base.v1beta1.CoinOuterClass;
 import proto.service.QueryGrpc;
@@ -19,9 +27,7 @@ import proto.service.Service;
 import proto.service.Tx;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class ServiceClient {
     private final BaseClient baseClient;
@@ -159,6 +165,15 @@ public class ServiceClient {
         return new CallServiceResp(reqCtxId, resultTx);
     }
 
+    // when callback != null, will subscribeServiceResponse
+    public CallServiceResp callService(CallServiceRequest req, BaseTx baseTx, InvokeCallback callback) throws IOException {
+        CallServiceResp resp = callService(req, baseTx);
+        if (callback != null) {
+            subscribeServiceResponse(resp.getReqCtxId(), callback);
+        }
+        return resp;
+    }
+
 
     public ResultTx responseService(ResponseServiceRequest req, BaseTx baseTx) throws IOException {
         Account provider = baseClient.queryAccount(baseTx);
@@ -207,9 +222,6 @@ public class ServiceClient {
         return resp == null ? null : resp.getServiceBindingsList();
     }
 
-    public void queryServiceBindings(String serviceName, Integer offset, Integer limit) {
-    }
-
     public Service.Request queryServiceRequest(String requestID) {
         Channel channel = baseClient.getGrpcClient();
         QueryOuterClass.QueryRequestRequest req = QueryOuterClass.QueryRequestRequest
@@ -229,9 +241,6 @@ public class ServiceClient {
                 .build();
         QueryOuterClass.QueryRequestsResponse resp = QueryGrpc.newBlockingStub(channel).requests(req);
         return resp == null ? null : resp.getRequestsList();
-    }
-
-    public void queryServiceRequests(String serviceName, String provider, Integer offset, Integer limit) {
     }
 
     public List<Service.Request> queryRequestsByReqCtx(String reqCtxID, long batchCounter, Pagination.PageRequest page) {
@@ -268,9 +277,6 @@ public class ServiceClient {
         return resp == null ? null : resp.getResponsesList();
     }
 
-    public void queryServiceResponses(String reqCtxID, int batchCounter, Integer offset, Integer limit) {
-    }
-
     public Service.RequestContext queryRequestContext(String reqCtxID) {
         Channel channel = baseClient.getGrpcClient();
         QueryOuterClass.QueryRequestContextRequest req = QueryOuterClass.QueryRequestContextRequest
@@ -281,17 +287,100 @@ public class ServiceClient {
         return resp == null ? null : resp.getRequestContext();
     }
 
-    // TODO use websocket
-    public void subscribeRequest(String serviceName, BaseTx baseTx) {
+    public void subscribeServiceRequest(String serviceName, RespondCallback callback, BaseTx baseTx) {
         Account account = baseClient.queryAccount(baseTx);
-
         EventQueryBuilder builder = new EventQueryBuilder()
-                .AddCondition(Condition.newCond("new_batch_request_provider", "service_name").eq(serviceName))
-                .AddCondition(Condition.newCond("new_batch_request_provider", "provider").eq(account.getAddress()))
-                .AddCondition(Condition.newCond("tm", "event").eq("NewBlock"));
+                .AddCondition(Condition.newCond(EventType.NEW_BATCH_REQUEST_PROVIDER, AttributeKey.SERVICE_NAME).eq(serviceName))
+                .AddCondition(Condition.newCond(EventType.NEW_BATCH_REQUEST_PROVIDER, AttributeKey.PROVIDER).eq(account.getAddress()));
 
+        baseClient.getRpcClient().subscribeNewBlock(builder, block -> {
+            List<Events> events = ListenChainUtil.decodeEvent(block);
+            List<GeneratedMessageV3> msgs = genServiceRespondMsgs(events, serviceName, account.getAddress(), callback);
+            if (msgs == null || msgs.size() == 0) {
+                return;
+            }
+
+            Account accountRefresh = baseClient.queryAccount(baseTx);
+            ResultTx resultTx = baseClient.buildAndSend(msgs, baseTx, accountRefresh);
+            LogUtils.info("provider respond, tx_hash:" + resultTx.getResult().getHash());
+        });
     }
 
-    public void subscribeResponse() {
+    private List<GeneratedMessageV3> genServiceRespondMsgs(List<Events> events, String serviceName, String provider, RespondCallback callback) {
+        List<String> reqIds = new ArrayList<>();
+        for (Events event : events) {
+            if (EventType.NEW_BATCH_REQUEST_PROVIDER.equals(event.getType())) {
+                List<Attributes> attributes = event.getAttributes();
+                String svcName = attributes.stream().filter(a -> AttributeKey.SERVICE_NAME.equals(a.getKey())).map(Attributes::getValue).findAny().orElse("");
+                String prov = attributes.stream().filter(a -> AttributeKey.PROVIDER.equals(a.getKey())).map(Attributes::getValue).findAny().orElse("");
+
+                if (serviceName.equals(svcName) && provider.equals(prov)) {
+                    String reqIDsStr = event.getAttributes().stream().filter(e -> e.getKey().equals(AttributeKey.REQUESTS)).map(Attributes::getValue).findAny().orElse("");
+                    if (StringUtils.isEmpty(reqIDsStr)) {
+                        return null;
+                    }
+
+                    try {
+                        reqIds.addAll(new ObjectMapper().readValue(reqIDsStr, new TypeReference<List<String>>() {
+                        }));
+                    } catch (IOException e) {
+                        throw new IritaSDKException(e.getMessage());
+                    }
+                }
+            }
+        }
+
+        List<GeneratedMessageV3> msgs = new ArrayList<>();
+        for (String reqId : reqIds) {
+            Service.Request request = queryServiceRequest(reqId);
+            // checkAgain
+            if (serviceName.equals(request.getServiceName()) && provider.equals(request.getProvider())) {
+                ServiceResponseInfo m = callback.apply(request.getRequestContextId(), request.getId(), request.getInput());
+                Tx.MsgRespondService msg = Tx.MsgRespondService.newBuilder()
+                        .setRequestId(request.getId())
+                        .setProvider(provider)
+                        .setOutput(m.getOutput())
+                        .setResult(m.getResult())
+                        .build();
+
+                msgs.add(msg);
+            }
+        }
+        return msgs;
+    }
+
+    public void subscribeServiceResponse(String reqCtxID, InvokeCallback callback) {
+        if (StringUtils.isEmpty(reqCtxID)) {
+            throw new IritaSDKException("reqCtxID should not be empty");
+        }
+
+        EventQueryBuilder builder = new EventQueryBuilder()
+                .AddCondition(Condition.newCond(EventType.RESPONSE_SERVICE, AttributeKey.REQUEST_CONTEXT_ID).eq(reqCtxID));
+
+        baseClient.getRpcClient().subscribeTx(builder, tx -> {
+            irita.sdk.model.ws.tx.Events events = tx.getResult().getEvents();
+            LogUtils.info(String.format("consumer received response transaction sent by provider, tx_hash:%s, height: %s, reqCtxId: %s"
+                    , events.getTxHash(), events.getTxHeight(), reqCtxID));
+
+            List<Tx.MsgRespondService> msgs = ListenChainUtil.getResponseMsgsFromTx(tx);
+            for (Tx.MsgRespondService msg : msgs) {
+                String reqCtxID2 = splitRequestID(msg.getRequestId());
+                if (reqCtxID2.equals(reqCtxID)) {
+                    callback.accept(reqCtxID, msg.getRequestId(), msg.getOutput());
+                }
+            }
+        });
+    }
+
+    private String splitRequestID(String requestId) {
+        byte[] hexBytes = Hex.decode(requestId);
+        final int requestIDLen = 58;
+        if (hexBytes.length != requestIDLen) {
+            throw new IritaSDKException("invalid request id");
+        }
+
+        byte[] dest = new byte[40];
+        System.arraycopy(hexBytes, 0, dest, 0, dest.length);
+        return Hex.toHexString(dest).toUpperCase(Locale.ROOT);
     }
 }
