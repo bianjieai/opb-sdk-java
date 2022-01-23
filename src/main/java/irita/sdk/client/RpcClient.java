@@ -290,7 +290,6 @@ public class RpcClient implements WsEvent {
         return resultBlockResults.getResult();
     }
 
-
     @Override
     public void subscribeNewBlock(EventQueryBuilder builder, EventHandler<NewBlockBean> blockHandler) {
         builder = Optional.ofNullable(builder).orElse(new EventQueryBuilder());

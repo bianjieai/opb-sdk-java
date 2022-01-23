@@ -37,15 +37,15 @@ public class ServiceDemoTest {
     @BeforeEach
     public void init() {
         //更换为自己链上地址的助记词
-        String mnemonic = "require trip wage figure garage reunion neutral cave because scorpion inject hover blouse dress skin oven garlic virus exist purpose boy convince become inform";
+        String mnemonic = "opera vivid pride shallow brick crew found resist decade neck expect apple chalk belt sick author know try tank detail tree impact hand best";
         km = KeyManagerFactory.createDefault();
         km.recover(mnemonic);
 
         //连接测试网（连接主网请参考README.md）
-        String nodeUri = "http://101.132.138.109:26657";
-        String grpcAddr = "101.132.138.109:9090";
+        String nodeUri = "http://47.100.192.234:26657";
+        String grpcAddr = "47.100.192.234:9090";
         String chainId = "testing";
-        String wsAddr = "ws://101.132.138.109:26657/websocket";
+        String wsAddr = "ws://47.100.192.234:9090/websocket";
         ClientConfig clientConfig = new ClientConfig(nodeUri, grpcAddr, chainId, wsAddr);
         //测试网为null，主网请参考README.md
         OpbConfig opbConfig = null;
@@ -53,7 +53,7 @@ public class ServiceDemoTest {
         IritaClient client = new IritaClient(clientConfig, opbConfig, km);
         serviceClient = client.getServiceClient();
         //判断由助记词恢复的是否为预期的链上地址
-        assertEquals("iaa106lcg5m8h3cdawun7c2rrwpj7q3ncfr9k3wxwx", km.getCurrentKeyInfo().getAddress());
+        assertEquals("iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3", km.getCurrentKeyInfo().getAddress());
     }
 
     @Test
