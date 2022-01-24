@@ -11,20 +11,25 @@ import irita.sdk.model.Coin;
 import irita.sdk.model.Fee;
 import irita.sdk.model.ResultTx;
 import irita.sdk.module.service.*;
+import irita.sdk.ws.JsonUtils;
+import irita.sdk.ws.MockServiceInput;
+import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import proto.service.Service;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class ServiceDemo {
+public class ServiceDemoTest {
     private KeyManager km;
     private ServiceClient serviceClient;
     private final BaseTx baseTx = new BaseTx(200000, new Fee("200000", "uirita"), BroadcastMode.Commit);
@@ -40,7 +45,8 @@ public class ServiceDemo {
         String nodeUri = "http://47.100.192.234:26657";
         String grpcAddr = "47.100.192.234:9090";
         String chainId = "testing";
-        ClientConfig clientConfig = new ClientConfig(nodeUri, grpcAddr, chainId);
+        String wsAddr = "ws://47.100.192.234:9090/websocket";
+        ClientConfig clientConfig = new ClientConfig(nodeUri, grpcAddr, chainId, wsAddr);
         //测试网为null，主网请参考README.md
         OpbConfig opbConfig = null;
 
@@ -110,7 +116,7 @@ public class ServiceDemo {
         assertNotNull(definition);
 
         //绑定服务
-        Coin deposit = new Coin("upoint", "5000000000");
+        Coin deposit = new Coin("upoint", "10000");
         String pricing = "{\"price\":\"1upoint\"}";
         long qos = 50;
         String options = "{}";
@@ -153,7 +159,7 @@ public class ServiceDemo {
         System.out.println(callServiceResp.getResultTx().getResult().getHash());
 
 
-        String requestId = "";
+        String requestId;
         List<Service.Request> requestList = serviceClient.queryServiceRequests(serviceName, km.getCurrentKeyInfo().getAddress());
         for (Service.Request request : requestList) {
             requestId = request.getId();
@@ -175,8 +181,64 @@ public class ServiceDemo {
 
             Service.Response response = serviceClient.queryServiceResponse(requestId);
             assertNotNull(response);
-            assertEquals(output,response.getOutput());
+            assertEquals(output, response.getOutput());
             System.out.println(response.getOutput());
         }
+    }
+
+
+    @Test
+    @Disabled
+    public void subscribeRequest() throws Exception {
+        serviceClient.subscribeServiceRequest("testservice109", (reqCtxID, reqID, input) -> {
+            // 这里就是实际做的业务逻辑，reqCtxID, reqID 请求的ContextId 和 请求 ID，input 为结束到的入参
+            MockServiceInput params = JsonUtils.readValue(input, MockServiceInput.class);// 反序列化为自己想要的类型
+            String param1 = params.getBody().getParam1();
+            String param2 = params.getBody().getParam2();
+            System.out.println("成功监听到服务请求，应用程序处理中，param1:" + param1 + ", param2:" + param2);
+
+            // 下面的 result 代表业务上的是否成功，output 实际需要响应返回的值
+            String result = "{\"code\":200,\"message\":\"success\"}";
+            String output = "{\"header\":{},\"body\":{\"data\":\"" + Hex.toHexString(param1.getBytes(StandardCharsets.UTF_8)) + "\"}}";
+            return new ServiceResponseInfo(output, result);
+        }, baseTx);
+        TimeUnit.SECONDS.sleep(50);
+    }
+
+    @Test
+    @Disabled
+    public void invokeService() throws IOException, InterruptedException {
+        String serviceName = "testservice109";
+
+        //服务调用
+        List<String> providers = new ArrayList<>();
+        providers.add(km.getCurrentKeyInfo().getAddress());
+        //2个参数：param1,param2
+        String input = "{\"header\":{},\"body\":{\"param1\":\"hello\",\"param2\":\"world\"}}";
+        Coin serviceFeeCap = new Coin("upoint", "1");
+        long timeout = 50;
+        boolean repeated = false;
+        long repeatedFrequency = 0;
+        long repeatedTotal = 0;
+        CallServiceRequest callServiceRequest = new CallServiceRequest()
+                .setServiceName(serviceName)
+                .setProviders(providers)
+                .setInput(input)
+                .setServiceFeeCap(serviceFeeCap)
+                .setTimeout(timeout)
+                .setRepeated(repeated)
+                .setRepeatedFrequency(repeatedFrequency)
+                .setRepeatedTotal(repeatedTotal);
+        CallServiceResp callServiceResp = serviceClient.callService(callServiceRequest, baseTx, (reqCtxID, reqID, output) -> {
+            // 请求者的回调业务逻辑
+            System.out.println("成功监听到服务提供商的返回结果");
+            System.out.println("reqCtxID:" + reqCtxID);
+            System.out.println("reqID" + reqID);
+            System.out.println("output" + output);
+        });
+        assertNotNull(callServiceResp);
+        System.out.println(callServiceResp.getReqCtxId());
+        System.out.println(callServiceResp.getResultTx().getResult().getHash());
+        TimeUnit.SECONDS.sleep(50);
     }
 }

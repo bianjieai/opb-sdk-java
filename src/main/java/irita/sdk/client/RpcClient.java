@@ -3,38 +3,47 @@ package irita.sdk.client;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.protobuf.Any;
-import com.google.protobuf.ByteString;
 import com.google.protobuf.GeneratedMessageV3;
 import irita.sdk.config.ClientConfig;
 import irita.sdk.config.OpbConfig;
+import irita.sdk.constant.EventType;
+import irita.sdk.constant.TmTypes;
 import irita.sdk.constant.TxStatus;
 import irita.sdk.constant.enums.BroadcastMode;
-import irita.sdk.constant.enums.MsgEnum;
 import irita.sdk.exception.IritaSDKException;
+import irita.sdk.function.EventHandler;
+import irita.sdk.model.Result;
 import irita.sdk.model.*;
 import irita.sdk.model.block.BlockResult;
 import irita.sdk.model.block.ResultBlock;
 import irita.sdk.model.block.ResultBlockResults;
 import irita.sdk.model.block.ResultBlockRpc;
-import irita.sdk.model.tx.Body;
-import irita.sdk.model.tx.EventQueryBuilder;
-import irita.sdk.model.tx.TxRpc;
-import irita.sdk.model.tx.TxsRpc;
+import irita.sdk.model.tx.*;
+import irita.sdk.model.ws.block.NewBlockBean;
+import irita.sdk.model.ws.tx.TxBean;
 import irita.sdk.util.HashUtils;
 import irita.sdk.util.HttpUtils;
+import irita.sdk.util.LogUtils;
+import irita.sdk.util.MsgParser;
 import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.util.encoders.Hex;
 import proto.cosmos.tx.v1beta1.TxOuterClass;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.net.URI;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
-public class RpcClient {
+public class RpcClient implements WsEvent {
     private final String rpcUri;
+    private String wsAddr;
     private final HttpUtils httpUtils;
 
+    /**
+     * @deprecated Use {@link #RpcClient(ClientConfig, OpbConfig)} instead. will remove at later versions
+     */
+    @Deprecated
     public RpcClient(String rpcUri) {
         this.rpcUri = rpcUri;
         this.httpUtils = new HttpUtils();
@@ -42,6 +51,7 @@ public class RpcClient {
 
     public RpcClient(ClientConfig clientConfig, OpbConfig opbConfig) {
         this.rpcUri = clientConfig.getRpcUri();
+        this.wsAddr = clientConfig.getWsAddr();
 
         // need set projectKey
         if (opbConfig != null && StringUtils.isNotEmpty(opbConfig.getProjectKey())) {
@@ -146,7 +156,7 @@ public class RpcClient {
         TxOuterClass.Tx tx = TxOuterClass.Tx.parseFrom(Base64.getDecoder().decode(result.getTx()));
         List<GeneratedMessageV3> messageList = new ArrayList<>();
         for (Any any : tx.getBody().getMessagesList()) {
-            messageList.add(unpackMsg(any.getTypeUrl(), any.getValue()));
+            messageList.add(MsgParser.unpackMsg(any.getTypeUrl(), any.getValue()));
         }
 
         ResultBlock resultBlock = queryBlock(result.getHeight());
@@ -215,17 +225,7 @@ public class RpcClient {
         return resultSearchTxs;
     }
 
-    public GeneratedMessageV3 unpackMsg(String typeUrl, ByteString value) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        if (StringUtils.isEmpty(typeUrl) || value.isEmpty()) {
-            throw new IritaSDKException("message can not be empty");
-        }
-        typeUrl = typeUrl.replace("/", "");
-        Class<?> clazz = MsgEnum.getClassName(typeUrl);
-        Method method = clazz.getMethod("parseFrom", ByteString.class);
-        return (GeneratedMessageV3) method.invoke(clazz, value);
-    }
-
-    public ResultBlock queryBlock(String height) throws IOException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+    public ResultBlock queryBlock(String height) throws IOException {
         Map<String, Object> params = new HashMap<>();
         params.put("height", height);
 
@@ -247,7 +247,7 @@ public class RpcClient {
                 TxOuterClass.Tx tx = TxOuterClass.Tx.parseFrom(Base64.getDecoder().decode((String) o));
                 messageList = new ArrayList<>();
                 for (Any any : tx.getBody().getMessagesList()) {
-                    messageList.add(unpackMsg(any.getTypeUrl(), any.getValue()));
+                    messageList.add(MsgParser.unpackMsg(any.getTypeUrl(), any.getValue()));
                 }
                 stdTx.setMsgs(messageList);
                 stdTx.setMemo(tx.getBody().getMemo());
@@ -288,5 +288,81 @@ public class RpcClient {
             }
         }
         return resultBlockResults.getResult();
+    }
+
+    @Override
+    public void subscribeNewBlock(EventQueryBuilder builder, EventHandler<NewBlockBean> blockHandler) {
+        builder = Optional.ofNullable(builder).orElse(new EventQueryBuilder());
+        builder.AddCondition(new Condition(EventType.TM_EVENT).eq(TmTypes.EVENT_NEW_BLOCK)).build();
+        String query = builder.build();
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("query", query);
+        String sendMessage = JsonRpc.WrapBaseQuery(map, "subscribe").toJsonStr();
+
+        try {
+            WsClient wsClient = new WsClient(new URI(wsAddr), sendMessage) {
+                @Override
+                public void onMessage(String s) {
+                    if (s.length() > 100) {
+                        try {
+                            NewBlockBean block = ListenChainUtil.convertNewBlockBean(s);
+                            blockHandler.accept(block);
+                        } catch (IOException e) {
+                            throw new IritaSDKException("websocket io failed:" + e.getMessage());
+                        }
+                    }
+                }
+            };
+
+            wsClient.connect();
+            reConnectThread(wsClient);
+        } catch (Exception e) {
+            throw new IritaSDKException("connect websocket failed: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void subscribeTx(EventQueryBuilder builder, EventHandler<TxBean> txHandler) {
+        builder = Optional.ofNullable(builder).orElse(new EventQueryBuilder());
+        builder.AddCondition(new Condition(EventType.TM_EVENT).eq(TmTypes.EVENT_TX)).build();
+        String query = builder.build();
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("query", query);
+        String sendMessage = JsonRpc.WrapBaseQuery(map, "subscribe").toJsonStr();
+
+        try {
+            WsClient wsClient = new WsClient(new URI(wsAddr), sendMessage) {
+                @Override
+                public void onMessage(String s) {
+                    if (s.length() > 100) {
+                        try {
+                            TxBean tx = ListenChainUtil.convertTxBean(s);
+                            txHandler.accept(tx);
+                        } catch (IOException e) {
+                            throw new IritaSDKException("websocket io failed:" + e.getMessage());
+                        }
+                    }
+                }
+            };
+
+            wsClient.connect();
+            reConnectThread(wsClient);
+        } catch (Exception e) {
+            throw new IritaSDKException("connect websocket failed: " + e.getMessage());
+        }
+    }
+
+    private void reConnectThread(WsClient wsClient) {
+        new Thread(() -> {
+            while (true) {
+                try {
+                    TimeUnit.SECONDS.sleep(120);
+                    wsClient.reconnect();
+                    LogUtils.info("websocket reconnect");
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 }
