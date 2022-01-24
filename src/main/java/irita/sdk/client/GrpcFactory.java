@@ -8,6 +8,7 @@ import io.grpc.netty.shaded.io.grpc.netty.NegotiationType;
 import io.grpc.netty.shaded.io.grpc.netty.NettyChannelBuilder;
 import io.grpc.netty.shaded.io.netty.handler.ssl.SslContext;
 import io.grpc.netty.shaded.io.netty.handler.ssl.SslContextBuilder;
+import io.grpc.netty.shaded.io.netty.handler.ssl.SslProvider;
 import irita.sdk.config.ClientConfig;
 import irita.sdk.config.OpbConfig;
 import irita.sdk.exception.IritaSDKException;
@@ -56,16 +57,30 @@ public class GrpcFactory {
 
     public static Channel createGrpcClient(String name, int port, OpbConfig opbConfig, X509Certificate[] certificates) throws IOException {
         name = removePrefix(name);
-        Channel channel = NettyChannelBuilder.forAddress(name, port)
-                .negotiationType(NegotiationType.TLS)
-                .sslContext(buildSslContext(certificates))
-                .build();
+        Channel channel;
+        if (opbConfig.getSslProvider() != null) {
+            channel = NettyChannelBuilder.forAddress(name, port)
+                    .negotiationType(NegotiationType.TLS)
+                    .sslContext(buildSslContextWithProvider(certificates, opbConfig.getSslProvider()))
+                    .build();
+        } else {
+            channel = NettyChannelBuilder.forAddress(name, port)
+                    .negotiationType(NegotiationType.TLS)
+                    .sslContext(buildSslContext(certificates))
+                    .build();
+        }
         channel = ClientInterceptors.intercept(channel, new GrpcBSNInterceptor(opbConfig));
         return channel;
     }
 
-    private static SslContext buildSslContext(X509Certificate[] certificates) throws IOException {
+    public static SslContext buildSslContext(X509Certificate[] certificates) throws IOException {
         SslContextBuilder builder = GrpcSslContexts.forClient();
+        builder.trustManager(certificates);
+        return builder.build();
+    }
+
+    public static SslContext buildSslContextWithProvider(X509Certificate[] certificates, SslProvider sslProvider) throws IOException {
+        SslContextBuilder builder = GrpcSslContexts.configure(SslContextBuilder.forClient(), sslProvider);
         builder.trustManager(certificates);
         return builder.build();
     }
