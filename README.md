@@ -294,7 +294,9 @@ https://mvnrepository.com/artifact/io.github.bianjieai
 查看 permClient 下的方法 (see method in perClient.java)
 
 ## 单元测试 (Unit Test Demo)
-[ServiceDemo.java](./src/test/java/irita/sdk/ServiceDemo.java)
+[ServiceDemo.java](./src/test/java/irita/sdk/ServiceDemoTest.java)
+[ServiceDemo-SubscribeRequest](./src/test/java/irita/sdk/ws/LocalSubscribeRequestTest.java)
+[ServiceDemo-SubscribeResponse](./src/test/java/irita/sdk/ws/LocalSubscribeResponseTest.java)
 
 [MsgsDemo.java](./src/test/java/irita/sdk/MsgsDemo.java)
 
