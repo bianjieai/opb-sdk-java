@@ -6,7 +6,7 @@
 
     <groupId>io.github.bianjieai</groupId>
     <artifactId>opb-sdk</artifactId>
-    <version>0.1.7-rc3</version>
+    <version>0.1.7</version>
     <url>https://github.com/bianjieai/opb-sdk-java</url>
     <name>opb-sdk</name>
     <licenses>
