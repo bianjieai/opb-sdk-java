@@ -48,8 +48,8 @@ public class BaseClient {
         this.txEngine = TxEngineFactory.createTxEngine(km, clientConfig.getChainID());
         if (opbConfig != null && opbConfig.isEnableTLS()) {
             X509Certificate[] certificates;
+            certificates = HttpClientGetServerCertificate.getGateWayTlsCertPool(clientConfig.getRpcUri());
             try {
-                certificates = HttpClientGetServerCertificate.getGateWayTlsCertPool(clientConfig.getRpcUri());
                 this.grpcClient = GrpcFactory.createGrpcClient(clientConfig, opbConfig, certificates);
             } catch (IOException e) {
                 throw new IritaSDKException(e.getMessage());
