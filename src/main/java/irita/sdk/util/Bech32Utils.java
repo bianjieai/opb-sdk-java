@@ -7,7 +7,7 @@ public class Bech32Utils {
 
     public static String toBech32(String hrp, byte[] pubkeyHex) {
         byte[] bits = AddressUtils.convertBits(pubkeyHex, 0, pubkeyHex.length, 8, 5, true);
-        return Bech32.encode(hrp, bits);
+        return Bech32.encode(Bech32.Encoding.BECH32, hrp, bits);
     }
 
     public static byte[] fromBech32(String address) {
