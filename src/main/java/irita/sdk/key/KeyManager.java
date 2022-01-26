@@ -139,9 +139,10 @@ public abstract class KeyManager implements Key, MultiKey {
             byte[] keyHashSha256 = HashUtils.sha256(keyHashByte);
 
             SimpleBox box = new SimpleBox(keyHashSha256);
-            byte[] privKeyAmino = box.open(encBytes).orElseThrow(() -> {
+            if (!box.open(encBytes).isPresent()) {
                 throw new IritaSDKException("failed decrypt keystore with password");
-            });
+            }
+            byte[] privKeyAmino = box.open(encBytes).get();
             byte[] privKeyTemp = Arrays.copyOfRange(privKeyAmino, 5, privKeyAmino.length);
 
             BigInteger privKey = new BigInteger(1, privKeyTemp);
