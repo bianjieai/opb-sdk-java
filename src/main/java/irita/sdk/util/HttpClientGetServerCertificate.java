@@ -5,12 +5,8 @@ import okhttp3.Handshake;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import sun.net.www.protocol.https.HttpsURLConnectionImpl;
 
-import javax.net.ssl.HttpsURLConnection;
 import java.io.IOException;
-import java.net.URL;
-import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 
 public class HttpClientGetServerCertificate {

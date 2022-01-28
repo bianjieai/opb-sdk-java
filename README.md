@@ -118,6 +118,11 @@ https://mvnrepository.com/artifact/io.github.bianjieai
         assertEquals("iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3", km.getCurrentKeyInfo().getAddress());
 ```
 
+```java
+    // tips: 连接大唐链需要修改bench32前缀
+    km.setHrp("dtc");
+```
+
 ### 2 构造 txBodyBz (construct txBodyBz)
 
 ```java
