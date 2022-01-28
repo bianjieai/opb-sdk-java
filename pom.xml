@@ -6,7 +6,7 @@
 
     <groupId>io.github.bianjieai</groupId>
     <artifactId>opb-sdk</artifactId>
-    <version>0.1.7</version>
+    <version>0.1.8-rc1</version>
     <url>https://github.com/bianjieai/opb-sdk-java</url>
     <name>opb-sdk</name>
     <licenses>
@@ -57,10 +57,6 @@
                 <exclusion>
                     <artifactId>guava</artifactId>
                     <groupId>com.google.guava</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>okhttp</artifactId>
-                    <groupId>com.squareup.okhttp3</groupId>
                 </exclusion>
                 <exclusion>
                     <artifactId>slf4j-api</artifactId>
