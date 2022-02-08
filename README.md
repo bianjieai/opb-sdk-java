@@ -179,6 +179,8 @@ https://mvnrepository.com/artifact/io.github.bianjieai
 
 ## 使用NFT模块(Use NftClient)
 
+> 完整 Demo 示例详见: [NftDemo.java](./src/test/java/irita/sdk/NftDemo.java)
+
 ### 1. 新增一个denom(issue denom)
 
 ```java
