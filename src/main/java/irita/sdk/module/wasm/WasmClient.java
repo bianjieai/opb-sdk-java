@@ -1,6 +1,5 @@
 package irita.sdk.module.wasm;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.GeneratedMessageV3;
 import io.grpc.Channel;
@@ -12,6 +11,7 @@ import irita.sdk.model.BaseTx;
 import irita.sdk.model.Coin;
 import irita.sdk.model.ResultTx;
 import irita.sdk.util.IOUtils;
+import irita.sdk.util.JsonUtils;
 import proto.cosmos.base.v1beta1.CoinOuterClass;
 import proto.cosmwasm.wasm.v1.QueryGrpc;
 import proto.cosmwasm.wasm.v1.QueryOuterClass;
@@ -58,12 +58,11 @@ public class WasmClient {
     // instantiate the contract state
     public String instantiate(InstantiateRequest req, BaseTx baseTx) throws IOException {
         Account account = baseClient.queryAccount(baseTx);
-        ObjectMapper mapper = new ObjectMapper();
         Tx.MsgInstantiateContract.Builder builder = Tx.MsgInstantiateContract.newBuilder()
                 .setSender(account.getAddress())
                 .setAdmin(Optional.of(req).map(InstantiateRequest::getAdmin).orElse(""))
                 .setCodeId(req.getCodeId())
-                .setMsg(ByteString.copyFrom(mapper.writeValueAsString(req.getInitMsg()).getBytes(StandardCharsets.UTF_8)))
+                .setMsg(ByteString.copyFrom(JsonUtils.writeValueAsString(req.getInitMsg()).getBytes(StandardCharsets.UTF_8)))
                 .setLabel(req.getLabel());
 
         if (req.getInitFunds() != null) {
