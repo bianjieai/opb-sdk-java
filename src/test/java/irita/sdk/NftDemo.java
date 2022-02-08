@@ -1,5 +1,7 @@
 package irita.sdk;
 
+import com.google.protobuf.GeneratedMessageV3;
+import irita.sdk.client.BaseClient;
 import irita.sdk.client.IritaClient;
 import irita.sdk.config.ClientConfig;
 import irita.sdk.config.OpbConfig;
@@ -7,24 +9,30 @@ import irita.sdk.constant.enums.BroadcastMode;
 import irita.sdk.key.KeyInfo;
 import irita.sdk.key.KeyManager;
 import irita.sdk.key.KeyManagerFactory;
-import irita.sdk.model.BaseTx;
-import irita.sdk.model.Fee;
-import irita.sdk.model.ResultTx;
+import irita.sdk.model.*;
 import irita.sdk.module.nft.*;
+import irita.sdk.util.AddressUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import proto.cosmos.base.query.v1beta1.Pagination;
+import proto.nft.Tx;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+import static java.lang.Thread.sleep;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class NftDemo {
     private KeyManager km;
     private NftClient nftClient;
+    private BaseClient baseClient;
     private final BaseTx baseTx = new BaseTx(200000, new Fee("200000", "uirita"), BroadcastMode.Commit);
 
     @BeforeEach
@@ -44,6 +52,7 @@ public class NftDemo {
 
         IritaClient client = new IritaClient(clientConfig, opbConfig, km);
         nftClient = client.getNftClient();
+        baseClient = client.getBaseClient();
         //判断由助记词恢复的是否为预期的链上地址
         assertEquals("iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3", km.getCurrentKeyInfo().getAddress());
     }
@@ -155,7 +164,7 @@ public class NftDemo {
         assertNotNull(resultTx.getResult().getHash());
 
         //query collection 通过denomID查询集合 即该denom信息和其nft列表信息
-        QueryCollectionResp queryCollectionResp = nftClient.queryCollection(denomID, null);
+        QueryCollectionResp queryCollectionResp = nftClient.queryCollection(denomID, Pagination.PageRequest.newBuilder().setOffset(0).setLimit(1000000).build());
         assertNotNull(queryCollectionResp);
         assertEquals(2, queryCollectionResp.getNfts().size());
 
@@ -167,7 +176,7 @@ public class NftDemo {
         assertNotNull(resultTx.getResult().getHash());
 
         //query collection 查询集合，nft列表的数量减少1个
-        queryCollectionResp = nftClient.queryCollection(denomID, null);
+        queryCollectionResp = nftClient.queryCollection(denomID, Pagination.PageRequest.newBuilder().setOffset(0).setLimit(1000000).build());
         assertNotNull(queryCollectionResp);
         assertEquals(1, queryCollectionResp.getNfts().size());
 
@@ -184,5 +193,106 @@ public class NftDemo {
         //query supply 查询该地址在该denom下拥有的nft数量
         long supply = nftClient.querySupply(denomID, reci);
         assertEquals(1, supply);
+    }
+
+    @Test
+    @Disabled
+    public void testBatchNft() throws IOException, InterruptedException {
+        String denomID = "batchdenom" + new Random().nextInt(1000);
+        String denomName = "test_batch_denom";
+        String schema = "no shcema";
+        String symbol = "symbol";
+        //是否限制发行
+        //true  只有 Denom 的所有者可以发行此类别的 NFT 给自己（发行到别的地址也是不可以的）
+        //false 任何人都可以发行 NFT
+        boolean mintRestricted = false;
+        //是否限制更新 NFT
+        //true  任何人都不可以更新 NFT
+        //false 只有此 NFT 的所有者才能更新
+        boolean updateRestricted = false;
+
+        //issue denom 创建 denom
+        IssueDenomRequest req = new IssueDenomRequest()
+                .setId(denomID)
+                .setName(denomName)
+                .setSchema(schema)
+                .setSymbol(symbol)
+                .setMintRestricted(mintRestricted)
+                .setUpdateRestricted(updateRestricted);
+        ResultTx resultTx = nftClient.issueDenom(req, baseTx);
+        assertNotNull(resultTx.getResult().getHash());
+
+        // batch mint nft 批量发行nft，方式为每个msg都广播一次
+        String batchNftID = "batchnft";
+        String batchNftName = "batch_nft_name";
+        String batchUri = "https://www.baidu.com";
+        String batchData = "any data";
+        //批量发行的数量
+        Integer mintNum = 100;
+        Account account = baseClient.queryAccount(baseTx);
+        baseTx.setAccountNumber(account.getAccountNumber());
+        //由于网络延迟原因，需要将广播模式设置为Sync或Async以提高发行速度
+        baseTx.setMode(BroadcastMode.Sync);
+        long sequence = account.getSequence();
+        MintNFTRequest mintReq;
+        for (int i=0; i<mintNum; i++) {
+             mintReq = new MintNFTRequest()
+                    .setDenom(denomID)
+                    .setId(batchNftID + i)
+                    .setName(batchNftName)
+                    .setUri(batchUri)
+                    .setData(batchData)
+                    .setRecipient(km.getCurrentKeyInfo().getAddress());
+            baseTx.setSequence(sequence);
+            //不直接使用mintNft方法的原因:避免多次调用queryAccount方法，手动维护sequence，提高性能
+            Tx.MsgMintNFT.Builder builder = Tx.MsgMintNFT
+                    .newBuilder()
+                    .setDenomId(mintReq.getDenom())
+                    .setId(mintReq.getId())
+                    .setName(mintReq.getName())
+                    .setUri(mintReq.getUri())
+                    .setData(mintReq.getData())
+                    .setSender(account.getAddress());
+
+            if (StringUtils.isNotEmpty(mintReq.getRecipient())) {
+                String recipient = mintReq.getRecipient();
+                AddressUtils.validAddress(recipient);
+                builder.setRecipient(recipient);
+            } else {
+                builder.setRecipient(account.getAddress());
+            }
+            Tx.MsgMintNFT msg = builder.build();
+            List<GeneratedMessageV3> msgs = Collections.singletonList(msg);
+            resultTx = baseClient.buildAndSend(msgs, baseTx, account);
+            sequence += 1;
+            assertNotNull(resultTx.getResult().getHash());
+        }
+        //由于baseTx在单个发行时使用的是Sync模式，所以这里线程需要短暂挂起，等待节点commit；否则会影响一些方法正确执行
+        sleep(5000);
+        //重置为commit模式
+        baseTx.setMode(BroadcastMode.Commit);
+        //将sequence重置为0，baseTx的sequence为0时，signTx方法会使用account中的sequence
+        baseTx.setSequence(0);
+
+        //batch mint nft 批量发行nft，方式为将多个msg打包后广播一次
+        batchNftID = "batchnftpackage";
+        List<GeneratedMessageV3> mintNFTMsgs = new ArrayList<>();
+        for (int i=1; i<=mintNum; i++) {
+            Tx.MsgMintNFT msg = Tx.MsgMintNFT
+                    .newBuilder()
+                    .setDenomId(denomID)
+                    .setId(batchNftID + i)
+                    .setName(batchNftName)
+                    .setUri(batchUri)
+                    .setData(batchData)
+                    .setSender(account.getAddress())
+                    .setRecipient(km.getCurrentKeyInfo().getAddress())
+                    .build();
+            mintNFTMsgs.add(msg);
+        }
+        GasInfo gasInfo = baseClient.simulateTx(mintNFTMsgs, baseTx, null);
+        baseTx.setGas(Integer.parseInt(gasInfo.getGasUsed())*2);
+        resultTx = baseClient.buildAndSend(mintNFTMsgs, baseTx, baseClient.queryAccount(baseTx));
+        assertNotNull(resultTx.getResult().getHash());
     }
 }
