@@ -1,5 +1,7 @@
 package irita.sdk;
 
+import com.google.protobuf.GeneratedMessageV3;
+import irita.sdk.client.BaseClient;
 import irita.sdk.client.IritaClient;
 import irita.sdk.config.ClientConfig;
 import irita.sdk.config.OpbConfig;
@@ -7,15 +9,16 @@ import irita.sdk.constant.enums.BroadcastMode;
 import irita.sdk.key.KeyInfo;
 import irita.sdk.key.KeyManager;
 import irita.sdk.key.KeyManagerFactory;
-import irita.sdk.model.BaseTx;
-import irita.sdk.model.Fee;
-import irita.sdk.model.ResultTx;
+import irita.sdk.model.*;
 import irita.sdk.module.nft.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import proto.cosmos.base.query.v1beta1.Pagination;
+import proto.nft.Tx;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -25,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 public class NftDemo {
     private KeyManager km;
     private NftClient nftClient;
+    private BaseClient baseClient;
     private final BaseTx baseTx = new BaseTx(200000, new Fee("200000", "uirita"), BroadcastMode.Commit);
 
     @BeforeEach
@@ -44,6 +48,7 @@ public class NftDemo {
 
         IritaClient client = new IritaClient(clientConfig, opbConfig, km);
         nftClient = client.getNftClient();
+        baseClient = client.getBaseClient();
         //判断由助记词恢复的是否为预期的链上地址
         assertEquals("iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3", km.getCurrentKeyInfo().getAddress());
     }
@@ -120,6 +125,59 @@ public class NftDemo {
         resultTx = nftClient.mintNft(mintReq, baseTx);
         assertNotNull(resultTx.getResult().getHash());
 
+        // batch mint nft 批量发行nft，方式为每个msg都广播一次
+        String batchNftID = "batchnft";
+        String batchNftName = "batch_nft_name";
+        String batchUri = "https://www.baidu.com";
+        String batchData = "any data";
+        //批量发行的数量
+        Integer mintNum = 101;
+        Account account = baseClient.queryAccount(baseTx);
+        baseTx.setAccountNumber(account.getAccountNumber());
+        baseTx.setMode(BroadcastMode.Sync);
+        long sequence = account.getSequence();
+        for (int i=0; i<mintNum; i++) {
+            mintReq = new MintNFTRequest()
+                    .setDenom(denomID)
+                    .setId(batchNftID + i)
+                    .setName(batchNftName)
+                    .setUri(batchUri)
+                    .setData(batchData)
+                    .setRecipient(km.getCurrentKeyInfo().getAddress());
+            baseTx.setSequence(sequence);
+            resultTx = nftClient.mintNft(mintReq, baseTx);
+            sequence += 1;
+            assertNotNull(resultTx.getResult().getHash());
+        }
+        //重置为commit模式
+        baseTx.setMode(BroadcastMode.Commit);
+
+        //batch mint nft 批量发行nft，方式为将多个msg打包后广播一次
+        batchNftID = "batchnftpackage";
+        List<GeneratedMessageV3> mintNFTMsgs = new ArrayList<>();
+        for (int i=1; i<=mintNum; i++) {
+            Tx.MsgMintNFT msg = Tx.MsgMintNFT
+                    .newBuilder()
+                    .setDenomId(denomID)
+                    .setId(batchNftID + i)
+                    .setName(batchNftName)
+                    .setUri(uri)
+                    .setData(data)
+                    .setSender(account.getAddress())
+                    .setRecipient(km.getCurrentKeyInfo().getAddress())
+                    .build();
+            mintNFTMsgs.add(msg);
+        }
+        //方便修改gas
+        BaseTx baseTx1 = new BaseTx(200000, new Fee("300000", "uirita"), BroadcastMode.Commit);
+        //可以手动将sequence加1，也可以传0，传0时，signTx方法会取account中的sequence
+        baseTx.setSequence(baseTx.getSequence() + 1);
+        GasInfo gasInfo = baseClient.simulateTx(mintNFTMsgs, baseTx, account);
+        baseTx1.setGas(Integer.parseInt(gasInfo.getGasUsed())*2);
+        baseTx1.setSequence(baseTx.getSequence());
+        resultTx = baseClient.buildAndSend(mintNFTMsgs, baseTx1, account);
+        assertNotNull(resultTx.getResult().getHash());
+
         //query nft1 通过denomID和nftID查询nft信息
         QueryNFTResp nft = nftClient.queryNFT(denomID, nftID1);
         assertEquals(nftID1, nft.getId());
@@ -129,7 +187,8 @@ public class NftDemo {
         assertEquals(keyInfo.getAddress(), nft.getOwner());
 
         //transfer nft1 交易nft1到其他链上地址
-        String reci = "iaa14s9hekvzhtf3y3962zn3vzv45k0ay7mguyqhrl";
+        String reci = "iaa1am94vsm4vhmgt2zz4nyktzhs02s6m0prlmz5g5";
+        baseTx.setSequence(baseTx.getSequence() + 1);
         TransferNFTRequest transferReq = new TransferNFTRequest()
                 .setDenom(denomID)
                 .setId(nftID1)
@@ -145,6 +204,7 @@ public class NftDemo {
         String newNftName = "test_name_new";
         String newUri = "https://www.baidu.com/new";
         String newData = "any data new";
+        baseTx.setSequence(baseTx.getSequence() + 1);
         EditNFTRequest editReq = new EditNFTRequest()
                 .setDenom(denomID)
                 .setId(nftID2)
@@ -155,21 +215,22 @@ public class NftDemo {
         assertNotNull(resultTx.getResult().getHash());
 
         //query collection 通过denomID查询集合 即该denom信息和其nft列表信息
-        QueryCollectionResp queryCollectionResp = nftClient.queryCollection(denomID, null);
+        QueryCollectionResp queryCollectionResp = nftClient.queryCollection(denomID, Pagination.PageRequest.newBuilder().setOffset(0).setLimit(1000000).build());
         assertNotNull(queryCollectionResp);
-        assertEquals(2, queryCollectionResp.getNfts().size());
+        assertEquals(204, queryCollectionResp.getNfts().size());
 
         //burn nft2 通过denomID和nftID销毁nft2
         BurnNFTRequest burnNFTReq = new BurnNFTRequest()
                 .setDenom(denomID)
                 .setId(nftID2);
+        baseTx.setSequence(baseTx.getSequence() + 1);
         resultTx = nftClient.burnNft(burnNFTReq, baseTx);
         assertNotNull(resultTx.getResult().getHash());
 
         //query collection 查询集合，nft列表的数量减少1个
-        queryCollectionResp = nftClient.queryCollection(denomID, null);
+        queryCollectionResp = nftClient.queryCollection(denomID, Pagination.PageRequest.newBuilder().setOffset(0).setLimit(1000000).build());
         assertNotNull(queryCollectionResp);
-        assertEquals(1, queryCollectionResp.getNfts().size());
+        assertEquals(203, queryCollectionResp.getNfts().size());
 
         //query denoms 查询所有denom列表
         List<QueryDenomResp> queryDenomResps = nftClient.queryDenoms(null);
