@@ -1,7 +1,6 @@
 package irita.sdk.module.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.protobuf.GeneratedMessageV3;
 import io.grpc.Channel;
 import irita.sdk.client.BaseClient;
@@ -16,6 +15,7 @@ import irita.sdk.model.*;
 import irita.sdk.model.tx.Condition;
 import irita.sdk.model.tx.EventQueryBuilder;
 import irita.sdk.util.AddressUtils;
+import irita.sdk.util.JsonUtils;
 import irita.sdk.util.LogUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.util.encoders.Hex;
@@ -321,7 +321,7 @@ public class ServiceClient {
                     }
 
                     try {
-                        reqIds.addAll(new ObjectMapper().readValue(reqIDsStr, new TypeReference<List<String>>() {
+                        reqIds.addAll(JsonUtils.readValue(reqIDsStr, new TypeReference<List<String>>() {
                         }));
                     } catch (IOException e) {
                         throw new IritaSDKException(e.getMessage());

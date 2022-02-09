@@ -1,7 +1,5 @@
 package irita.sdk.client;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.protobuf.Any;
 import com.google.protobuf.GeneratedMessageV3;
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -10,6 +8,7 @@ import irita.sdk.model.Events;
 import irita.sdk.model.ws.block.NewBlockBean;
 import irita.sdk.model.ws.block.ResultEndBlock;
 import irita.sdk.model.ws.tx.TxBean;
+import irita.sdk.util.JsonUtils;
 import irita.sdk.util.MsgParser;
 import proto.cosmos.tx.v1beta1.TxOuterClass;
 import proto.service.Tx;
@@ -21,10 +20,8 @@ import java.util.List;
 
 public class ListenChainUtil {
     public static NewBlockBean convertNewBlockBean(String message) {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         try {
-            return mapper.readValue(message, NewBlockBean.class);
+            return JsonUtils.readValue(message, NewBlockBean.class);
         } catch (IOException e) {
             throw new IritaSDKException("convertNewBlockBean failed: " + e.getMessage());
         }
@@ -45,10 +42,8 @@ public class ListenChainUtil {
     }
 
     public static TxBean convertTxBean(String message) {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         try {
-            return mapper.readValue(message, TxBean.class);
+            return JsonUtils.readValue(message, TxBean.class);
         } catch (IOException e) {
             throw new IritaSDKException("convertTxBean failed: " + e.getMessage());
         }
