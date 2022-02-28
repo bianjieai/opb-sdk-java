@@ -29,11 +29,11 @@ import static java.lang.Thread.sleep;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class NftDemo {
+public class NftDemoTest {
     private KeyManager km;
     private NftClient nftClient;
     private BaseClient baseClient;
-    private final BaseTx baseTx = new BaseTx(200000, new Fee("200000", "uirita"), BroadcastMode.Commit);
+    private final BaseTx baseTx = new BaseTx(200000, new Fee("200000", "ugas"), BroadcastMode.Commit);
 
     @BeforeEach
     public void init() {

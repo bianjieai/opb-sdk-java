@@ -10,6 +10,7 @@ import irita.sdk.model.BaseTx;
 import irita.sdk.model.Fee;
 import irita.sdk.module.identity.IdentityClient;
 import irita.sdk.util.ByteUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -21,27 +22,15 @@ import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class IdentityClientTest {
-    private final BaseTx baseTx = new BaseTx(200000, new Fee("300000", "uirita"), BroadcastMode.Commit);
-    IdentityClient identityClient;
+class IdentityClientTest extends ConfigTest {
+    private final BaseTx baseTx = new BaseTx(200000, new Fee("300000", "ugas"), BroadcastMode.Commit);
+    private IdentityClient identityClient;
     private IritaClient client;
 
     @BeforeEach
     public void init() {
-        Properties properties = Config.getTestConfig();
-        String mnemonic = properties.getProperty("mnemonic");
-        KeyManager km = KeyManagerFactory.createDefault();
-        km.recover(mnemonic);
-
-        String nodeUri = properties.getProperty("node_uri");
-        String grpcAddr = properties.getProperty("grpc_addr");
-        String chainId = properties.getProperty("chain_id");
-        ClientConfig clientConfig = new ClientConfig(nodeUri, grpcAddr, chainId);
-        OpbConfig opbConfig = null;
-
-        client = new IritaClient(clientConfig, opbConfig, km);
+        client = getTestClient();
         identityClient = client.getIdentityClient();
-        assertEquals(properties.getProperty("address"), km.getCurrentKeyInfo().getAddress());
     }
 
 

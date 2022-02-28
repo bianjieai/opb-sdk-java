@@ -134,7 +134,7 @@ public class BaseClient {
         return rpcClient.queryTxs(builder, page, size);
     }
 
-    public BlockDetail queryBlock(String height) throws IOException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    public BlockDetail queryBlock(String height) throws IOException {
         ResultBlock resultBlock = rpcClient.queryBlock(height);
         BlockResult blockResult = rpcClient.queryBlockResult(height);
 
@@ -167,5 +167,9 @@ public class BaseClient {
 
     public void setTxEngine(TxEngine txEngine) {
         this.txEngine = txEngine;
+    }
+
+    public KeyManager getKm() {
+        return km;
     }
 }
