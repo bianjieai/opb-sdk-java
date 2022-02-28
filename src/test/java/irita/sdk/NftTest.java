@@ -22,27 +22,16 @@ import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class NftTest {
+public class NftTest extends ConfigTest {
     private KeyManager km;
     private NftClient nftClient;
-    private final BaseTx baseTx = new BaseTx(200000, new Fee("300000", "uirita"), BroadcastMode.Commit);
+    private final BaseTx baseTx = new BaseTx(200000, new Fee("300000", "ugas"), BroadcastMode.Commit);
 
     @BeforeEach
     public void init() {
-        Properties properties = Config.getTestConfig();
-        String mnemonic = properties.getProperty("mnemonic");
-        km = KeyManagerFactory.createDefault();
-        km.recover(mnemonic);
-
-        String nodeUri = properties.getProperty("node_uri");
-        String grpcAddr = properties.getProperty("grpc_addr");
-        String chainId = properties.getProperty("chain_id");
-        ClientConfig clientConfig = new ClientConfig(nodeUri, grpcAddr, chainId);
-        OpbConfig opbConfig = null;
-
-        IritaClient iritaClient = new IritaClient(clientConfig, opbConfig, km);
-        nftClient = iritaClient.getNftClient();
-        assertEquals(properties.getProperty("address"), km.getCurrentKeyInfo().getAddress());
+        IritaClient client = getTestClient();
+        km = client.getBaseClient().getKm();
+        nftClient = client.getNftClient();
     }
 
     @Test

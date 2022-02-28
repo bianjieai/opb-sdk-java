@@ -24,26 +24,14 @@ import java.util.Properties;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class RecordTest {
+public class RecordTest extends ConfigTest {
     private RecordClient recordClient;
-    private final BaseTx baseTx = new BaseTx(200000, new Fee("300000", "uirita"), BroadcastMode.Commit);
+    private final BaseTx baseTx = new BaseTx(200000, new Fee("300000", "ugas"), BroadcastMode.Commit);
 
     @BeforeEach
     public void init() {
-        Properties properties = Config.getTestConfig();
-        String mnemonic = properties.getProperty("mnemonic");
-        KeyManager km = KeyManagerFactory.createDefault();
-        km.recover(mnemonic);
-
-        String nodeUri = properties.getProperty("node_uri");
-        String grpcAddr = properties.getProperty("grpc_addr");
-        String chainId = properties.getProperty("chain_id");
-        ClientConfig clientConfig = new ClientConfig(nodeUri, grpcAddr, chainId);
-        OpbConfig opbConfig = null;
-
-        IritaClient client = new IritaClient(clientConfig, opbConfig, km);
+        IritaClient client = getTestClient();
         recordClient = client.getRecordClient();
-        assertEquals(properties.getProperty("address"), km.getCurrentKeyInfo().getAddress());
     }
 
     @Test

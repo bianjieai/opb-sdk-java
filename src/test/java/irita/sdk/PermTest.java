@@ -20,24 +20,13 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class PermTest {
+public class PermTest extends ConfigTest {
     private IritaClient client;
-    private final BaseTx baseTx = new BaseTx(200000, new Fee("200000", "uirita"), BroadcastMode.Commit);
+    private final BaseTx baseTx = new BaseTx(200000, new Fee("200000", "ugas"), BroadcastMode.Commit);
 
     @BeforeEach
     public void init() {
-        String mnemonic = "razor educate ostrich pave ...";
-        KeyManager km = KeyManagerFactory.createDefault();
-        km.recover(mnemonic);
-
-        String nodeUri = "http://192.168.150.43:26657";
-        String grpcAddr = "192.168.150.43:9090";
-        String chainId = "dev";
-        ClientConfig clientConfig = new ClientConfig(nodeUri, grpcAddr, chainId);
-        OpbConfig opbConfig = null;
-
-        client = new IritaClient(clientConfig, opbConfig, km);
-        assertEquals("iaa1v8xgh04q7axgn9kstudkeg7rj08ccg4eks8c8r", km.getCurrentKeyInfo().getAddress());
+        client = getTestClient();
     }
 
     @Test

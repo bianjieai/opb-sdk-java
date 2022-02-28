@@ -26,11 +26,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MsgsTest {
     private BaseClient baseClient;
-    private final BaseTx baseTx = new BaseTx(200000, new Fee("300000", "uirita"), BroadcastMode.Commit);
+    private final BaseTx baseTx = new BaseTx(200000, new Fee("300000", "ugas"), BroadcastMode.Commit);
 
     @BeforeEach
     public void init() {
-        Properties properties = Config.getTestConfig();
+        Properties properties = ConfigTest.getTestConfig();
         String mnemonic = properties.getProperty("mnemonic");
         KeyManager km = KeyManagerFactory.createDefault();
         km.recover(mnemonic);

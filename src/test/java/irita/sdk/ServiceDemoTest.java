@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 public class ServiceDemoTest {
     private KeyManager km;
     private ServiceClient serviceClient;
-    private final BaseTx baseTx = new BaseTx(200000, new Fee("200000", "uirita"), BroadcastMode.Commit);
+    private final BaseTx baseTx = new BaseTx(200000, new Fee("200000", "ugas"), BroadcastMode.Commit);
 
     @BeforeEach
     public void init() {
@@ -45,7 +45,7 @@ public class ServiceDemoTest {
         String nodeUri = "http://47.100.192.234:26657";
         String grpcAddr = "47.100.192.234:9090";
         String chainId = "testing";
-        String wsAddr = "ws://47.100.192.234:9090/websocket";
+        String wsAddr = "ws://47.100.192.234:26657/websocket";
         ClientConfig clientConfig = new ClientConfig(nodeUri, grpcAddr, chainId, wsAddr);
         //测试网为null，主网请参考README.md
         OpbConfig opbConfig = null;

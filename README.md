@@ -218,7 +218,7 @@ https://mvnrepository.com/artifact/io.github.bianjieai
 ### 1. 新增一个denom(issue denom)
 
 ```java
-        BaseTx baseTx = new BaseTx(200000, new Fee("200000", "uirita"), BroadcastMode.Commit);
+        BaseTx baseTx = new BaseTx(200000, new Fee("200000", "ugas"), BroadcastMode.Commit);
         String denomID = "denomid" + new Random().nextInt(1000);
         String denomName = "test_name" + new Random().nextInt(1000);
         String schema = "no shcema";
@@ -233,7 +233,7 @@ https://mvnrepository.com/artifact/io.github.bianjieai
 ### 2. 发行一个nft(mint nft)
 
 ```java
-        BaseTx baseTx = new BaseTx(200000, new Fee("200000", "uirita"), BroadcastMode.Commit);
+        BaseTx baseTx = new BaseTx(200000, new Fee("200000", "ugas"), BroadcastMode.Commit);
         MintNFTRequest mintReq = new MintNFTRequest()
         .setDenom(denomID)
         .setId(nftID)
@@ -247,7 +247,7 @@ https://mvnrepository.com/artifact/io.github.bianjieai
 ### 3. 编辑/修改存在的nft(edit nft)
 
 ```java
-        BaseTx baseTx = new BaseTx(200000, new Fee("200000", "uirita"), BroadcastMode.Commit);
+        BaseTx baseTx = new BaseTx(200000, new Fee("200000", "ugas"), BroadcastMode.Commit);
         String newName = "new_name";
         String newUri = "http://xx.com";
         String newData = "new_data";
@@ -263,7 +263,7 @@ https://mvnrepository.com/artifact/io.github.bianjieai
 ### 4. 销毁nft(burn nft)
 
 ```java
-        BaseTx baseTx = new BaseTx(200000, new Fee("200000", "uirita"), BroadcastMode.Commit);
+        BaseTx baseTx = new BaseTx(200000, new Fee("200000", "ugas"), BroadcastMode.Commit);
         BurnNFTRequest burnNFTReq = new BurnNFTRequest()
                 .setDenom(denomID)
                 .setId(nftID);
@@ -335,11 +335,12 @@ https://mvnrepository.com/artifact/io.github.bianjieai
 查看 permClient 下的方法 (see method in perClient.java)
 
 ## 单元测试 (Unit Test Demo)
-[ServiceDemo.java](./src/test/java/irita/sdk/ServiceDemoTest.java)
 
-[MsgsDemo.java](./src/test/java/irita/sdk/MsgsDemo.java)
+[ServiceDemoTest.java](./src/test/java/irita/sdk/ServiceDemoTest.java)
 
-[NftDemo.java](./src/test/java/irita/sdk/NftDemo.java)
+[MsgsDemoTest.java](./src/test/java/irita/sdk/MsgsDemoTest.java)
+
+[NftDemoTest.java](./src/test/java/irita/sdk/NftDemoTest.java)
 
 [ClientTest.java](./src/test/java/irita/sdk/ClientTest.java)
 
@@ -351,7 +352,9 @@ https://mvnrepository.com/artifact/io.github.bianjieai
 
 [IOUtilTest.java](./src/test/java/irita/sdk/IOUtilTest.java)
 
-[KeyManagerTest.java](./src/test/java/irita/sdk/KeyManagerTest.java)
+[Secp256k1KeyManagerTest.java](./src/test/java/irita/sdk/Secp256k1KeyManagerTest.java)
+
+[Sm2KeyManagerTest.java](./src/test/java/irita/sdk/Sm2KeyManagerTest.java)
 
 [MsgsTest.java](./src/test/java/irita/sdk/MsgsTest.java)
 

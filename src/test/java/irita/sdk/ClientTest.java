@@ -26,24 +26,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 
-public class ClientTest {
+public class ClientTest extends ConfigTest {
     private IritaClient client;
 
     @BeforeEach
     public void init() {
-        String mnemonic = "opera vivid pride shallow brick crew found resist decade neck expect apple chalk belt sick author know try tank detail tree impact hand best";
-        KeyManager km = KeyManagerFactory.createDefault();
-        km.recover(mnemonic);
-
-        String nodeUri = "http://101.132.67.8:26657";
-        String grpcAddr = "http://101.132.67.8:9090";
-        String chainId = "wenchangchain";
-        ClientConfig clientConfig = new ClientConfig(nodeUri, grpcAddr, chainId);
-//        OpbConfig opbConfig = new OpbConfig("", "", "");
-        OpbConfig opbConfig = null;
-
-        client = new IritaClient(clientConfig, opbConfig, km);
-        assertEquals("iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3", km.getCurrentKeyInfo().getAddress());
+        client = getTestClient();
     }
 
     @Test
@@ -58,7 +46,7 @@ public class ClientTest {
     @Disabled
     public void simulateTx() throws IOException {
         BaseClient baseClient = client.getBaseClient();
-        BaseTx baseTx = new BaseTx(10000, new Fee("10000", "uirita"), BroadcastMode.Commit);
+        BaseTx baseTx = new BaseTx(10000, new Fee("10000", "ugas"), BroadcastMode.Commit);
         Account account = baseClient.queryAccount(baseTx);
         Tx.MsgIssueDenom msg = Tx.MsgIssueDenom
                 .newBuilder()

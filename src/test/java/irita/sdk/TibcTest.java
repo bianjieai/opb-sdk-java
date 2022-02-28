@@ -30,19 +30,6 @@ public class TibcTest {
         String mnemonic = "genre stamp head slam drop chuckle patrol mushroom staff range bomb accuse donor bounce main ancient home guide account floor label trigger wife doctor";
         KeyManager km = KeyManagerFactory.createKeyManger(AlgoEnum.SECP256K1);
         km.recover(mnemonic);
-//        String keystore="-----BEGIN TENDERMINT PRIVATE KEY-----\n"+
-//                "salt: 183EF9B57DEF8EF8C3AD9D21DE672E1B\n"+
-//                "type: sm2\n"+
-//                "kdf: bcrypt\n"+
-//                "\n"+
-//                "cpreEPwi0X3yIdsAIf94fR6s8L1TnDAQd/r4ifID6GmQX5a+4ehMmnTp2JjDpUe5\n"+
-//                "kpgRI7CzF0DjKpPLvY9V9ZSXJFN42LHWscxqQ1E=\n"+
-//                "=nJvd\n"+
-//                "-----END TENDERMINT PRIVATE KEY-----";
-//
-//        InputStream input=new ByteArrayInputStream(keystore.getBytes(StandardCharsets.UTF_8));
-//        km=KeyManagerFactory.createDefault();
-//        km.recover(input,"12345678");
         String nodeUri = "http://localhost:46657";
         String grpcAddr = "http://localhost:9092";
         String chainId = "iris-test2";
