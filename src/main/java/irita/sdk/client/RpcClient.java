@@ -19,11 +19,7 @@ import irita.sdk.model.block.ResultBlockRpc;
 import irita.sdk.model.tx.*;
 import irita.sdk.model.ws.block.NewBlockBean;
 import irita.sdk.model.ws.tx.TxBean;
-import irita.sdk.util.HashUtils;
-import irita.sdk.util.HttpUtils;
-import irita.sdk.util.LogUtils;
-import irita.sdk.util.MsgParser;
-import irita.sdk.util.JsonUtils;
+import irita.sdk.util.*;
 import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.util.encoders.Hex;
 import proto.cosmos.tx.v1beta1.TxOuterClass;
@@ -79,7 +75,7 @@ public class RpcClient implements WsEvent {
     public synchronized ResultTx broadcastTxCommit(byte[] txBytes) throws IOException {
         JsonRpc jsonRpc = JsonRpc.WrapTxBytes(txBytes, "broadcast_tx_commit");
         String str = httpUtils.post(rpcUri, JsonUtils.writeValueAsString(jsonRpc));
-        return checkResTxAndConvert(str);
+        return checkCommitResultTx(str);
     }
 
     public synchronized ResultTx broadcastTxAsync(byte[] txBytes) throws IOException {
@@ -92,7 +88,7 @@ public class RpcClient implements WsEvent {
     public synchronized ResultTx broadcastTxSync(byte[] txBytes) throws IOException {
         JsonRpc jsonRpc = JsonRpc.WrapTxBytes(txBytes, "broadcast_tx_sync");
         String str = httpUtils.post(rpcUri, JsonUtils.writeValueAsString(jsonRpc));
-        return JsonUtils.readValue(str, ResultTx.class);
+        return checkSyncResultTx(str);
     }
 
     public synchronized GasInfo simulateTx(byte[] txBytes) throws IOException {
@@ -115,14 +111,30 @@ public class RpcClient implements WsEvent {
         return gasInfoWrap.getGasInfo();
     }
 
-    private ResultTx checkResTxAndConvert(String res) throws IOException {
+    private ResultTx checkCommitResultTx(String res) throws IOException {
         ResultTx resultTx = JsonUtils.readValue(res, ResultTx.class);
 
         if (resultTx.getError() != null) {
             throw new IritaSDKException(resultTx.getError().getData());
         }
-        if (resultTx.getCode() != TxStatus.SUCCESS) {
-            throw new IritaSDKException(String.format("log: %s\nhash: %s", resultTx.getLog(), Optional.of(resultTx).map(ResultTx::getResult).map(Result::getHash).orElse("")));
+
+        Check_tx checkTx = resultTx.getResult().getCheck_tx();
+        if (checkTx.getCode() != TxStatus.SUCCESS) {
+            throw new IritaSDKException(String.format("log: %s\nhash: %s", checkTx.getLog(), Optional.of(resultTx).map(ResultTx::getResult).map(Result::getHash).orElse("")));
+        }
+
+        Deliver_tx deliverTx = resultTx.getResult().getDeliver_tx();
+        if (deliverTx.getCode() != TxStatus.SUCCESS) {
+            throw new IritaSDKException(String.format("log: %s\nhash: %s", deliverTx.getLog(), Optional.of(resultTx).map(ResultTx::getResult).map(Result::getHash).orElse("")));
+        }
+        return resultTx;
+    }
+
+    private ResultTx checkSyncResultTx(String str) throws IOException {
+        ResultTx resultTx = JsonUtils.readValue(str, ResultTx.class);
+
+        if (resultTx.getResult().getCode() != TxStatus.SUCCESS) {
+            throw new IritaSDKException(String.format("log: %s\nhash: %s", resultTx.getResult().getLog(), Optional.of(resultTx).map(ResultTx::getResult).map(Result::getHash).orElse("")));
         }
         return resultTx;
     }
