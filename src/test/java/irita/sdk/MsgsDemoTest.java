@@ -36,17 +36,14 @@ public class MsgsDemoTest {
     @BeforeEach
     public void init() {
         //更换为自己链上地址的助记词
-        String mnemonic = "edit endorse silver canyon silver cargo draft almost worth snack twin predict hint orange thumb apology same end weapon bitter tip shy elevator already";
+        String mnemonic = "opera vivid pride shallow brick crew found resist decade neck expect apple chalk belt sick author know try tank detail tree impact hand best";
         KeyManager km = KeyManagerFactory.createDefault();
         km.recover(mnemonic);
 
-
         //连接测试网（连接主网请参考README.md）
-        String nodeUri = "http://127.0.0.1:26657";
-        String grpcAddr = "127.0.0.1:9090";
-        String chainId = "irita-test";
-        /*System.getProperty("java.library.path");
-        System.loadLibrary("libsecp256k1");*/
+        String nodeUri = "http://47.100.192.234:26657";
+        String grpcAddr = "47.100.192.234:9090";
+        String chainId = "testing";
 
         ClientConfig clientConfig = new ClientConfig(nodeUri, grpcAddr, chainId);
         //测试网为null，主网请参考README.md
@@ -54,10 +51,11 @@ public class MsgsDemoTest {
 
         client = new IritaClient(clientConfig, opbConfig, km);
         //判断由助记词恢复的是否为预期的链上地址
-        assertEquals("iaa1tu4v8q40nwxkhthverngnzqeyl47ay3ux9932n", km.getCurrentKeyInfo().getAddress());
+        assertEquals("iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3", km.getCurrentKeyInfo().getAddress());
     }
 
     @Test
+    @Disabled
     public void testSendMsgs() throws IOException {
         //创建 denom 的参数
         String denomID = "testdenom" + new Random().nextInt(1000);
@@ -89,8 +87,8 @@ public class MsgsDemoTest {
         TxOuterClass.TxBody txBodyFromBytes = TxOuterClass.TxBody.parseFrom(bytes);
         TxOuterClass.Tx signTx = baseClient.getTxEngine().signTx(txBodyFromBytes, baseTx, account);
         byte[] signTxBytes = signTx.toByteArray();
-        ResultTx resultTx = baseClient.getRpcClient().broadcastTx(signTxBytes, baseTx.getMode());
         //broadcast 广播签名后的交易
+        ResultTx resultTx = baseClient.getRpcClient().broadcastTx(signTxBytes, baseTx.getMode());
         assertNotNull(resultTx);
 
         //查询denom验证
