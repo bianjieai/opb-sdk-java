@@ -6,6 +6,7 @@ import irita.sdk.client.IritaClient;
 import irita.sdk.config.ClientConfig;
 import irita.sdk.config.OpbConfig;
 import irita.sdk.constant.enums.BroadcastMode;
+import irita.sdk.key.AlgoEnum;
 import irita.sdk.key.KeyManager;
 import irita.sdk.key.KeyManagerFactory;
 import irita.sdk.model.Account;
@@ -15,7 +16,6 @@ import irita.sdk.model.ResultTx;
 import irita.sdk.module.nft.QueryCollectionResp;
 import irita.sdk.module.nft.QueryDenomResp;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import proto.cosmos.tx.v1beta1.TxOuterClass;
 import proto.nft.Tx;
@@ -29,22 +29,22 @@ import java.util.Random;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class MsgsDemoTest {
+public class ETHSecp256k1Test {
     private IritaClient client;
-    private final BaseTx baseTx = new BaseTx(200000, new Fee("200000", "ugas"), BroadcastMode.Commit);
+    private final BaseTx baseTx = new BaseTx(200000, new Fee("200000", "uirita"), BroadcastMode.Commit);
 
     @BeforeEach
     public void init() {
         //更换为自己链上地址的助记词
-        String mnemonic = "edit endorse silver canyon silver cargo draft almost worth snack twin predict hint orange thumb apology same end weapon bitter tip shy elevator already";
-        KeyManager km = KeyManagerFactory.createDefault();
+        String mnemonic = "live ramp pigeon thrive pretty genre have reunion crater funny then bread typical toe nation guard deposit sea drop acoustic market cake december body";
+        KeyManager km = KeyManagerFactory.createKeyManger(AlgoEnum.ETHECP256K1);
         km.recover(mnemonic);
 
 
         //连接测试网（连接主网请参考README.md）
         String nodeUri = "http://127.0.0.1:26657";
         String grpcAddr = "127.0.0.1:9090";
-        String chainId = "irita-test";
+        String chainId = "test";
         /*System.getProperty("java.library.path");
         System.loadLibrary("libsecp256k1");*/
 
@@ -54,7 +54,7 @@ public class MsgsDemoTest {
 
         client = new IritaClient(clientConfig, opbConfig, km);
         //判断由助记词恢复的是否为预期的链上地址
-        assertEquals("iaa1tu4v8q40nwxkhthverngnzqeyl47ay3ux9932n", km.getCurrentKeyInfo().getAddress());
+        assertEquals("iaa1g3kszwkv8zc0tvwq3grmjah9s8f69gpanczkyh", km.getCurrentKeyInfo().getAddress());
     }
 
     @Test
