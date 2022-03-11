@@ -10,8 +10,6 @@ import irita.sdk.model.Account;
 import irita.sdk.model.BaseTx;
 import irita.sdk.util.ByteUtils;
 import irita.sdk.util.HashUtils;
-import org.bitcoinj.core.ECKey;
-import org.bitcoinj.core.Sha256Hash;
 import org.bouncycastle.math.ec.ECPoint;
 import org.web3j.crypto.ECKeyPair;
 import org.web3j.crypto.Sign;
@@ -21,13 +19,9 @@ import proto.cosmos.tx.v1beta1.TxOuterClass;
 import proto.ethermint.crypto.ethsecp256k1.Keys;
 
 import java.math.BigInteger;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-
-import static org.bitcoinj.core.ECKey.CURVE;
 
 public class EthSecp256k1TxEngine implements TxEngine {
     private final KeyManager km;
@@ -86,11 +80,12 @@ public class EthSecp256k1TxEngine implements TxEngine {
                 .setChainId(chainID)
                 .build();
 
-        byte[] sigData = new byte[64];
+        byte[] sigData = new byte[65];
         BigInteger pubKey = Sign.publicKeyFromPrivate(privKey);
         ECKeyPair keyPair = new ECKeyPair(privKey, pubKey);
-        Sign.SignatureData signature = Sign.signMessage(HashUtils.sha256(signDoc.toByteArray()), keyPair, false);
+        Sign.SignatureData signature = Sign.signMessage(org.web3j.crypto.Hash.sha3(signDoc.toByteArray()), keyPair, false);
         sigData = ByteUtils.addAll(signature.getR(), signature.getS());
+        sigData = ByteUtils.addAll(sigData, signature.getV());
         return TxOuterClass.Tx.newBuilder()
                 .setBody(txBody)
                 .setAuthInfo(ai)
