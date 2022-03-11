@@ -18,6 +18,6 @@ public class KeyManagerFactory {
     }
 
     public static KeyManager createDefault() {
-        return new EthSecp256k1KeyManger();
+        return new Sm2KeyManager();
     }
 }

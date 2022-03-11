@@ -2,8 +2,6 @@ package irita.sdk.tx;
 
 import com.google.protobuf.Any;
 import com.google.protobuf.ByteString;
-import com.google.protobuf.GeneratedMessageV3;
-import irita.sdk.exception.IritaSDKException;
 import irita.sdk.key.KeyInfo;
 import irita.sdk.key.KeyManager;
 import irita.sdk.model.Account;
@@ -16,9 +14,7 @@ import proto.cosmos.tx.signing.v1beta1.Signing;
 import proto.cosmos.tx.v1beta1.TxOuterClass;
 
 import java.math.BigInteger;
-import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 public class Secp256k1TxEngine implements TxEngine {
     private final KeyManager km;
@@ -27,26 +23,6 @@ public class Secp256k1TxEngine implements TxEngine {
     public Secp256k1TxEngine(KeyManager km, String chainID) {
         this.km = km;
         this.chainID = chainID;
-    }
-
-    @Override
-    public TxOuterClass.TxBody buildTxBody(List<GeneratedMessageV3> msgs) {
-        return this.buildTxBodyWithMemo(msgs, null);
-    }
-
-    @Override
-    public TxOuterClass.TxBody buildTxBodyWithMemo(List<GeneratedMessageV3> msgs, String memo) {
-        if (msgs.size() == 0) {
-            throw new IritaSDKException("size of msgs should larger than 0");
-        }
-        TxOuterClass.TxBody.Builder builder = TxOuterClass.TxBody.newBuilder();
-        msgs.forEach(msg -> {
-            builder.addMessages(Any.pack(msg, "/"));
-        });
-        return builder
-                .setMemo(Optional.ofNullable(memo).orElse(""))
-                .setTimeoutHeight(0)
-                .build();
     }
 
     @Override

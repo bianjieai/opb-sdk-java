@@ -2,14 +2,11 @@ package irita.sdk.tx;
 
 import com.google.protobuf.Any;
 import com.google.protobuf.ByteString;
-import com.google.protobuf.GeneratedMessageV3;
-import irita.sdk.exception.IritaSDKException;
 import irita.sdk.key.KeyInfo;
 import irita.sdk.key.KeyManager;
 import irita.sdk.model.Account;
 import irita.sdk.model.BaseTx;
 import irita.sdk.util.ByteUtils;
-import irita.sdk.util.HashUtils;
 import org.bouncycastle.math.ec.ECPoint;
 import org.web3j.crypto.ECKeyPair;
 import org.web3j.crypto.Sign;
@@ -19,9 +16,7 @@ import proto.cosmos.tx.v1beta1.TxOuterClass;
 import proto.ethermint.crypto.ethsecp256k1.Keys;
 
 import java.math.BigInteger;
-import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 public class EthSecp256k1TxEngine implements TxEngine {
     private final KeyManager km;
@@ -30,26 +25,6 @@ public class EthSecp256k1TxEngine implements TxEngine {
     public EthSecp256k1TxEngine(KeyManager km, String chainID) {
         this.km = km;
         this.chainID = chainID;
-    }
-
-    @Override
-    public TxOuterClass.TxBody buildTxBody(List<GeneratedMessageV3> msgs) {
-        return this.buildTxBodyWithMemo(msgs, null);
-    }
-
-    @Override
-    public TxOuterClass.TxBody buildTxBodyWithMemo(List<GeneratedMessageV3> msgs, String memo) {
-        if (msgs.size() == 0) {
-            throw new IritaSDKException("size of msgs should larger than 0");
-        }
-        TxOuterClass.TxBody.Builder builder = TxOuterClass.TxBody.newBuilder();
-        msgs.forEach(msg -> {
-            builder.addMessages(Any.pack(msg, "/"));
-        });
-        return builder
-                .setMemo(Optional.ofNullable(memo).orElse(""))
-                .setTimeoutHeight(0)
-                .build();
     }
 
     @Override

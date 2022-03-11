@@ -32,26 +32,6 @@ public class Sm2TxEngine implements TxEngine {
     }
 
     @Override
-    public TxOuterClass.TxBody buildTxBody(List<GeneratedMessageV3> msgs) {
-        return this.buildTxBodyWithMemo(msgs, null);
-    }
-
-    @Override
-    public TxOuterClass.TxBody buildTxBodyWithMemo(List<GeneratedMessageV3> msgs, String memo) {
-        if (msgs.size() == 0) {
-            throw new IritaSDKException("size of msgs should larger than 0");
-        }
-        TxOuterClass.TxBody.Builder builder = TxOuterClass.TxBody.newBuilder();
-        msgs.forEach(msg -> {
-            builder.addMessages(Any.pack(msg, "/"));
-        });
-        return builder
-                .setMemo(Optional.ofNullable(memo).orElse(""))
-                .setTimeoutHeight(0)
-                .build();
-    }
-
-    @Override
     public TxOuterClass.Tx signTx(TxOuterClass.TxBody txBody, BaseTx baseTx, Account account) {
         if (baseTx == null) {
             throw new IritaSDKException("baseTx not be null");
