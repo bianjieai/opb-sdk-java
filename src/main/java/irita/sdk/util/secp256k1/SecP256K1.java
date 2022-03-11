@@ -40,6 +40,8 @@ public class SecP256K1 extends GMBaseUtils {
     public static final ECPoint G_POINT = CURVE.createPoint(SecP256K1_ECC_GX, SecP256K1_ECC_GY);
     public static final ECDomainParameters DOMAIN_PARAMS = new ECDomainParameters(CURVE, G_POINT,
             SecP256K1_ECC_N, SecP256K1_ECC_H);
+    public static final ECDomainParameters ETH_DOMAIN_PARAMS = new ECDomainParameters(CURVE, G_POINT,
+            SecP256K1_ECC_N, SecP256K1_ECC_P);
     public static final int CURVE_LEN = BCECUtils.getCurveLength(DOMAIN_PARAMS);
     //////////////////////////////////////////////////////////////////////////////////////
 
