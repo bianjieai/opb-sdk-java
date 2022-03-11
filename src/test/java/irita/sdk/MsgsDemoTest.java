@@ -31,12 +31,12 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class MsgsDemoTest {
     private IritaClient client;
-    private final BaseTx baseTx = new BaseTx(200000, new Fee("200000", "ugas"), BroadcastMode.Commit);
+    private final BaseTx baseTx = new BaseTx(200000, new Fee("200000", "uirita"), BroadcastMode.Commit);
 
     @BeforeEach
     public void init() {
         //更换为自己链上地址的助记词
-        String mnemonic = "edit endorse silver canyon silver cargo draft almost worth snack twin predict hint orange thumb apology same end weapon bitter tip shy elevator already";
+        String mnemonic = "leisure timber expire affair wife solar combine mercy language amount bacon merge lottery rural rule bench job pattern rule another copper method slender police";
         KeyManager km = KeyManagerFactory.createDefault();
         km.recover(mnemonic);
 
@@ -44,7 +44,7 @@ public class MsgsDemoTest {
         //连接测试网（连接主网请参考README.md）
         String nodeUri = "http://127.0.0.1:26657";
         String grpcAddr = "127.0.0.1:9090";
-        String chainId = "irita-test";
+        String chainId = "irita-tesnet";
         /*System.getProperty("java.library.path");
         System.loadLibrary("libsecp256k1");*/
 
@@ -54,7 +54,7 @@ public class MsgsDemoTest {
 
         client = new IritaClient(clientConfig, opbConfig, km);
         //判断由助记词恢复的是否为预期的链上地址
-        assertEquals("iaa1tu4v8q40nwxkhthverngnzqeyl47ay3ux9932n", km.getCurrentKeyInfo().getAddress());
+        assertEquals("iaa14cn0hyqnez0f9v5n8lclewegmss8ysxc2u0qqs", km.getCurrentKeyInfo().getAddress());
     }
 
     @Test
