@@ -21,10 +21,7 @@ import proto.cosmos.tx.v1beta1.TxOuterClass;
 import proto.nft.Tx;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -36,17 +33,15 @@ public class MsgsDemoTest {
     @BeforeEach
     public void init() {
         //更换为自己链上地址的助记词
-        String mnemonic = "edit endorse silver canyon silver cargo draft almost worth snack twin predict hint orange thumb apology same end weapon bitter tip shy elevator already";
+        String mnemonic = "opera vivid pride shallow brick crew found resist decade neck expect apple chalk belt sick author know try tank detail tree impact hand best";
         KeyManager km = KeyManagerFactory.createDefault();
         km.recover(mnemonic);
 
-
         //连接测试网（连接主网请参考README.md）
-        String nodeUri = "http://127.0.0.1:26657";
-        String grpcAddr = "127.0.0.1:9090";
-        String chainId = "irita-test";
-        /*System.getProperty("java.library.path");
-        System.loadLibrary("libsecp256k1");*/
+        Properties properties = ConfigTest.getTestConfig();
+        String nodeUri = properties.getProperty("node_uri");
+        String grpcAddr = properties.getProperty("grpc_addr");
+        String chainId = properties.getProperty("chain_id");
 
         ClientConfig clientConfig = new ClientConfig(nodeUri, grpcAddr, chainId);
         //测试网为null，主网请参考README.md
@@ -54,7 +49,7 @@ public class MsgsDemoTest {
 
         client = new IritaClient(clientConfig, opbConfig, km);
         //判断由助记词恢复的是否为预期的链上地址
-        assertEquals("iaa1tu4v8q40nwxkhthverngnzqeyl47ay3ux9932n", km.getCurrentKeyInfo().getAddress());
+        assertEquals("iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3", km.getCurrentKeyInfo().getAddress());
     }
 
     @Test
