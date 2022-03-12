@@ -58,8 +58,8 @@ public class ETHSecp256k1Test {
     @Test
     public void testSendMsgs() throws IOException {
         //创建 denom 的参数
-        String denomID = "testdenom" + new Random().nextInt(1000);
-        String denomName = "test_name";
+        String denomID = "denomid" + new Random().nextInt(1000);
+        String denomName = "denomname" + new Random().nextInt(1000);
         String schema = "no shcema";
 
         /**
