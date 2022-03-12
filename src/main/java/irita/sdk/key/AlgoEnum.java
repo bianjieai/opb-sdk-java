@@ -4,6 +4,7 @@ import irita.sdk.constant.Armored;
 
 public enum AlgoEnum {
     SECP256K1("secp256k1", Armored.SECP256K1_RIV_KEY_NAME),
+    ETHECP256K1("eth_secp256k1", Armored.ETHSECP256K1_RIV_KEY_NAME),
     SM2("sm2", Armored.SM2_PRIV_KEY_NAME);
 
 
