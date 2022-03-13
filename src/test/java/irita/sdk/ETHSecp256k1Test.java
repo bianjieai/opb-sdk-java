@@ -21,30 +21,28 @@ import proto.cosmos.tx.v1beta1.TxOuterClass;
 import proto.nft.Tx;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class ETHSecp256k1Test {
     private IritaClient client;
-    private final BaseTx baseTx = new BaseTx(200000, new Fee("200000", "uirita"), BroadcastMode.Commit);
+    private final BaseTx baseTx = new BaseTx(200000, new Fee("200000", "ugas"), BroadcastMode.Commit);
 
     @BeforeEach
     public void init() {
         //更换为自己链上地址的助记词
-        String mnemonic = "live ramp pigeon thrive pretty genre have reunion crater funny then bread typical toe nation guard deposit sea drop acoustic market cake december body";
+        String mnemonic = "debris minute night puzzle angry gorilla radio negative beef throw invest three badge setup used earth base bottom drill security shell ugly decorate leaf";
         KeyManager km = KeyManagerFactory.createKeyManger(AlgoEnum.ETHECP256K1);
         km.recover(mnemonic);
 
 
         //连接测试网（连接主网请参考README.md）
-        String nodeUri = "http://127.0.0.1:26657";
-        String grpcAddr = "127.0.0.1:9090";
-        String chainId = "test";
+        Properties properties = ConfigTest.getTestConfig();
+        String nodeUri = properties.getProperty("node_uri");
+        String grpcAddr = properties.getProperty("grpc_addr");
+        String chainId = properties.getProperty("chain_id");
         /*System.getProperty("java.library.path");
         System.loadLibrary("libsecp256k1");*/
 
@@ -54,14 +52,14 @@ public class ETHSecp256k1Test {
 
         client = new IritaClient(clientConfig, opbConfig, km);
         //判断由助记词恢复的是否为预期的链上地址
-        assertEquals("iaa1g3kszwkv8zc0tvwq3grmjah9s8f69gpanczkyh", km.getCurrentKeyInfo().getAddress());
+        assertEquals("iaa1g938d6d97jz2r6hxwv78v2g7w0jwf3xxu8cw0s", km.getCurrentKeyInfo().getAddress());
     }
 
     @Test
     public void testSendMsgs() throws IOException {
         //创建 denom 的参数
-        String denomID = "testdenom" + new Random().nextInt(1000);
-        String denomName = "test_name";
+        String denomID = "denomid" + new Random().nextInt(1000);
+        String denomName = "denomname" + new Random().nextInt(1000);
         String schema = "no shcema";
 
         /**
