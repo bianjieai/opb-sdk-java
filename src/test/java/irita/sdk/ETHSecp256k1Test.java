@@ -37,7 +37,7 @@ public class ETHSecp256k1Test {
     public void init() {
         //更换为自己链上地址的助记词
         String mnemonic = "live ramp pigeon thrive pretty genre have reunion crater funny then bread typical toe nation guard deposit sea drop acoustic market cake december body";
-        KeyManager km = KeyManagerFactory.createKeyManger(AlgoEnum.ETHECP256K1);
+        KeyManager km = KeyManagerFactory.createKeyManger(AlgoEnum.ETH_SECP256K1);
         km.recover(mnemonic);
 
 
@@ -58,7 +58,7 @@ public class ETHSecp256k1Test {
     }
 
     @Test
-    public void testSendMsgs() throws IOException {
+    public void sendMsgs() throws IOException {
         //创建 denom 的参数
         String denomID = "testdenom" + new Random().nextInt(1000);
         String denomName = "test_name";
