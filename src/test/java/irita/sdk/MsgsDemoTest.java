@@ -21,10 +21,7 @@ import proto.cosmos.tx.v1beta1.TxOuterClass;
 import proto.nft.Tx;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -41,9 +38,10 @@ public class MsgsDemoTest {
         km.recover(mnemonic);
 
         //连接测试网（连接主网请参考README.md）
-        String nodeUri = "http://47.100.192.234:26657";
-        String grpcAddr = "47.100.192.234:9090";
-        String chainId = "testing";
+        Properties properties = ConfigTest.getTestConfig();
+        String nodeUri = properties.getProperty("node_uri");
+        String grpcAddr = properties.getProperty("grpc_addr");
+        String chainId = properties.getProperty("chain_id");
 
         ClientConfig clientConfig = new ClientConfig(nodeUri, grpcAddr, chainId);
         //测试网为null，主网请参考README.md
@@ -55,11 +53,10 @@ public class MsgsDemoTest {
     }
 
     @Test
-    @Disabled
     public void testSendMsgs() throws IOException {
         //创建 denom 的参数
-        String denomID = "testdenom" + new Random().nextInt(1000);
-        String denomName = "test_name";
+        String denomID = "denomid" + new Random().nextInt(1000);
+        String denomName = "denomname" + new Random().nextInt(1000);
         String schema = "no shcema";
 
         /**
@@ -87,8 +84,8 @@ public class MsgsDemoTest {
         TxOuterClass.TxBody txBodyFromBytes = TxOuterClass.TxBody.parseFrom(bytes);
         TxOuterClass.Tx signTx = baseClient.getTxEngine().signTx(txBodyFromBytes, baseTx, account);
         byte[] signTxBytes = signTx.toByteArray();
-        //broadcast 广播签名后的交易
         ResultTx resultTx = baseClient.getRpcClient().broadcastTx(signTxBytes, baseTx.getMode());
+        //broadcast 广播签名后的交易
         assertNotNull(resultTx);
 
         //查询denom验证
