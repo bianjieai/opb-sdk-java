@@ -6,7 +6,6 @@ import irita.sdk.client.IritaClient;
 import irita.sdk.config.ClientConfig;
 import irita.sdk.config.OpbConfig;
 import irita.sdk.constant.enums.BroadcastMode;
-import irita.sdk.key.AlgoEnum;
 import irita.sdk.key.KeyManager;
 import irita.sdk.key.KeyManagerFactory;
 import irita.sdk.model.Account;
@@ -15,7 +14,11 @@ import irita.sdk.model.Fee;
 import irita.sdk.model.ResultTx;
 import irita.sdk.module.nft.QueryCollectionResp;
 import irita.sdk.module.nft.QueryDenomResp;
+import irita.sdk.util.HashUtils;
+import org.bouncycastle.util.Strings;
+import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import proto.cosmos.tx.v1beta1.TxOuterClass;
 import proto.nft.Tx;
@@ -26,25 +29,21 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class ETHSecp256k1Test {
+public class SignTxTest {
     private IritaClient client;
-    private final BaseTx baseTx = new BaseTx(200000, new Fee("200000", "ugas"), BroadcastMode.Commit);
+    private final BaseTx baseTx = new BaseTx(200000, new Fee("200000", "ugas"), BroadcastMode.Sync);
 
     @BeforeEach
     public void init() {
         //更换为自己链上地址的助记词
-        String mnemonic = "debris minute night puzzle angry gorilla radio negative beef throw invest three badge setup used earth base bottom drill security shell ugly decorate leaf";
-        KeyManager km = KeyManagerFactory.createKeyManger(AlgoEnum.ETH_SECP256K1);
+        String mnemonic = "opera vivid pride shallow brick crew found resist decade neck expect apple chalk belt sick author know try tank detail tree impact hand best";
+        KeyManager km = KeyManagerFactory.createDefault();
         km.recover(mnemonic);
 
-
         //连接测试网（连接主网请参考README.md）
-        Properties properties = ConfigTest.getTestConfig();
-        String nodeUri = properties.getProperty("node_uri");
-        String grpcAddr = properties.getProperty("grpc_addr");
-        String chainId = properties.getProperty("chain_id");
-        /*System.getProperty("java.library.path");
-        System.loadLibrary("libsecp256k1");*/
+        String nodeUri = "http://47.100.192.234:26657";
+        String grpcAddr = "47.100.192.234:9090";
+        String chainId = "testing";
 
         ClientConfig clientConfig = new ClientConfig(nodeUri, grpcAddr, chainId);
         //测试网为null，主网请参考README.md
@@ -52,14 +51,15 @@ public class ETHSecp256k1Test {
 
         client = new IritaClient(clientConfig, opbConfig, km);
         //判断由助记词恢复的是否为预期的链上地址
-        assertEquals("iaa1g938d6d97jz2r6hxwv78v2g7w0jwf3xxu8cw0s", km.getCurrentKeyInfo().getAddress());
+        assertEquals("iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3", km.getCurrentKeyInfo().getAddress());
     }
 
     @Test
-    public void sendMsgs() throws IOException {
+    @Disabled
+    public void signTxOfflineAndSend() throws IOException {
         //创建 denom 的参数
-        String denomID = "denomid" + new Random().nextInt(1000);
-        String denomName = "denomname" + new Random().nextInt(1000);
+        String denomID = "testdenom" + new Random().nextInt(1000);
+        String denomName = "test_name";
         String schema = "no shcema";
 
         /**
@@ -87,9 +87,12 @@ public class ETHSecp256k1Test {
         TxOuterClass.TxBody txBodyFromBytes = TxOuterClass.TxBody.parseFrom(bytes);
         TxOuterClass.Tx signTx = baseClient.getTxEngine().signTx(txBodyFromBytes, baseTx, account);
         byte[] signTxBytes = signTx.toByteArray();
-        ResultTx resultTx = baseClient.getRpcClient().broadcastTx(signTxBytes, baseTx.getMode());
-        //broadcast 广播签名后的交易
+        // 离线计算交易hash
+        String txHash = Strings.toUpperCase(Hex.toHexString(HashUtils.sha256(signTxBytes)));
+        //broadcast 广播签名后的交易 - 通过sync模式
+        ResultTx resultTx = baseClient.getRpcClient().broadcastTx(signTxBytes, BroadcastMode.Sync);
         assertNotNull(resultTx);
+        assertEquals(resultTx.getResult().getHash(),txHash);
 
         //查询denom验证
         QueryDenomResp denom = client.getNftClient().queryDenom(denomID);

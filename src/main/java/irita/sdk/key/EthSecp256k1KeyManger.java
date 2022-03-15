@@ -29,7 +29,7 @@ public class EthSecp256k1KeyManger extends KeyManager{
 
     @Override
     public AlgoEnum getAlgo() {
-        return AlgoEnum.ETHECP256K1;
+        return AlgoEnum.ETH_SECP256K1;
     }
 
     @Override

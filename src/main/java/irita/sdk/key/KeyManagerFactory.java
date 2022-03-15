@@ -10,7 +10,7 @@ public class KeyManagerFactory {
                 return new Sm2KeyManager();
             case SECP256K1:
                 return new Secp256k1KeyManger();
-            case ETHECP256K1:
+            case ETH_SECP256K1:
                 return new EthSecp256k1KeyManger();
             default:
                 throw new RuntimeException("panic");
