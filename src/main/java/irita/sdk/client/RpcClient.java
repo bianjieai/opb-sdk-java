@@ -132,8 +132,7 @@ public class RpcClient implements WsEvent {
 
     private ResultTx checkSyncResultTx(String str) throws IOException {
         ResultTx resultTx = JsonUtils.readValue(str, ResultTx.class);
-
-        if (resultTx.getResult().getCode() != TxStatus.SUCCESS) {
+        if (resultTx.getCode() != TxStatus.SUCCESS || resultTx.getResult().getCode() != TxStatus.SUCCESS) {
             throw new IritaSDKException(String.format("log: %s\nhash: %s", resultTx.getResult().getLog(), Optional.of(resultTx).map(ResultTx::getResult).map(Result::getHash).orElse("")));
         }
         return resultTx;

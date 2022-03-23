@@ -89,8 +89,8 @@ public class SignTxTest {
         byte[] signTxBytes = signTx.toByteArray();
         // 离线计算交易hash
         String txHash = Strings.toUpperCase(Hex.toHexString(HashUtils.sha256(signTxBytes)));
-        //broadcast 广播签名后的交易 - 通过sync模式
-        ResultTx resultTx = baseClient.getRpcClient().broadcastTx(signTxBytes, BroadcastMode.Sync);
+        //broadcast 广播签名后的交易 - 通过commit模式，如果使用sync模式，则会影响下面的nft的发送
+        ResultTx resultTx = baseClient.getRpcClient().broadcastTx(signTxBytes, BroadcastMode.Commit);
         assertNotNull(resultTx);
         assertEquals(resultTx.getResult().getHash(),txHash);
 
@@ -135,12 +135,17 @@ public class SignTxTest {
         mintNFTMsgs.add(msg1);
         mintNFTMsgs.add(msg2);
         //使用 baseClient 每一笔交易前都需要查询一次account(因为每发一笔交易,该地址account的sequence会自增)
-        account = baseClient.queryAccount(baseTx);
-        resultTx = baseClient.buildAndSend(mintNFTMsgs, baseTx, account);
-        assertNotNull(resultTx);
-        //通过denomID查询collection,即该denom和其nft列表信息
-        QueryCollectionResp collection = client.getNftClient().queryCollection(denomID, null);
-        assertNotNull(collection);
-        assertEquals(2, collection.getNfts().size());
+        TxOuterClass.TxBody nftBody = baseClient.getTxEngine().buildTxBodyWithMemo(mintNFTMsgs, "example memo");
+        byte[] nftBytes = nftBody.toByteArray();
+        //sign 签名
+        TxOuterClass.TxBody txBodyFromNftBytes = TxOuterClass.TxBody.parseFrom(nftBytes);
+        TxOuterClass.Tx nftSignTx = baseClient.getTxEngine().signTx(txBodyFromNftBytes, baseTx, account);
+        byte[] nftSignTxBytes = nftSignTx.toByteArray();
+        // 离线计算交易hash
+        String nftTxHash = Strings.toUpperCase(Hex.toHexString(HashUtils.sha256(nftSignTxBytes)));
+        //broadcast 广播签名后的交易 - 通过sync模式
+        ResultTx nftResultTx = baseClient.getRpcClient().broadcastTx(signTxBytes, BroadcastMode.Sync);
+        assertNotNull(nftResultTx);
+        assertEquals(nftResultTx.getResult().getHash(),nftTxHash);
     }
 }
