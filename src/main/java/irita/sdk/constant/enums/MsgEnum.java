@@ -8,6 +8,7 @@ public enum MsgEnum {
     //bank
     Msg_Send("cosmos.bank.v1beta1.MsgSend", proto.cosmos.bank.v1beta1.Tx.MsgSend.class),
     Msg_Multi_Send("cosmos.bank.v1beta1.MsgMultiSend", proto.cosmos.bank.v1beta1.Tx.MsgMultiSend.class),
+    Msg_Ethereum_Tx("ethermint.evm.v1.MsgEthereumTx",proto.ethermint.evm.v1.Tx.MsgEthereumTx.class),
     //staking
 //    MSG_DELEGATE("cosmos.staking.v1beta1.MsgDelegate", proto.cosmos.MsgDelegate.class),
 //    MSG_UNDELEGATE("cosmos.staking.v1beta1.MsgUndelegate", .class),
@@ -62,6 +63,8 @@ public enum MsgEnum {
     MSG_UNASSIGN_ROLES("iritamod.perm.MsgUnassignRoles", proto.perm.Tx.MsgUnassignRoles.class),
     MSG_BLOCK_ACCOUNT("iritamod.perm.MsgBlockAccount", proto.perm.Tx.MsgBlockAccount.class),
     MSG_UNBLOCK_ACCOUNT("iritamod.perm.MsgUnblockAccount", proto.perm.Tx.MsgUnblockAccount.class),
+    MSG_BLOCK_CONTRACT("iritamod.perm.MsgBlockContract", proto.perm.Tx.MsgBlockContract.class),
+    MSG_UNBLOCK_CONTRACT("iritamod.perm.MsgUnblockContract", proto.perm.Tx.MsgUnblockContract.class),
     // wasm
     MSG_EXECUTE_CONTRACT("cosmwasm.wasm.v1.MsgExecuteContract", proto.cosmwasm.wasm.v1.Tx.MsgExecuteContract.class),
     MSG_INSTANTIATE_CONTRACT("cosmwasm.wasm.v1.MsgInstantiateContract", proto.cosmwasm.wasm.v1.Tx.MsgInstantiateContract.class),
