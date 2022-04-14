@@ -68,6 +68,8 @@ public class ETHSecp256k1Test {
          * 其他模块交易也可以以这种方式实现
          */
         BaseClient baseClient = client.getBaseClient();
+        /*baseTx.setFeeGranter("iaa17y3qs2zuanr93nk844x0t7e6ktchwygnc8fr0g");
+        baseTx.setFeePayer("iaa1xdah5h7elxc8ezhye29jxyv365gpsp0vluk6y3");*/
         //查询账户信息
         Account account = baseClient.queryAccount(baseTx);
         //build msg 构建msg

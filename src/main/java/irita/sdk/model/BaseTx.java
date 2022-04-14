@@ -13,6 +13,8 @@ public class BaseTx {
     private BroadcastMode mode;
     private long accountNumber;
     private long sequence;
+    private String feeGranter;
+    private String feePayer;
 
     public BaseTx() {
     }
@@ -118,6 +120,24 @@ public class BaseTx {
 
     public BaseTx setSequence(long sequence) {
         this.sequence = sequence;
+        return this;
+    }
+
+    public String getFeeGranter() {
+        return feeGranter;
+    }
+
+    public BaseTx setFeeGranter(String feeGranter) {
+        this.feeGranter = feeGranter;
+        return this;
+    }
+
+    public String getFeePayer() {
+        return feePayer;
+    }
+
+    public BaseTx setFeePayer(String feePayer) {
+        this.feePayer = feePayer;
         return this;
     }
 }

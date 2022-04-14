@@ -38,6 +38,15 @@ public class EthSecp256k1TxEngine implements TxEngine {
 
         long sequence = baseTx.getSequence() != 0 ? baseTx.getSequence() : account.getSequence();
         long accountNumber = baseTx.getAccountNumber() != 0 ? baseTx.getAccountNumber() : account.getAccountNumber();
+        TxOuterClass.Fee.Builder fee = TxOuterClass.Fee.newBuilder();
+        fee.setGasLimit(baseTx.getGas());
+        fee.addAmount(CoinOuterClass.Coin.newBuilder().setAmount(baseTx.getFee().getAmount()).setDenom(baseTx.getFee().getDenom()));
+        if (baseTx.getFeePayer() != null) {
+            fee.setPayer(baseTx.getFeePayer());
+        }
+        if (baseTx.getFeeGranter() != null) {
+            fee.setGranter(baseTx.getFeeGranter());
+        }
 
         TxOuterClass.AuthInfo ai = TxOuterClass.AuthInfo.newBuilder()
                 .addSignerInfos(
@@ -45,7 +54,7 @@ public class EthSecp256k1TxEngine implements TxEngine {
                                 .setPublicKey(Any.pack(Keys.PubKey.newBuilder().setKey(ByteString.copyFrom(publicKeyEncoded)).build(), "/"))
                                 .setModeInfo(TxOuterClass.ModeInfo.newBuilder().setSingle(TxOuterClass.ModeInfo.Single.newBuilder().setMode(Signing.SignMode.SIGN_MODE_DIRECT)))
                                 .setSequence(sequence))
-                .setFee(TxOuterClass.Fee.newBuilder().setGasLimit(baseTx.getGas()).addAmount(CoinOuterClass.Coin.newBuilder().setAmount(baseTx.getFee().getAmount()).setDenom(baseTx.getFee().getDenom()))).build();
+                .setFee(fee).build();
 
 
         TxOuterClass.SignDoc signDoc = TxOuterClass.SignDoc.newBuilder()
