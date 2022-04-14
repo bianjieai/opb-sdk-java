@@ -127,15 +127,17 @@ public class BaseTx {
         return feeGranter;
     }
 
-    public void setFeeGranter(String feeGranter) {
+    public BaseTx setFeeGranter(String feeGranter) {
         this.feeGranter = feeGranter;
+        return this;
     }
 
     public String getFeePayer() {
         return feePayer;
     }
 
-    public void setFeePayer(String feePayer) {
+    public BaseTx setFeePayer(String feePayer) {
         this.feePayer = feePayer;
+        return this;
     }
 }
