@@ -45,7 +45,7 @@ public class FeeGrantTest {
         IritaClient iritaClient = new IritaClient(clientConfig, opbConfig, km);
         NftClient nftClient = iritaClient.getNftClient();
         baseClient = iritaClient.getBaseClient();
-        //本地环境中FeeGranter中户地址以及FeePlayer账户的地址  其中付款为FeeGranter
+        //本地环境中FeeGranter账户地址以及FeePlayer账户的地址  其中付款为FeeGranter
         baseTx.setFeeGranter("iaa17y3qs2zuanr93nk844x0t7e6ktchwygnc8fr0g").setFeePayer("iaa1cfqjw7h5h5xdaz6d05vs5xtpsn5w3vthartxvk");
         assertEquals("iaa1cfqjw7h5h5xdaz6d05vs5xtpsn5w3vthartxvk", km.getCurrentKeyInfo().getAddress());
     }
