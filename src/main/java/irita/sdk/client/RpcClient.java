@@ -9,6 +9,7 @@ import irita.sdk.constant.TmTypes;
 import irita.sdk.constant.TxStatus;
 import irita.sdk.constant.enums.BroadcastMode;
 import irita.sdk.exception.IritaSDKException;
+import irita.sdk.exception.UnknownMsgException;
 import irita.sdk.function.EventHandler;
 import irita.sdk.model.Result;
 import irita.sdk.model.*;
@@ -247,7 +248,9 @@ public class RpcClient implements WsEvent {
                 TxOuterClass.Tx tx = TxOuterClass.Tx.parseFrom(Base64.getDecoder().decode((String) o));
                 messageList = new ArrayList<>();
                 for (Any any : tx.getBody().getMessagesList()) {
-                    messageList.add(MsgParser.unpackMsg(any.getTypeUrl(), any.getValue()));
+                    try {
+                        messageList.add(MsgParser.unpackMsg(any.getTypeUrl(), any.getValue()));
+                    } catch (UnknownMsgException ignored){}
                 }
                 stdTx.setMsgs(messageList);
                 stdTx.setMemo(tx.getBody().getMemo());
