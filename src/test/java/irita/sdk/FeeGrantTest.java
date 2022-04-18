@@ -6,12 +6,11 @@ import irita.sdk.client.IritaClient;
 import irita.sdk.config.ClientConfig;
 import irita.sdk.config.OpbConfig;
 import irita.sdk.constant.enums.BroadcastMode;
+import irita.sdk.exception.IritaSDKException;
 import irita.sdk.key.KeyManager;
 import irita.sdk.key.KeyManagerFactory;
-import irita.sdk.model.Account;
-import irita.sdk.model.BaseTx;
-import irita.sdk.model.Fee;
-import irita.sdk.model.ResultTx;
+import irita.sdk.model.*;
+import irita.sdk.module.bank.BankClient;
 import irita.sdk.module.nft.NftClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -26,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class FeeGrantTest {
     private BaseClient baseClient;
+    private IritaClient iritaClient;
     private final BaseTx baseTx = new BaseTx(200000, new Fee("300000", "ugas"), BroadcastMode.Commit);
 
     @BeforeEach
@@ -42,11 +42,15 @@ public class FeeGrantTest {
         ClientConfig clientConfig = new ClientConfig(nodeUri, grpcAddr, chainId);
         OpbConfig opbConfig = null;
 
-        IritaClient iritaClient = new IritaClient(clientConfig, opbConfig, km);
+        iritaClient = new IritaClient(clientConfig, opbConfig, km);
         NftClient nftClient = iritaClient.getNftClient();
         baseClient = iritaClient.getBaseClient();
-        //本地环境中FeeGranter账户地址以及FeePlayer账户的地址  其中付款为FeeGranter
-        baseTx.setFeeGranter("iaa17y3qs2zuanr93nk844x0t7e6ktchwygnc8fr0g").setFeePayer("iaa1cfqjw7h5h5xdaz6d05vs5xtpsn5w3vthartxvk");
+        //设置FeeGrant 该FeeGrant账户须是已对本次交易发送方账户进行过feegrant操作
+        baseTx.setFeeGranter("iaa17y3qs2zuanr93nk844x0t7e6ktchwygnc8fr0g");
+        //如果需要设置FeePayer 则该FeePayer必须对本交易签名
+        //baseTx.setFeePayer("iaa1j782zma8xj78wsmyfqvt8muvza8aazj05vpx9p");
+        System.out.println("FeeGrant Account Balances:"+testQueryAccount("iaa17y3qs2zuanr93nk844x0t7e6ktchwygnc8fr0g",iritaClient));
+        System.out.println("From Account Balances:"+testQueryAccount("iaa1cfqjw7h5h5xdaz6d05vs5xtpsn5w3vthartxvk",iritaClient));
         assertEquals("iaa1cfqjw7h5h5xdaz6d05vs5xtpsn5w3vthartxvk", km.getCurrentKeyInfo().getAddress());
     }
 
@@ -81,25 +85,40 @@ public class FeeGrantTest {
         msgs.add(msg2);
         ResultTx resultTx = baseClient.buildAndSend(msgs, baseTx, account);
         System.out.println(resultTx.getResult().getHash());
+        System.out.println("FeeGrant Account Balances:"+testQueryAccount("iaa17y3qs2zuanr93nk844x0t7e6ktchwygnc8fr0g",iritaClient));
+        System.out.println("From Account Balances:"+testQueryAccount("iaa1cfqjw7h5h5xdaz6d05vs5xtpsn5w3vthartxvk",iritaClient));
+    }
+
+
+    private String testQueryAccount(String address,IritaClient iritaClien) {
+        BankClient bankClient = iritaClien.getBankClient();
+        BaseAccount account = bankClient.queryAccount(address);
+        List<Coin> coins = account.getCoins();
+        Optional<Coin> iritaCoin = coins.stream().filter(x -> x.getDenom().equals("ugas")).findFirst();
+        if (!iritaCoin.isPresent()) {
+            return "0";
+        }
+        return iritaCoin.get().getAmount();
     }
 }
 
 /*tx:
-        '@type': /cosmos.tx.v1beta1.Tx
-        auth_info:
-        fee:
-        amount:
-        - amount: "300000"
+  '@type': /cosmos.tx.v1beta1.Tx
+  auth_info:
+    fee:
+      amount:
+      - amount: "300000"
         denom: ugas
-        gas_limit: "200000"
-        granter: iaa17y3qs2zuanr93nk844x0t7e6ktchwygnc8fr0g
-        payer: iaa1cfqjw7h5h5xdaz6d05vs5xtpsn5w3vthartxvk
-        signer_infos:
-        - mode_info:
+      gas_limit: "200000"
+      granter: iaa17y3qs2zuanr93nk844x0t7e6ktchwygnc8fr0g
+      payer: ""
+    signer_infos:
+    - mode_info:
         single:
-        mode: SIGN_MODE_DIRECT
-        public_key:
+          mode: SIGN_MODE_DIRECT
+      public_key:
         '@type': /cosmos.crypto.sm2.PubKey
         key: AxOeWQYtALvVweF7hvXDsFKbfZK2BARgD1YdgBNLZ3Yw
-        sequence: "2"*/
+      sequence: "7"
+*/
 
