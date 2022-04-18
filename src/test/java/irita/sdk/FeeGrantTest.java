@@ -6,12 +6,10 @@ import irita.sdk.client.IritaClient;
 import irita.sdk.config.ClientConfig;
 import irita.sdk.config.OpbConfig;
 import irita.sdk.constant.enums.BroadcastMode;
-import irita.sdk.exception.IritaSDKException;
 import irita.sdk.key.KeyManager;
 import irita.sdk.key.KeyManagerFactory;
 import irita.sdk.model.*;
 import irita.sdk.module.bank.BankClient;
-import irita.sdk.module.nft.NftClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -19,8 +17,10 @@ import proto.nft.Tx;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -28,7 +28,7 @@ public class FeeGrantTest {
     private BaseClient baseClient;
     private IritaClient iritaClient;
     private final BaseTx baseTx = new BaseTx(200000, new Fee("300000", "ugas"), BroadcastMode.Commit);
-    private String accountAmout;
+    private String accountAmount;
     private String grantAmount;
 
     @BeforeEach
@@ -46,24 +46,21 @@ public class FeeGrantTest {
         OpbConfig opbConfig = null;
 
         iritaClient = new IritaClient(clientConfig, opbConfig, km);
-        NftClient nftClient = iritaClient.getNftClient();
         baseClient = iritaClient.getBaseClient();
         //设置FeeGrant 该FeeGrant账户须是已对本次交易发送方账户进行过feegrant操作
         baseTx.setFeeGranter("iaa17y3qs2zuanr93nk844x0t7e6ktchwygnc8fr0g");
         //如果需要设置FeePayer 则该FeePayer必须对本交易签名
         //baseTx.setFeePayer("iaa1j782zma8xj78wsmyfqvt8muvza8aazj05vpx9p");
-        accountAmout = testQueryAccount("iaa1cfqjw7h5h5xdaz6d05vs5xtpsn5w3vthartxvk",iritaClient);
+        accountAmount = testQueryAccount("iaa1cfqjw7h5h5xdaz6d05vs5xtpsn5w3vthartxvk",iritaClient);
         grantAmount = testQueryAccount("iaa17y3qs2zuanr93nk844x0t7e6ktchwygnc8fr0g",iritaClient);
         System.out.println("FeeGrant Account Balances:"+grantAmount);
-        System.out.println("From Account Balances:"+accountAmout);
+        System.out.println("From Account Balances:"+ accountAmount);
         assertEquals("iaa1cfqjw7h5h5xdaz6d05vs5xtpsn5w3vthartxvk", km.getCurrentKeyInfo().getAddress());
     }
 
     @Test
     @Disabled
     public void testFeeGrant() throws IOException {
-        Date day = new Date();
-        SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
 
         String denomID = "denomid" + new Random().nextInt(1000);
         String denomName = "denomname" + new Random().nextInt(1000);
@@ -94,10 +91,10 @@ public class FeeGrantTest {
         String amount =  testQueryAccount("iaa1cfqjw7h5h5xdaz6d05vs5xtpsn5w3vthartxvk",iritaClient);
         System.out.println("FeeGrant Account Balances:"+feeGrantResult);
         System.out.println("From Account Balances:"+amount);
-        BigInteger integer = new BigInteger(grantAmount);
+        BigInteger grantAmountBigInteger = new BigInteger(grantAmount);
         BigInteger grantResult = new BigInteger(feeGrantResult);
-        assertEquals(amount, accountAmout);
-        assertEquals(integer.subtract(new BigInteger("300000")),grantResult);
+        assertEquals(amount, accountAmount);
+        assertEquals(grantAmountBigInteger.subtract(new BigInteger("300000")),grantResult);
     }
 
 
