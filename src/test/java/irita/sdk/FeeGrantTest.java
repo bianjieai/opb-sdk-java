@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import proto.nft.Tx;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -28,6 +29,7 @@ public class FeeGrantTest {
     private IritaClient iritaClient;
     private final BaseTx baseTx = new BaseTx(200000, new Fee("300000", "ugas"), BroadcastMode.Commit);
     private String accountAmout;
+    private String grantAmount;
 
     @BeforeEach
     public void init() {
@@ -51,7 +53,8 @@ public class FeeGrantTest {
         //如果需要设置FeePayer 则该FeePayer必须对本交易签名
         //baseTx.setFeePayer("iaa1j782zma8xj78wsmyfqvt8muvza8aazj05vpx9p");
         accountAmout = testQueryAccount("iaa1cfqjw7h5h5xdaz6d05vs5xtpsn5w3vthartxvk",iritaClient);
-        System.out.println("FeeGrant Account Balances:"+testQueryAccount("iaa17y3qs2zuanr93nk844x0t7e6ktchwygnc8fr0g",iritaClient));
+        grantAmount = testQueryAccount("iaa17y3qs2zuanr93nk844x0t7e6ktchwygnc8fr0g",iritaClient);
+        System.out.println("FeeGrant Account Balances:"+grantAmount);
         System.out.println("From Account Balances:"+accountAmout);
         assertEquals("iaa1cfqjw7h5h5xdaz6d05vs5xtpsn5w3vthartxvk", km.getCurrentKeyInfo().getAddress());
     }
@@ -87,10 +90,14 @@ public class FeeGrantTest {
         msgs.add(msg2);
         ResultTx resultTx = baseClient.buildAndSend(msgs, baseTx, account);
         System.out.println(resultTx.getResult().getHash());
-        System.out.println("FeeGrant Account Balances:"+testQueryAccount("iaa17y3qs2zuanr93nk844x0t7e6ktchwygnc8fr0g",iritaClient));
+        String feeGrantResult = testQueryAccount("iaa17y3qs2zuanr93nk844x0t7e6ktchwygnc8fr0g",iritaClient);
         String amount =  testQueryAccount("iaa1cfqjw7h5h5xdaz6d05vs5xtpsn5w3vthartxvk",iritaClient);
+        System.out.println("FeeGrant Account Balances:"+feeGrantResult);
         System.out.println("From Account Balances:"+amount);
+        BigInteger integer = new BigInteger(grantAmount);
+        BigInteger grantResult = new BigInteger(feeGrantResult);
         assertEquals(amount, accountAmout);
+        assertEquals(integer.subtract(new BigInteger("300000")),grantResult);
     }
 
 
