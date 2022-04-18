@@ -27,6 +27,7 @@ public class FeeGrantTest {
     private BaseClient baseClient;
     private IritaClient iritaClient;
     private final BaseTx baseTx = new BaseTx(200000, new Fee("300000", "ugas"), BroadcastMode.Commit);
+    private String accountAmout;
 
     @BeforeEach
     public void init() {
@@ -49,8 +50,9 @@ public class FeeGrantTest {
         baseTx.setFeeGranter("iaa17y3qs2zuanr93nk844x0t7e6ktchwygnc8fr0g");
         //如果需要设置FeePayer 则该FeePayer必须对本交易签名
         //baseTx.setFeePayer("iaa1j782zma8xj78wsmyfqvt8muvza8aazj05vpx9p");
+        accountAmout = testQueryAccount("iaa1cfqjw7h5h5xdaz6d05vs5xtpsn5w3vthartxvk",iritaClient);
         System.out.println("FeeGrant Account Balances:"+testQueryAccount("iaa17y3qs2zuanr93nk844x0t7e6ktchwygnc8fr0g",iritaClient));
-        System.out.println("From Account Balances:"+testQueryAccount("iaa1cfqjw7h5h5xdaz6d05vs5xtpsn5w3vthartxvk",iritaClient));
+        System.out.println("From Account Balances:"+accountAmout);
         assertEquals("iaa1cfqjw7h5h5xdaz6d05vs5xtpsn5w3vthartxvk", km.getCurrentKeyInfo().getAddress());
     }
 
@@ -86,7 +88,9 @@ public class FeeGrantTest {
         ResultTx resultTx = baseClient.buildAndSend(msgs, baseTx, account);
         System.out.println(resultTx.getResult().getHash());
         System.out.println("FeeGrant Account Balances:"+testQueryAccount("iaa17y3qs2zuanr93nk844x0t7e6ktchwygnc8fr0g",iritaClient));
-        System.out.println("From Account Balances:"+testQueryAccount("iaa1cfqjw7h5h5xdaz6d05vs5xtpsn5w3vthartxvk",iritaClient));
+        String amount =  testQueryAccount("iaa1cfqjw7h5h5xdaz6d05vs5xtpsn5w3vthartxvk",iritaClient);
+        System.out.println("From Account Balances:"+amount);
+        assertEquals(amount, accountAmout);
     }
 
 
