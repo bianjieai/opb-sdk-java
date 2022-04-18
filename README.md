@@ -337,7 +337,7 @@ https://mvnrepository.com/artifact/io.github.bianjieai
 ## 设置FeeGrant
 ```java
         BaseTx baseTx = new BaseTx(200000, new Fee("300000", "ugas"), BroadcastMode.Commit);
-        baseTx.setFeeGranter("FeeGranter 地址").setFeePayer("FeePayer 地址");
+        baseTx.setFeeGranter("FeeGranter 地址");
 ```
 
 ## 单元测试 (Unit Test Demo)
