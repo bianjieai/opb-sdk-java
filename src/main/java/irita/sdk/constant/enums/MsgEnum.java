@@ -1,6 +1,7 @@
 package irita.sdk.constant.enums;
 
 import irita.sdk.exception.IritaSDKException;
+import irita.sdk.exception.UnknownMsgException;
 
 public enum MsgEnum {
     //tibc
@@ -96,6 +97,6 @@ public enum MsgEnum {
                 return msgEnum.className;
             }
         }
-        throw new IritaSDKException(String.format("not support this typUrl %s", typeUrl));
+        throw new UnknownMsgException(typeUrl);
     }
 }

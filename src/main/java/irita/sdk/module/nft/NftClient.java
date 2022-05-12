@@ -250,7 +250,7 @@ public class NftClient {
             }
 
             QueryCollectionResp res = new QueryCollectionResp();
-            res.setDenom(new QueryDenomResp(denom.getId(), denom.getName(), denom.getSchema(), denom.getCreator()));
+            res.setDenom(new QueryDenomResp(denom.getId(), denom.getName(), denom.getSchema(), denom.getCreator(),denom.getSymbol(),denom.getMintRestricted(),denom.getUpdateRestricted()));
             res.setNfts(nfts);
             return res;
         }

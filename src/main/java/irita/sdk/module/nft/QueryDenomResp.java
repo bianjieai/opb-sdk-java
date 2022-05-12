@@ -19,6 +19,16 @@ public class QueryDenomResp {
         this.creator = creator;
     }
 
+    public QueryDenomResp(String id, String name, String schema, String creator, String symbol, boolean mintRestricted, boolean updateRestricted) {
+        this.id = id;
+        this.name = name;
+        this.schema = schema;
+        this.symbol = symbol;
+        this.mintRestricted = mintRestricted;
+        this.updateRestricted = updateRestricted;
+        this.creator = creator;
+    }
+
     public String getId() {
         return id;
     }
