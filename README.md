@@ -334,6 +334,12 @@ https://mvnrepository.com/artifact/io.github.bianjieai
 
 查看 permClient 下的方法 (see method in perClient.java)
 
+## 设置FeeGrant
+```java
+        BaseTx baseTx = new BaseTx(200000, new Fee("300000", "ugas"), BroadcastMode.Commit);
+        baseTx.setFeeGranter("FeeGranter 地址");
+```
+
 ## 单元测试 (Unit Test Demo)
 
 [ServiceDemoTest.java](./src/test/java/irita/sdk/ServiceDemoTest.java)
@@ -367,3 +373,6 @@ https://mvnrepository.com/artifact/io.github.bianjieai
 [TibcTest.java](./src/test/java/irita/sdk/TibcTest.java)
 
 [WasmTest.java](./src/test/java/irita/sdk/WasmTest.java)
+
+[FeeGrantTest.java](./src/test/java/irita/sdk/FeeGrantTest.java)
+
