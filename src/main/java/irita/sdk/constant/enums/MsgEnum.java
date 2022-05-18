@@ -2,6 +2,7 @@ package irita.sdk.constant.enums;
 
 import irita.sdk.exception.IritaSDKException;
 import irita.sdk.exception.UnknownMsgException;
+import proto.cosmos.feegrant.v1beta1.Tx;
 
 public enum MsgEnum {
     //tibc
@@ -59,6 +60,9 @@ public enum MsgEnum {
     // identity
     MSG_CREATE_IDENTITY("iritamod.identity.MsgCreateIdentity", proto.identity.Tx.MsgCreateIdentity.class),
     MSG_UPDATE_IDENTITY("iritamod.identity.MsgUpdateIdentity", proto.identity.Tx.MsgUpdateIdentity.class),
+    //feegrant
+    MSG_GRANT_ALLOWANCE("cosmos.feegrant.v1beta1.MsgGrantAllowance", proto.cosmos.feegrant.v1beta1.Tx.MsgGrantAllowance.class),
+    MSG_REVOKE_ALLOWANCE("cosmos.feegrant.v1beta1.MsgRevokeAllowance",proto.cosmos.feegrant.v1beta1.Tx.MsgRevokeAllowance.class),
     // perm
     MSG_ASSIGN_ROLES("iritamod.perm.MsgAssignRoles", proto.perm.Tx.MsgAssignRoles.class),
     MSG_UNASSIGN_ROLES("iritamod.perm.MsgUnassignRoles", proto.perm.Tx.MsgUnassignRoles.class),
