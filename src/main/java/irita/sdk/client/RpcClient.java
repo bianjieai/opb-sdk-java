@@ -311,6 +311,8 @@ public class RpcClient implements WsEvent {
                             blockHandler.accept(block);
                         } catch (IOException e) {
                             throw new IritaSDKException("websocket io failed:" + e.getMessage());
+                        }finally {
+                            this.close();
                         }
                     }
                 }
@@ -342,6 +344,8 @@ public class RpcClient implements WsEvent {
                             txHandler.accept(tx);
                         } catch (IOException e) {
                             throw new IritaSDKException("websocket io failed:" + e.getMessage());
+                        }finally {
+                            this.close();
                         }
                     }
                 }
@@ -356,11 +360,13 @@ public class RpcClient implements WsEvent {
 
     private void reConnectThread(WsClient wsClient) {
         new Thread(() -> {
-            while (true) {
+            while (!wsClient.getStatus()) {
                 try {
-                    TimeUnit.SECONDS.sleep(120);
-                    wsClient.reconnect();
-                    LogUtils.info("websocket reconnect");
+                    if (wsClient.getConnection().isClosed()){
+                        TimeUnit.SECONDS.sleep(10);
+                        wsClient.reconnect();
+                        LogUtils.info("websocket reconnect");
+                    }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

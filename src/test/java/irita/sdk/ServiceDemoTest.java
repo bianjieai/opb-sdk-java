@@ -190,7 +190,7 @@ public class ServiceDemoTest {
     @Test
     @Disabled
     public void subscribeRequest() throws Exception {
-        serviceClient.subscribeServiceRequest("testservice109", (reqCtxID, reqID, input) -> {
+        serviceClient.subscribeServiceRequest("testservice615", (reqCtxID, reqID, input) -> {
             // 这里就是实际做的业务逻辑，reqCtxID, reqID 请求的ContextId 和 请求 ID，input 为接收到的入参
             MockServiceInput params = JsonUtils.readValue(input, MockServiceInput.class);// 反序列化为自己想要的类型
             String param1 = params.getBody().getParam1();
@@ -202,13 +202,13 @@ public class ServiceDemoTest {
             String output = "{\"header\":{},\"body\":{\"data\":\"" + Hex.toHexString(param1.getBytes(StandardCharsets.UTF_8)) + "\"}}";
             return new ServiceResponseInfo(output, result);
         }, baseTx);
-        TimeUnit.SECONDS.sleep(50);
+        TimeUnit.SECONDS.sleep(50000);
     }
 
     @Test
     @Disabled
     public void invokeService() throws IOException, InterruptedException {
-        String serviceName = "testservice109";
+        String serviceName = "testservice615";
 
         //服务调用
         List<String> providers = new ArrayList<>();
@@ -239,6 +239,6 @@ public class ServiceDemoTest {
         assertNotNull(callServiceResp);
         System.out.println(callServiceResp.getReqCtxId());
         System.out.println(callServiceResp.getResultTx().getResult().getHash());
-        TimeUnit.SECONDS.sleep(50);
+        TimeUnit.SECONDS.sleep(50000);
     }
 }

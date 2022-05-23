@@ -9,6 +9,7 @@ import java.net.URI;
 
 public abstract class WsClient extends WebSocketClient {
     private final String sendMessage;
+    private boolean status;
 
     public WsClient(URI serverUri, String sendMessage) {
         super(serverUri);
@@ -32,5 +33,14 @@ public abstract class WsClient extends WebSocketClient {
     public void onError(Exception e) {
         // if the error is fatal then onClose will be called additionally
         e.printStackTrace();
+    }
+
+    public boolean getStatus() {
+        return status;
+    }
+
+    public void close(){
+        this.getConnection().close();
+        this.status = true;
     }
 }
