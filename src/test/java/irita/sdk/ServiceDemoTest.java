@@ -202,7 +202,7 @@ public class ServiceDemoTest {
             String output = "{\"header\":{},\"body\":{\"data\":\"" + Hex.toHexString(param1.getBytes(StandardCharsets.UTF_8)) + "\"}}";
             return new ServiceResponseInfo(output, result);
         }, baseTx);
-        TimeUnit.SECONDS.sleep(50000);
+        TimeUnit.SECONDS.sleep(50);
     }
 
     @Test
@@ -239,6 +239,6 @@ public class ServiceDemoTest {
         assertNotNull(callServiceResp);
         System.out.println(callServiceResp.getReqCtxId());
         System.out.println(callServiceResp.getResultTx().getResult().getHash());
-        TimeUnit.SECONDS.sleep(50000);
+        TimeUnit.SECONDS.sleep(50);
     }
 }
