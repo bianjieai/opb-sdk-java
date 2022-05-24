@@ -363,7 +363,7 @@ public class RpcClient implements WsEvent {
             while (!wsClient.getStatus()) {
                 try {
                     if (wsClient.getConnection().isClosed()){
-                        TimeUnit.SECONDS.sleep(10);
+                        TimeUnit.SECONDS.sleep(120);
                         wsClient.reconnect();
                         LogUtils.info("websocket reconnect");
                     }
