@@ -300,26 +300,18 @@ public class RpcClient implements WsEvent {
         HashMap<String, Object> map = new HashMap<>();
         map.put("query", query);
         String sendMessage = JsonRpc.WrapBaseQuery(map, "subscribe").toJsonStr();
-
+        WsClient wsClient = null;
         try {
-            WsClient wsClient = new WsClient(new URI(wsAddr), sendMessage) {
-                @Override
-                public void onMessage(String s) {
-                    if (s.length() > 100) {
-                        try {
-                            NewBlockBean block = ListenChainUtil.convertNewBlockBean(s);
-                            blockHandler.accept(block);
-                        } catch (IOException e) {
-                            throw new IritaSDKException("websocket io failed:" + e.getMessage());
-                        }finally {
-                            this.close();
-                        }
-                    }
-                }
-            };
-
-            wsClient.connect();
-            reConnectThread(wsClient);
+            if (WsPool.getConnection(TmTypes.EVENT_NEW_BLOCK) != null){
+                wsClient = WsPool.getConnection(TmTypes.EVENT_NEW_BLOCK);
+                wsClient.setTxHandler(blockHandler);
+                wsClient.send(sendMessage);
+            }else {
+                wsClient = new WsClient(new URI(wsAddr), sendMessage,blockHandler);
+                wsClient.connect();
+                WsPool.addConnection(wsClient,TmTypes.EVENT_NEW_BLOCK);
+                reConnectThread(wsClient);
+            }
         } catch (Exception e) {
             throw new IritaSDKException("connect websocket failed: " + e.getMessage());
         }
@@ -333,26 +325,18 @@ public class RpcClient implements WsEvent {
         HashMap<String, Object> map = new HashMap<>();
         map.put("query", query);
         String sendMessage = JsonRpc.WrapBaseQuery(map, "subscribe").toJsonStr();
-
+        WsClient wsClient = null;
         try {
-            WsClient wsClient = new WsClient(new URI(wsAddr), sendMessage) {
-                @Override
-                public void onMessage(String s) {
-                    if (s.length() > 100) {
-                        try {
-                            TxBean tx = ListenChainUtil.convertTxBean(s);
-                            txHandler.accept(tx);
-                        } catch (IOException e) {
-                            throw new IritaSDKException("websocket io failed:" + e.getMessage());
-                        }finally {
-                            this.close();
-                        }
-                    }
-                }
-            };
-
-            wsClient.connect();
-            reConnectThread(wsClient);
+            if (WsPool.getConnection(TmTypes.EVENT_TX) != null){
+                wsClient = WsPool.getConnection(TmTypes.EVENT_TX);
+                wsClient.setTxHandler(txHandler);
+                wsClient.send(sendMessage);
+            }else {
+                wsClient = new WsClient(new URI(wsAddr),sendMessage, txHandler);
+                wsClient.connect();
+                WsPool.addConnection(wsClient,TmTypes.EVENT_TX);
+                reConnectThread(wsClient);
+            }
         } catch (Exception e) {
             throw new IritaSDKException("connect websocket failed: " + e.getMessage());
         }
