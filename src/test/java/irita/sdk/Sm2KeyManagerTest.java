@@ -97,5 +97,7 @@ public class Sm2KeyManagerTest {
         KeyManager km = KeyManagerFactory.createDefault();
         String mnemonic = km.add();
         System.out.println(mnemonic);
+        String address = km.getCurrentKeyInfo().getAddress();
+        System.out.println(address);
     }
 }
