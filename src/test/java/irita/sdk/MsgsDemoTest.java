@@ -53,6 +53,7 @@ public class MsgsDemoTest {
     }
 
     @Test
+    @Disabled
     public void testSendMsgs() throws IOException {
         //创建 denom 的参数
         String denomID = "denomid" + new Random().nextInt(1000);

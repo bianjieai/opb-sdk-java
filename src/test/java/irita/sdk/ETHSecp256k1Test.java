@@ -16,6 +16,7 @@ import irita.sdk.model.ResultTx;
 import irita.sdk.module.nft.QueryCollectionResp;
 import irita.sdk.module.nft.QueryDenomResp;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import proto.cosmos.tx.v1beta1.TxOuterClass;
 import proto.nft.Tx;
@@ -56,6 +57,7 @@ public class ETHSecp256k1Test {
     }
 
     @Test
+    @Disabled
     public void sendMsgs() throws IOException {
         //创建 denom 的参数
         String denomID = "denomid" + new Random().nextInt(1000);
