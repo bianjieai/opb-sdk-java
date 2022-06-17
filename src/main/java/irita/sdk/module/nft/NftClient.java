@@ -178,9 +178,13 @@ public class NftClient {
         QueryOuterClass.QueryCollectionRequest.Builder builder = QueryOuterClass.QueryCollectionRequest
                 .newBuilder()
                 .setDenomId(denomID);
-        if (page != null) {
-            builder.setPagination(page);
+        if (page == null) {
+            page = Pagination.PageRequest.newBuilder()
+                    .setOffset(0)
+                    .setLimit(100)
+                    .build();
         }
+        builder.setPagination(page);
         QueryOuterClass.QueryCollectionRequest req = builder.build();
 
         QueryOuterClass.QueryCollectionResponse resp = QueryGrpc.newBlockingStub(channel).collection(req);
@@ -200,9 +204,13 @@ public class NftClient {
     public List<QueryDenomResp> queryDenoms(Pagination.PageRequest page) {
         Channel channel = baseClient.getGrpcClient();
         QueryOuterClass.QueryDenomsRequest.Builder builder = QueryOuterClass.QueryDenomsRequest.newBuilder();
-        if (page != null) {
-            builder.setPagination(page);
+        if (page == null) {
+            page = Pagination.PageRequest.newBuilder()
+                    .setOffset(0)
+                    .setLimit(100)
+                    .build();
         }
+        builder.setPagination(page);
         QueryOuterClass.QueryDenomsRequest req = builder.build();
 
         QueryOuterClass.QueryDenomsResponse resp = QueryGrpc.newBlockingStub(channel).denoms(req);
