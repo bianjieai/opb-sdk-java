@@ -60,13 +60,11 @@ public class MtClient {
                 .setAmount(msgMintMTRequest.getAmount())
                 .setData(ByteString.copyFrom(msgMintMTRequest.getData()))
                 .setSender(account.getAddress());
-        if (StringUtils.isNotEmpty(msgMintMTRequest.getRecipient())) {
-            String recipient = msgMintMTRequest.getRecipient();
-            AddressUtils.validAddress(recipient);
-            mintMTBuilder.setRecipient(recipient);
-        } else {
-            mintMTBuilder.setRecipient(account.getAddress());
+        if (StringUtils.isEmpty(msgMintMTRequest.getRecipient())) {
+            throw new IllegalArgumentException("Recipient is null");
         }
+        AddressUtils.validAddress(msgMintMTRequest.getRecipient());
+        mintMTBuilder.setRecipient(msgMintMTRequest.getRecipient());
         Tx.MsgMintMT mintMT = mintMTBuilder.build();
         List<GeneratedMessageV3> msgs = Collections.singletonList(mintMT);
         return baseClient.buildAndSend(msgs, baseTx, account);
@@ -95,12 +93,11 @@ public class MtClient {
                 .setDenomId(denomId)
                 .setAmount(amount)
                 .setSender(account.getAddress());
-        if (StringUtils.isNotEmpty(recipient)) {
-            AddressUtils.validAddress(recipient);
-            msgTransfrtMtBuilder.setRecipient(recipient);
-        } else {
-            msgTransfrtMtBuilder.setRecipient(account.getAddress());
+        if (StringUtils.isEmpty(recipient)) {
+            throw new IllegalArgumentException("Recipient is null");
         }
+        AddressUtils.validAddress(recipient);
+        msgTransfrtMtBuilder.setRecipient(recipient);
         Tx.MsgTransferMT msgTransferMT = msgTransfrtMtBuilder.build();
         List<GeneratedMessageV3> msgs = Collections.singletonList(msgTransferMT);
         return baseClient.buildAndSend(msgs, baseTx, account);

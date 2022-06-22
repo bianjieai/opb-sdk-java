@@ -68,13 +68,11 @@ public class NftClient {
                 .setData(req.getData())
                 .setSender(account.getAddress());
 
-        if (StringUtils.isNotEmpty(req.getRecipient())) {
-            String recipient = req.getRecipient();
-            AddressUtils.validAddress(recipient);
-            builder.setRecipient(recipient);
-        } else {
-            builder.setRecipient(account.getAddress());
+        if (StringUtils.isEmpty(req.getRecipient())) {
+            throw new IllegalArgumentException("Recipient is null");
         }
+        AddressUtils.validAddress(req.getRecipient());
+        builder.setRecipient(req.getRecipient());
         Tx.MsgMintNFT msg = builder.build();
         List<GeneratedMessageV3> msgs = Collections.singletonList(msg);
         return baseClient.buildAndSend(msgs, baseTx, account);
@@ -126,11 +124,11 @@ public class NftClient {
                 .setName(req.getName())
                 .setSender(account.getAddress());
 
-        if (StringUtils.isNotEmpty(req.getRecipient())) {
-            String recipient = req.getRecipient();
-            AddressUtils.validAddress(recipient);
-            builder.setRecipient(recipient);
+        if (StringUtils.isEmpty(req.getRecipient())) {
+            throw new IllegalArgumentException("Recipient is null");
         }
+        AddressUtils.validAddress(req.getRecipient());
+        builder.setRecipient(req.getRecipient());
         Tx.MsgTransferNFT msg = builder.build();
         List<GeneratedMessageV3> msgs = Collections.singletonList(msg);
         return baseClient.buildAndSend(msgs, baseTx, account);
