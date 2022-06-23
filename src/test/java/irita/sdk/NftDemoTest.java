@@ -65,7 +65,7 @@ public class NftDemoTest {
         String schema = "no shcema";
         String symbol = "symbol";
         //是否限制发行
-        //true  只有 Denom 的所有者可以发行此类别的 NFT 给自己（发行到别的地址也是不可以的）
+        //true 只有 Denom 的所有者可以发行此类别的 NFT
         //false 任何人都可以发行 NFT
         boolean mintRestricted = false;
         //是否限制更新 NFT
