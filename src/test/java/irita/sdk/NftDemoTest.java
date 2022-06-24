@@ -263,7 +263,12 @@ public class NftDemoTest {
             }
             Tx.MsgMintNFT msg = builder.build();
             List<GeneratedMessageV3> msgs = Collections.singletonList(msg);
-            resultTx = baseClient.buildAndSend(msgs, baseTx, account);
+            try {
+                resultTx = baseClient.buildAndSend(msgs, baseTx, account);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return;
+            }
             sequence += 1;
             assertNotNull(resultTx.getResult().getHash());
         }
