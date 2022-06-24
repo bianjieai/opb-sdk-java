@@ -5,7 +5,6 @@ import irita.sdk.client.BaseClient;
 import irita.sdk.client.IritaClient;
 import irita.sdk.config.ClientConfig;
 import irita.sdk.config.OpbConfig;
-import irita.sdk.constant.TxStatus;
 import irita.sdk.constant.enums.BroadcastMode;
 import irita.sdk.key.KeyInfo;
 import irita.sdk.key.KeyManager;
@@ -265,7 +264,6 @@ public class NftDemoTest {
             Tx.MsgMintNFT msg = builder.build();
             List<GeneratedMessageV3> msgs = Collections.singletonList(msg);
             resultTx = baseClient.buildAndSend(msgs, baseTx, account);
-            assertEquals(resultTx.getResult().getCode(), TxStatus.SUCCESS);
             sequence += 1;
             assertNotNull(resultTx.getResult().getHash());
         }
