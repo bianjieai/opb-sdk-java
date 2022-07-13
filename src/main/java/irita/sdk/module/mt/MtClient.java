@@ -26,7 +26,7 @@ public class MtClient {
     }
 
     //creating a new denom.
-    public ResultTx issueDenom(String name, byte[] data,BaseTx baseTx) throws IOException {
+    public ResultTx issueDenom(String name, byte[] data, BaseTx baseTx) throws IOException {
         Account account = baseClient.queryAccount(baseTx);
         Tx.MsgIssueDenom msg = Tx.MsgIssueDenom
                 .newBuilder()
@@ -35,11 +35,11 @@ public class MtClient {
                 .setData(ByteString.copyFrom(data))
                 .build();
         List<GeneratedMessageV3> msgs = Collections.singletonList(msg);
-        return  baseClient.buildAndSend(msgs, baseTx, account);
+        return baseClient.buildAndSend(msgs, baseTx, account);
     }
 
     //transferring a denom.
-    public ResultTx transferDenom(String id,String recipient,BaseTx baseTx) throws IOException {
+    public ResultTx transferDenom(String id, String recipient, BaseTx baseTx) throws IOException {
         Account account = baseClient.queryAccount(baseTx);
         Tx.MsgTransferDenom msgTransferDenom = Tx.MsgTransferDenom
                 .newBuilder()
@@ -52,7 +52,7 @@ public class MtClient {
     }
 
     //creating a new MT or minting amounts of an existing MT
-    public ResultTx mintMT(MsgMintMTRequest msgMintMTRequest,BaseTx baseTx) throws IOException {
+    public ResultTx mintMT(MsgMintMTRequest msgMintMTRequest, BaseTx baseTx) throws IOException {
         Account account = baseClient.queryAccount(baseTx);
         Tx.MsgMintMT.Builder mintMTBuilder = Tx.MsgMintMT
                 .newBuilder()
@@ -70,8 +70,27 @@ public class MtClient {
         return baseClient.buildAndSend(msgs, baseTx, account);
     }
 
+    //Additional issuance existing MT
+    public ResultTx additionalIssueMt(MsgAddIssueMTRequest msgAddIssueMTRequest, BaseTx baseTx) throws IOException {
+        Account account = baseClient.queryAccount(baseTx);
+        Tx.MsgMintMT.Builder mintMTBuilder = Tx.MsgMintMT
+                .newBuilder()
+                .setId(msgAddIssueMTRequest.getId())
+                .setDenomId(msgAddIssueMTRequest.getDenomId())
+                .setAmount(msgAddIssueMTRequest.getAmount())
+                .setSender(account.getAddress());
+        if (StringUtils.isEmpty(msgAddIssueMTRequest.getRecipient())) {
+            throw new IllegalArgumentException("Recipient is null");
+        }
+        AddressUtils.validAddress(msgAddIssueMTRequest.getRecipient());
+        mintMTBuilder.setRecipient(msgAddIssueMTRequest.getRecipient());
+        Tx.MsgMintMT mintMT = mintMTBuilder.build();
+        List<GeneratedMessageV3> msgs = Collections.singletonList(mintMT);
+        return baseClient.buildAndSend(msgs, baseTx, account);
+    }
+
     //editing an MT.
-    public ResultTx editMT(String id,String denomId,byte[] data,BaseTx baseTx) throws IOException {
+    public ResultTx editMT(String id, String denomId, byte[] data, BaseTx baseTx) throws IOException {
         Account account = baseClient.queryAccount(baseTx);
         Tx.MsgEditMT msgEditMT = Tx.MsgEditMT
                 .newBuilder()
@@ -85,7 +104,7 @@ public class MtClient {
     }
 
     //transferring an MT.
-    public ResultTx transferMT(String id,String denomId,long amount,String recipient,BaseTx baseTx) throws IOException {
+    public ResultTx transferMT(String id, String denomId, long amount, String recipient, BaseTx baseTx) throws IOException {
         Account account = baseClient.queryAccount(baseTx);
         Tx.MsgTransferMT.Builder msgTransfrtMtBuilder = Tx.MsgTransferMT
                 .newBuilder()
@@ -104,7 +123,7 @@ public class MtClient {
     }
 
     //burning an MT.
-    public ResultTx burnMT(String id,String denomId,long amount,BaseTx baseTx) throws IOException {
+    public ResultTx burnMT(String id, String denomId, long amount, BaseTx baseTx) throws IOException {
         Account account = baseClient.queryAccount(baseTx);
         Tx.MsgBurnMT msgBurnMT = Tx.MsgBurnMT
                 .newBuilder()
@@ -133,9 +152,9 @@ public class MtClient {
     }*/
 
     // Denoms queries all the denoms
-    public  QueryOuterClass.QueryDenomsResponse queryDenoms(Pagination.PageRequest pageRequest){
+    public QueryOuterClass.QueryDenomsResponse queryDenoms(Pagination.PageRequest pageRequest) {
         Channel channel = baseClient.getGrpcClient();
-        if (pageRequest ==null){
+        if (pageRequest == null) {
             pageRequest = Pagination.PageRequest.newBuilder()
                     .setOffset(0)
                     .setLimit(100)
@@ -150,7 +169,7 @@ public class MtClient {
     }
 
     // Denom queries the definition of a given denom ID
-    public QueryOuterClass.QueryDenomResponse queryDenom(String denomId){
+    public QueryOuterClass.QueryDenomResponse queryDenom(String denomId) {
         Channel channel = baseClient.getGrpcClient();
         QueryOuterClass.QueryDenomRequest queryDenomRequest = QueryOuterClass.QueryDenomRequest
                 .newBuilder()
@@ -161,7 +180,7 @@ public class MtClient {
     }
 
     // MTSupply queries the total supply of given denom and mt ID
-    public long queryMTSupply(String denomId,String mtId){
+    public long queryMTSupply(String denomId, String mtId) {
         Channel channel = baseClient.getGrpcClient();
         QueryOuterClass.QueryMTSupplyRequest queryMTSupplyRequest = QueryOuterClass.QueryMTSupplyRequest
                 .newBuilder()
@@ -173,12 +192,12 @@ public class MtClient {
     }
 
     // MTs queries all the MTs of a given denom ID
-    public QueryOuterClass.QueryMTsResponse queryMTS(String denomId,Pagination.PageRequest pageRequest){
+    public QueryOuterClass.QueryMTsResponse queryMTS(String denomId, Pagination.PageRequest pageRequest) {
         Channel channel = baseClient.getGrpcClient();
         QueryOuterClass.QueryMTsRequest.Builder queryMTsRequestBuilder = QueryOuterClass.QueryMTsRequest
                 .newBuilder()
                 .setDenomId(denomId);
-        if (pageRequest == null){
+        if (pageRequest == null) {
             pageRequest = Pagination.PageRequest.newBuilder()
                     .setOffset(0)
                     .setLimit(100)
@@ -191,7 +210,7 @@ public class MtClient {
     }
 
     // MT queries the MT of the given denom and mt ID
-    public QueryOuterClass.QueryMTResponse querryMT(String denomId,String mtId){
+    public QueryOuterClass.QueryMTResponse querryMT(String denomId, String mtId) {
         Channel channel = baseClient.getGrpcClient();
         QueryOuterClass.QueryMTRequest queryMTRequest = QueryOuterClass.QueryMTRequest
                 .newBuilder()
@@ -203,13 +222,13 @@ public class MtClient {
     }
 
     // Balances queries the MT balances of a specified owner
-    public QueryOuterClass.QueryBalancesResponse queryBalances(String owner,String denomId,Pagination.PageRequest pageRequest){
+    public QueryOuterClass.QueryBalancesResponse queryBalances(String owner, String denomId, Pagination.PageRequest pageRequest) {
         Channel channel = baseClient.getGrpcClient();
         QueryOuterClass.QueryBalancesRequest.Builder queryBalancesRequestBuilder = QueryOuterClass.QueryBalancesRequest
                 .newBuilder()
                 .setOwner(owner)
                 .setDenomId(denomId);
-        if (pageRequest == null){
+        if (pageRequest == null) {
             pageRequest = Pagination.PageRequest.newBuilder()
                     .setOffset(0)
                     .setLimit(100)

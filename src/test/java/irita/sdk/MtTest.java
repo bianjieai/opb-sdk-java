@@ -11,6 +11,7 @@ import irita.sdk.key.KeyManagerFactory;
 import irita.sdk.model.BaseTx;
 import irita.sdk.model.Fee;
 import irita.sdk.model.ResultTx;
+import irita.sdk.module.mt.MsgAddIssueMTRequest;
 import irita.sdk.module.mt.MsgMintMTRequest;
 import irita.sdk.module.mt.MtClient;
 import irita.sdk.module.nft.NftClient;
@@ -112,6 +113,20 @@ public class MtTest {
         msgMintMTRequest.setDenomId(denomId);
         msgMintMTRequest.setData(data.getBytes());
         ResultTx resultTx = mtClient.mintMT(msgMintMTRequest, baseTx);
+        System.out.println(resultTx.getResult().getHash());
+        System.out.println(resultTx.getResult().getDeliver_tx().getLog());
+    }
+
+    @Test
+    @Disabled
+    public void testAddIssueMt()throws IOException{
+        String denomId = "fb5ec28123c8fe7999b17588aad1ab56f8488adb806aac5f40409020e2e83de8";
+        MsgAddIssueMTRequest msgMintMTRequest = new MsgAddIssueMTRequest();
+        msgMintMTRequest.setId("dc1d1f5a54cfdc4ed5b9ca90ad09f5b8b9bfa3b78a94b64ce51d4d77c6c212f3");
+        msgMintMTRequest.setAmount(20);
+        msgMintMTRequest.setDenomId(denomId);
+        msgMintMTRequest.setRecipient("iaa1w4yynxjyqyjkqmap4ug99l40zzhexykxmqf0mt");
+        ResultTx resultTx = mtClient.additionalIssueMt(msgMintMTRequest, baseTx);
         System.out.println(resultTx.getResult().getHash());
         System.out.println(resultTx.getResult().getDeliver_tx().getLog());
     }
