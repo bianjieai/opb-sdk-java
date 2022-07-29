@@ -23,6 +23,10 @@ public class HttpClientGetServerCertificate {
             response = client.newCall(request).execute();
         } catch (IOException e) {
             throw new IritaSDKException(String.format("connect to url:%s failed, %s", gateWayUrl, e.getMessage()));
+        } finally {
+            if (response != null) {
+                response.close();
+            }
         }
         Handshake handshake = response.handshake();
         if (handshake == null) {
