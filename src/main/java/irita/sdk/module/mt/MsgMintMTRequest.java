@@ -25,6 +25,9 @@ public class MsgMintMTRequest {
     }
 
     public byte[] getData() {
+        if (data == null){
+            return new byte[0];
+        }
         return data;
     }
 

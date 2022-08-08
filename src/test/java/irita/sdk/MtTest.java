@@ -112,6 +112,7 @@ public class MtTest {
         msgMintMTRequest.setAmount(20);
         msgMintMTRequest.setDenomId(denomId);
         msgMintMTRequest.setData(data.getBytes());
+        msgMintMTRequest.setRecipient("iaa1w4yynxjyqyjkqmap4ug99l40zzhexykxmqf0mt");
         ResultTx resultTx = mtClient.mintMT(msgMintMTRequest, baseTx);
         System.out.println(resultTx.getResult().getHash());
         System.out.println(resultTx.getResult().getDeliver_tx().getLog());
@@ -120,9 +121,9 @@ public class MtTest {
     @Test
     @Disabled
     public void testAddIssueMt()throws IOException{
-        String denomId = "fb5ec28123c8fe7999b17588aad1ab56f8488adb806aac5f40409020e2e83de8";
+        String denomId = "259edd57e552854d42bc4a0d98dc7a48fddeae343ad428c9df1d4b09e0ab525a";
         MsgAddIssueMTRequest msgMintMTRequest = new MsgAddIssueMTRequest();
-        msgMintMTRequest.setId("dc1d1f5a54cfdc4ed5b9ca90ad09f5b8b9bfa3b78a94b64ce51d4d77c6c212f3");
+        msgMintMTRequest.setId("89e7849fe0f72fd3abe55b65610715bec3544e50b473c4480a364dc82cff45c9");
         msgMintMTRequest.setAmount(20);
         msgMintMTRequest.setDenomId(denomId);
         msgMintMTRequest.setRecipient("iaa1w4yynxjyqyjkqmap4ug99l40zzhexykxmqf0mt");
