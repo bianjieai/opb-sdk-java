@@ -33,7 +33,7 @@ public class NftDemoTest {
     private KeyManager km;
     private NftClient nftClient;
     private BaseClient baseClient;
-    private final BaseTx baseTx = new BaseTx(200000, new Fee("200000", "ugas"), BroadcastMode.Commit);
+    private final BaseTx baseTx = new BaseTx(400000, new Fee("400000", "ugas"), BroadcastMode.Commit);
 
     @BeforeEach
     public void init() {
@@ -185,9 +185,9 @@ public class NftDemoTest {
         assertNotNull(queryDenomResps);
 
         //query owner 通过地址查询该地址拥有的nft列表 denomID可以指定也可以传空
-        QueryOwnerResp queryOwnerResp = nftClient.queryOwner(denomID, reci);
+        QueryOwnerResp queryOwnerResp = nftClient.queryOwner(denomID, reci, null);
         assertNotNull(queryOwnerResp);
-        queryOwnerResp = nftClient.queryOwner("", reci);
+        queryOwnerResp = nftClient.queryOwner("", reci, null);
         assertNotNull(queryOwnerResp);
 
         //query supply 查询该地址在该denom下拥有的nft数量
@@ -228,15 +228,15 @@ public class NftDemoTest {
         String batchUri = "https://www.baidu.com";
         String batchData = "any data";
         //批量发行的数量
-        Integer mintNum = 100;
+        int mintNum = 100;
         Account account = baseClient.queryAccount(baseTx);
         baseTx.setAccountNumber(account.getAccountNumber());
         //由于网络延迟原因，需要将广播模式设置为Sync或Async以提高发行速度
         baseTx.setMode(BroadcastMode.Sync);
         long sequence = account.getSequence();
         MintNFTRequest mintReq;
-        for (int i=0; i<mintNum; i++) {
-             mintReq = new MintNFTRequest()
+        for (int i = 0; i < mintNum; i++) {
+            mintReq = new MintNFTRequest()
                     .setDenom(denomID)
                     .setId(batchNftID + i)
                     .setName(batchNftName)
@@ -282,7 +282,7 @@ public class NftDemoTest {
         //batch mint nft 批量发行nft，方式为将多个msg打包后广播一次
         batchNftID = "batchnftpackage";
         List<GeneratedMessageV3> mintNFTMsgs = new ArrayList<>();
-        for (int i=1; i<=mintNum; i++) {
+        for (int i = 1; i <= mintNum; i++) {
             Tx.MsgMintNFT msg = Tx.MsgMintNFT
                     .newBuilder()
                     .setDenomId(denomID)
@@ -296,7 +296,7 @@ public class NftDemoTest {
             mintNFTMsgs.add(msg);
         }
         GasInfo gasInfo = baseClient.simulateTx(mintNFTMsgs, baseTx, null);
-        baseTx.setGas(Integer.parseInt(gasInfo.getGasUsed())*2);
+        baseTx.setGas(Integer.parseInt(gasInfo.getGasUsed()) * 2);
         resultTx = baseClient.buildAndSend(mintNFTMsgs, baseTx, baseClient.queryAccount(baseTx));
         assertNotNull(resultTx.getResult().getHash());
     }

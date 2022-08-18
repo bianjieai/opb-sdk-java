@@ -39,6 +39,9 @@ public class NftClient {
                 .setSymbol(req.getSymbol())
                 .setMintRestricted(req.isMintRestricted())
                 .setUpdateRestricted(req.isUpdateRestricted())
+                .setUri(req.getUri())
+                .setUriHash(req.getUriHash())
+                .setData(req.getData())
                 .setSender(account.getAddress())
                 .build();
         List<GeneratedMessageV3> msgs = Collections.singletonList(msg);
@@ -65,6 +68,7 @@ public class NftClient {
                 .setId(req.getId())
                 .setName(req.getName())
                 .setUri(req.getUri())
+                .setUriHash(req.getUriHash())
                 .setData(req.getData())
                 .setSender(account.getAddress());
 
@@ -88,6 +92,9 @@ public class NftClient {
         if (StringUtils.isEmpty(req.getName())) {
             req.setName(DO_NOT_MODIFY);
         }
+        if (StringUtils.isEmpty(req.getUriHash())) {
+            req.setUriHash(DO_NOT_MODIFY);
+        }
 
         Account account = baseClient.queryAccount(baseTx);
         Tx.MsgEditNFT msg = Tx.MsgEditNFT
@@ -96,6 +103,7 @@ public class NftClient {
                 .setId(req.getId())
                 .setName(req.getName())
                 .setUri(req.getUri())
+                .setUriHash(req.getUriHash())
                 .setData(req.getData())
                 .setSender(account.getAddress())
                 .build();
@@ -113,6 +121,9 @@ public class NftClient {
         if (StringUtils.isEmpty(req.getName())) {
             req.setName(DO_NOT_MODIFY);
         }
+        if (StringUtils.isEmpty(req.getUriHash())) {
+            req.setUriHash(DO_NOT_MODIFY);
+        }
 
         Account account = baseClient.queryAccount(baseTx);
         Tx.MsgTransferNFT.Builder builder = Tx.MsgTransferNFT
@@ -122,6 +133,7 @@ public class NftClient {
                 .setUri(req.getUri())
                 .setData(req.getData())
                 .setName(req.getName())
+                .setUriHash(req.getUriHash())
                 .setSender(account.getAddress());
 
         if (StringUtils.isEmpty(req.getRecipient())) {
@@ -159,14 +171,21 @@ public class NftClient {
         return resp.getAmount();
     }
 
-    public QueryOwnerResp queryOwner(String denomID, String owner) {
+    public QueryOwnerResp queryOwner(String denomID, String owner, Pagination.PageRequest page) {
         Channel channel = baseClient.getGrpcClient();
-        QueryOuterClass.QueryOwnerRequest req = QueryOuterClass.QueryOwnerRequest
+        QueryOuterClass.QueryOwnerRequest.Builder builder = QueryOuterClass.QueryOwnerRequest
                 .newBuilder()
                 .setDenomId(Optional.ofNullable(denomID).orElse(""))
-                .setOwner(owner)
-                .build();
+                .setOwner(owner);
 
+        if (page == null) {
+            page = Pagination.PageRequest.newBuilder()
+                    .setOffset(0)
+                    .setLimit(100)
+                    .build();
+        }
+        builder.setPagination(page);
+        QueryOuterClass.QueryOwnerRequest req = builder.build();
         QueryOuterClass.QueryOwnerResponse resp = QueryGrpc.newBlockingStub(channel).owner(req);
         return Convert.toQueryOwnerResp(resp.getOwner());
     }
@@ -256,7 +275,7 @@ public class NftClient {
             }
 
             QueryCollectionResp res = new QueryCollectionResp();
-            res.setDenom(new QueryDenomResp(denom.getId(), denom.getName(), denom.getSchema(), denom.getCreator(),denom.getSymbol(),denom.getMintRestricted(),denom.getUpdateRestricted()));
+            res.setDenom(new QueryDenomResp(denom.getId(), denom.getName(), denom.getSchema(), denom.getSymbol(), denom.getMintRestricted(), denom.getUpdateRestricted(), denom.getUri(), denom.getUriHash(), denom.getData(), denom.getCreator()));
             res.setNfts(nfts);
             return res;
         }
@@ -268,6 +287,9 @@ public class NftClient {
             res.setSchema(denom.getSchema());
             res.setCreator(denom.getCreator());
             res.setSymbol(denom.getSymbol());
+            res.setUri(denom.getUri());
+            res.setUriHash(denom.getUriHash());
+            res.setData(denom.getData());
             res.setMintRestricted(denom.getMintRestricted());
             res.setUpdateRestricted(denom.getUpdateRestricted());
             return res;
@@ -287,6 +309,7 @@ public class NftClient {
             res.setId(baseNFT.getId());
             res.setName(baseNFT.getName());
             res.setUri(baseNFT.getUri());
+            res.setUriHash(baseNFT.getUriHash());
             res.setData(baseNFT.getData());
             res.setOwner(baseNFT.getOwner());
             return res;

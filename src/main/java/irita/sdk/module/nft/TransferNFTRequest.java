@@ -4,6 +4,7 @@ public class TransferNFTRequest {
     private String denom = "";
     private String id = "";
     private String uri = "";
+    private String uriHash = "";
     private String data = "";
     private String name = "";
     private String recipient = "";
@@ -32,6 +33,15 @@ public class TransferNFTRequest {
 
     public TransferNFTRequest setUri(String uri) {
         this.uri = uri;
+        return this;
+    }
+
+    public String getUriHash() {
+        return uriHash;
+    }
+
+    public TransferNFTRequest setUriHash(String uriHash) {
+        this.uriHash = uriHash;
         return this;
     }
 

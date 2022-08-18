@@ -4,6 +4,7 @@ public class QueryNFTResp {
     private String id;
     private String name;
     private String uri;
+    private String uriHash;
     private String data;
     private String owner;
 
@@ -29,6 +30,14 @@ public class QueryNFTResp {
 
     public void setUri(String uri) {
         this.uri = uri;
+    }
+
+    public String getUriHash() {
+        return uriHash;
+    }
+
+    public void setUriHash(String uriHash) {
+        this.uriHash = uriHash;
     }
 
     public String getData() {

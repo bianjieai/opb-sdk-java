@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class NftTest extends ConfigTest {
     private KeyManager km;
     private NftClient nftClient;
-    private final BaseTx baseTx = new BaseTx(200000, new Fee("300000", "ugas"), BroadcastMode.Commit);
+    private final BaseTx baseTx = new BaseTx(400000, new Fee("400000", "ugas"), BroadcastMode.Commit);
 
     @BeforeEach
     public void init() {
@@ -44,7 +44,10 @@ public class NftTest extends ConfigTest {
         IssueDenomRequest req = new IssueDenomRequest()
                 .setId(denomID)
                 .setName(denomName)
-                .setSchema(schema);
+                .setSchema(schema)
+                .setData("data")
+                .setUri("www.wcchain.com")
+                .setSymbol("aaa");
         ResultTx resultTx = nftClient.issueDenom(req, baseTx);
         assertNotNull(resultTx.getResult().getHash());
 
@@ -112,7 +115,7 @@ public class NftTest extends ConfigTest {
         assertEquals(keyInfo.getAddress(), nfts.getDenom().getCreator());
         assertTrue(nfts.getNfts().size() > 0);
 
-        QueryOwnerResp owner = nftClient.queryOwner(denomID, keyInfo.getAddress());
+        QueryOwnerResp owner = nftClient.queryOwner(denomID, keyInfo.getAddress(), null);
         assertEquals(keyInfo.getAddress(), owner.getAddress());
 
 //        BurnNFTRequest burnNFTReq = new BurnNFTRequest()

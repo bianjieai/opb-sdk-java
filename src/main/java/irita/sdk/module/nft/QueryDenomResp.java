@@ -7,25 +7,24 @@ public class QueryDenomResp {
     private String symbol;
     private boolean mintRestricted;
     private boolean updateRestricted;
+    private String uri;
+    private String uriHash;
+    private String data;
     private String creator;
 
     public QueryDenomResp() {
     }
 
-    public QueryDenomResp(String id, String name, String schema, String creator) {
-        this.id = id;
-        this.name = name;
-        this.schema = schema;
-        this.creator = creator;
-    }
-
-    public QueryDenomResp(String id, String name, String schema, String creator, String symbol, boolean mintRestricted, boolean updateRestricted) {
+    public QueryDenomResp(String id, String name, String schema, String symbol, boolean mintRestricted, boolean updateRestricted, String uri, String uriHash, String data, String creator) {
         this.id = id;
         this.name = name;
         this.schema = schema;
         this.symbol = symbol;
         this.mintRestricted = mintRestricted;
         this.updateRestricted = updateRestricted;
+        this.uri = uri;
+        this.uriHash = uriHash;
+        this.data = data;
         this.creator = creator;
     }
 
@@ -53,14 +52,6 @@ public class QueryDenomResp {
         this.schema = schema;
     }
 
-    public String getCreator() {
-        return creator;
-    }
-
-    public void setCreator(String creator) {
-        this.creator = creator;
-    }
-
     public String getSymbol() {
         return symbol;
     }
@@ -83,5 +74,37 @@ public class QueryDenomResp {
 
     public void setUpdateRestricted(boolean updateRestricted) {
         this.updateRestricted = updateRestricted;
+    }
+
+    public String getUri() {
+        return uri;
+    }
+
+    public void setUri(String uri) {
+        this.uri = uri;
+    }
+
+    public String getUriHash() {
+        return uriHash;
+    }
+
+    public void setUriHash(String uriHash) {
+        this.uriHash = uriHash;
+    }
+
+    public String getData() {
+        return data;
+    }
+
+    public void setData(String data) {
+        this.data = data;
+    }
+
+    public String getCreator() {
+        return creator;
+    }
+
+    public void setCreator(String creator) {
+        this.creator = creator;
     }
 }
