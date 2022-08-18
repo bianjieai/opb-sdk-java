@@ -5,6 +5,7 @@ public class EditNFTRequest {
     private String id = "";
     private String name = "";
     private String uri = "";
+    private String uriHash = "";
     private String data = "";
 
     public String getDenom() {
@@ -40,6 +41,15 @@ public class EditNFTRequest {
 
     public EditNFTRequest setUri(String uri) {
         this.uri = uri;
+        return this;
+    }
+
+    public String getUriHash() {
+        return uriHash;
+    }
+
+    public EditNFTRequest setUriHash(String uriHash) {
+        this.uriHash = uriHash;
         return this;
     }
 

@@ -5,6 +5,7 @@ public class MintNFTRequest {
     private String id = "";
     private String name = "";
     private String uri = "";
+    private String uriHash = "";
     private String data = "";
     private String recipient = "";
 
@@ -41,6 +42,15 @@ public class MintNFTRequest {
 
     public MintNFTRequest setUri(String uri) {
         this.uri = uri;
+        return this;
+    }
+
+    public String getUriHash() {
+        return uriHash;
+    }
+
+    public MintNFTRequest setUriHash(String uriHash) {
+        this.uriHash = uriHash;
         return this;
     }
 
