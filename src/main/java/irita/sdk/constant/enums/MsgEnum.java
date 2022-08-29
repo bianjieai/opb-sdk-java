@@ -27,7 +27,7 @@ public enum MsgEnum {
     //nft
     MSG_ISSUE_DENOM("irismod.nft.MsgIssueDenom", proto.nft.Tx.MsgIssueDenom.class),
     MSG_TRANSFER_NFT("irismod.nft.MsgTransferNFT", proto.nft.Tx.MsgTransferNFT.class),
-    MSG_EDIT_NFT("irismod.nft.MsgEditNFT", proto.nft.Tx.MsgTransferNFT.class),
+    MSG_EDIT_NFT("irismod.nft.MsgEditNFT", proto.nft.Tx.MsgEditNFT.class),
     MSG_MINT_NFT("irismod.nft.MsgMintNFT", proto.nft.Tx.MsgMintNFT.class),
     MSG_BURN_NFT("irismod.nft.MsgBurnNFT", proto.nft.Tx.MsgBurnNFT.class),
     //token
@@ -47,7 +47,7 @@ public enum MsgEnum {
     //record
     MSG_CREATE_RECORD("irismod.record.MsgCreateRecord", proto.record.Tx.MsgCreateRecord.class),
     // service
-    MSG_DEFINE_SERVICE("irismod.record.MsgCreateRecord", proto.service.Tx.MsgDefineService.class),
+    MSG_DEFINE_SERVICE("irismod.record.MsgDefineService", proto.service.Tx.MsgDefineService.class),
     MSG_BIND_SERVICE("irismod.service.MsgBindService", proto.service.Tx.MsgBindService.class),
     MSG_CALL_SERVICE("irismod.service.MsgCallService", proto.service.Tx.MsgCallService.class),
     MSG_RESPOND_SERVICE("irismod.service.MsgRespondService", proto.service.Tx.MsgRespondService.class),
