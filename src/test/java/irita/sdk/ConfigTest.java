@@ -30,7 +30,7 @@ public class ConfigTest {
     public IritaClient getTestClient() {
         Properties properties = ConfigTest.getTestConfig();
         String mnemonic = properties.getProperty("mnemonic");
-        KeyManager km = KeyManagerFactory.createKeyManger(AlgoEnum.ETH_SECP256K1);
+        KeyManager km = KeyManagerFactory.createDefault();
         km.recover(mnemonic);
 
         String nodeUri = properties.getProperty("node_uri");
