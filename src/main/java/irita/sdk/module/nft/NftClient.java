@@ -2,7 +2,7 @@ package irita.sdk.module.nft;
 
 
 import com.google.protobuf.GeneratedMessageV3;
-import io.grpc.Channel;
+import io.grpc.ManagedChannel;
 import irita.sdk.client.BaseClient;
 import irita.sdk.model.Account;
 import irita.sdk.model.BaseTx;
@@ -160,7 +160,7 @@ public class NftClient {
 
 
     public long querySupply(String denomID, String owner) {
-        Channel channel = baseClient.getGrpcClient();
+        ManagedChannel channel = baseClient.getGrpcClient();
         QueryOuterClass.QuerySupplyRequest req = QueryOuterClass.QuerySupplyRequest
                 .newBuilder()
                 .setDenomId(denomID)
@@ -168,11 +168,12 @@ public class NftClient {
                 .build();
 
         QueryOuterClass.QuerySupplyResponse resp = QueryGrpc.newBlockingStub(channel).supply(req);
+        channel.shutdown();
         return resp.getAmount();
     }
 
     public QueryOwnerResp queryOwner(String denomID, String owner, Pagination.PageRequest page) {
-        Channel channel = baseClient.getGrpcClient();
+        ManagedChannel channel = baseClient.getGrpcClient();
         QueryOuterClass.QueryOwnerRequest.Builder builder = QueryOuterClass.QueryOwnerRequest
                 .newBuilder()
                 .setDenomId(Optional.ofNullable(denomID).orElse(""))
@@ -187,11 +188,12 @@ public class NftClient {
         builder.setPagination(page);
         QueryOuterClass.QueryOwnerRequest req = builder.build();
         QueryOuterClass.QueryOwnerResponse resp = QueryGrpc.newBlockingStub(channel).owner(req);
+        channel.shutdown();
         return Convert.toQueryOwnerResp(resp.getOwner());
     }
 
     public QueryCollectionResp queryCollection(String denomID, Pagination.PageRequest page) {
-        Channel channel = baseClient.getGrpcClient();
+        ManagedChannel channel = baseClient.getGrpcClient();
         QueryOuterClass.QueryCollectionRequest.Builder builder = QueryOuterClass.QueryCollectionRequest
                 .newBuilder()
                 .setDenomId(denomID);
@@ -205,21 +207,23 @@ public class NftClient {
         QueryOuterClass.QueryCollectionRequest req = builder.build();
 
         QueryOuterClass.QueryCollectionResponse resp = QueryGrpc.newBlockingStub(channel).collection(req);
+        channel.shutdown();
         return Convert.toQueryCollectionResp(resp.getCollection());
     }
 
     public QueryDenomResp queryDenom(String denomID) {
-        Channel channel = baseClient.getGrpcClient();
+        ManagedChannel channel = baseClient.getGrpcClient();
         QueryOuterClass.QueryDenomRequest req = QueryOuterClass.QueryDenomRequest
                 .newBuilder()
                 .setDenomId(denomID)
                 .build();
         QueryOuterClass.QueryDenomResponse resp = QueryGrpc.newBlockingStub(channel).denom(req);
+        channel.shutdown();
         return Convert.toQueryDenomResp(resp.getDenom());
     }
 
     public List<QueryDenomResp> queryDenoms(Pagination.PageRequest page) {
-        Channel channel = baseClient.getGrpcClient();
+        ManagedChannel channel = baseClient.getGrpcClient();
         QueryOuterClass.QueryDenomsRequest.Builder builder = QueryOuterClass.QueryDenomsRequest.newBuilder();
         if (page == null) {
             page = Pagination.PageRequest.newBuilder()
@@ -231,11 +235,12 @@ public class NftClient {
         QueryOuterClass.QueryDenomsRequest req = builder.build();
 
         QueryOuterClass.QueryDenomsResponse resp = QueryGrpc.newBlockingStub(channel).denoms(req);
+        channel.shutdown();
         return Convert.toListQueryDenomResp(resp.getDenomsList());
     }
 
     public QueryNFTResp queryNFT(String denomID, String nftID) {
-        Channel channel = baseClient.getGrpcClient();
+        ManagedChannel channel = baseClient.getGrpcClient();
         QueryOuterClass.QueryNFTRequest req = QueryOuterClass.QueryNFTRequest
                 .newBuilder()
                 .setDenomId(denomID)
@@ -243,6 +248,7 @@ public class NftClient {
                 .build();
 
         QueryOuterClass.QueryNFTResponse resp = QueryGrpc.newBlockingStub(channel).nFT(req);
+        channel.shutdown();
         return Convert.toQueryNFTResp(resp.getNft());
     }
 

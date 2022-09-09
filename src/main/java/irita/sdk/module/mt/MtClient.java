@@ -2,7 +2,7 @@ package irita.sdk.module.mt;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.GeneratedMessageV3;
-import io.grpc.Channel;
+import io.grpc.ManagedChannel;
 import irita.sdk.client.BaseClient;
 import irita.sdk.model.Account;
 import irita.sdk.model.BaseTx;
@@ -153,7 +153,7 @@ public class MtClient {
 
     // Denoms queries all the denoms
     public QueryOuterClass.QueryDenomsResponse queryDenoms(Pagination.PageRequest pageRequest) {
-        Channel channel = baseClient.getGrpcClient();
+        ManagedChannel channel = baseClient.getGrpcClient();
         if (pageRequest == null) {
             pageRequest = Pagination.PageRequest.newBuilder()
                     .setOffset(0)
@@ -165,35 +165,38 @@ public class MtClient {
                 .setPagination(pageRequest)
                 .build();
         QueryOuterClass.QueryDenomsResponse queryDenomsResponse = QueryGrpc.newBlockingStub(channel).denoms(queryDenomsRequest);
+        channel.shutdown();
         return queryDenomsResponse;
     }
 
     // Denom queries the definition of a given denom ID
     public QueryOuterClass.QueryDenomResponse queryDenom(String denomId) {
-        Channel channel = baseClient.getGrpcClient();
+        ManagedChannel channel = baseClient.getGrpcClient();
         QueryOuterClass.QueryDenomRequest queryDenomRequest = QueryOuterClass.QueryDenomRequest
                 .newBuilder()
                 .setDenomId(denomId)
                 .build();
         QueryOuterClass.QueryDenomResponse queryDenomResponse = QueryGrpc.newBlockingStub(channel).denom(queryDenomRequest);
+        channel.shutdown();
         return queryDenomResponse;
     }
 
     // MTSupply queries the total supply of given denom and mt ID
     public long queryMTSupply(String denomId, String mtId) {
-        Channel channel = baseClient.getGrpcClient();
+        ManagedChannel channel = baseClient.getGrpcClient();
         QueryOuterClass.QueryMTSupplyRequest queryMTSupplyRequest = QueryOuterClass.QueryMTSupplyRequest
                 .newBuilder()
                 .setDenomId(denomId)
                 .setMtId(mtId)
                 .build();
         QueryOuterClass.QueryMTSupplyResponse queryMTSupplyResponse = QueryGrpc.newBlockingStub(channel).mTSupply(queryMTSupplyRequest);
+        channel.shutdown();
         return queryMTSupplyResponse.getAmount();
     }
 
     // MTs queries all the MTs of a given denom ID
     public QueryOuterClass.QueryMTsResponse queryMTS(String denomId, Pagination.PageRequest pageRequest) {
-        Channel channel = baseClient.getGrpcClient();
+        ManagedChannel channel = baseClient.getGrpcClient();
         QueryOuterClass.QueryMTsRequest.Builder queryMTsRequestBuilder = QueryOuterClass.QueryMTsRequest
                 .newBuilder()
                 .setDenomId(denomId);
@@ -206,24 +209,26 @@ public class MtClient {
         queryMTsRequestBuilder.setPagination(pageRequest);
         QueryOuterClass.QueryMTsRequest queryMTsRequest = queryMTsRequestBuilder.build();
         QueryOuterClass.QueryMTsResponse queryMTsResponse = QueryGrpc.newBlockingStub(channel).mTs(queryMTsRequest);
+        channel.shutdown();
         return queryMTsResponse;
     }
 
     // MT queries the MT of the given denom and mt ID
     public QueryOuterClass.QueryMTResponse querryMT(String denomId, String mtId) {
-        Channel channel = baseClient.getGrpcClient();
+        ManagedChannel channel = baseClient.getGrpcClient();
         QueryOuterClass.QueryMTRequest queryMTRequest = QueryOuterClass.QueryMTRequest
                 .newBuilder()
                 .setDenomId(denomId)
                 .setMtId(mtId)
                 .build();
         QueryOuterClass.QueryMTResponse queryMTResponse = QueryGrpc.newBlockingStub(channel).mT(queryMTRequest);
+        channel.shutdown();
         return queryMTResponse;
     }
 
     // Balances queries the MT balances of a specified owner
     public QueryOuterClass.QueryBalancesResponse queryBalances(String owner, String denomId, Pagination.PageRequest pageRequest) {
-        Channel channel = baseClient.getGrpcClient();
+        ManagedChannel channel = baseClient.getGrpcClient();
         QueryOuterClass.QueryBalancesRequest.Builder queryBalancesRequestBuilder = QueryOuterClass.QueryBalancesRequest
                 .newBuilder()
                 .setOwner(owner)
@@ -237,6 +242,7 @@ public class MtClient {
         queryBalancesRequestBuilder.setPagination(pageRequest);
         QueryOuterClass.QueryBalancesRequest queryBalancesRequest = queryBalancesRequestBuilder.build();
         QueryOuterClass.QueryBalancesResponse queryBalancesResponse = QueryGrpc.newBlockingStub(channel).balances(queryBalancesRequest);
+        channel.shutdown();
         return queryBalancesResponse;
     }
 

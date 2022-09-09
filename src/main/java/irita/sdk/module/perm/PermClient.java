@@ -2,6 +2,7 @@ package irita.sdk.module.perm;
 
 import com.google.protobuf.GeneratedMessageV3;
 import io.grpc.Channel;
+import io.grpc.ManagedChannel;
 import irita.sdk.client.BaseClient;
 import irita.sdk.model.Account;
 import irita.sdk.model.BaseTx;
@@ -101,30 +102,33 @@ public class PermClient {
     public List<Perm.Role> queryRoles(String address) {
         AddressUtils.validAddress(address);
 
-        Channel channel = baseClient.getGrpcClient();
+        ManagedChannel channel = baseClient.getGrpcClient();
         QueryOuterClass.QueryRolesRequest req = QueryOuterClass.QueryRolesRequest
                 .newBuilder()
                 .setAddress(address)
                 .build();
         QueryOuterClass.QueryRolesResponse resp = QueryGrpc.newBlockingStub(channel).roles(req);
+        channel.shutdown();
         return resp.getRolesList();
     }
 
     public List<String> queryBlockListAccount() {
-        Channel channel = baseClient.getGrpcClient();
+        ManagedChannel channel = baseClient.getGrpcClient();
         QueryOuterClass.QueryBlockListRequest req = QueryOuterClass.QueryBlockListRequest
                 .newBuilder()
                 .build();
         QueryOuterClass.QueryBlockListResponse resp = QueryGrpc.newBlockingStub(channel).accountBlockList(req);
+        channel.shutdown();
         return resp.getAddressesList();
     }
 
     public List<String> queryBlockListContract() {
-        Channel channel = baseClient.getGrpcClient();
+        ManagedChannel channel = baseClient.getGrpcClient();
         QueryOuterClass.QueryContractDenyList req = QueryOuterClass.QueryContractDenyList
                 .newBuilder()
                 .build();
         QueryOuterClass.QueryContractDenyListResponse resp = QueryGrpc.newBlockingStub(channel).contractDenyList(req);
+        channel.shutdown();
         return resp.getAddressesList();
     }
 }

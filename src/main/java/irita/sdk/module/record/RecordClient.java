@@ -2,6 +2,7 @@ package irita.sdk.module.record;
 
 import com.google.protobuf.GeneratedMessageV3;
 import io.grpc.Channel;
+import io.grpc.ManagedChannel;
 import irita.sdk.client.BaseClient;
 import irita.sdk.constant.enums.EventEnum;
 import irita.sdk.exception.IritaSDKException;
@@ -51,7 +52,9 @@ public class RecordClient {
         QueryOuterClass.QueryRecordRequest recordRequest = QueryOuterClass.QueryRecordRequest.newBuilder()
                 .setRecordId(recordId)
                 .build();
-        Channel channel = baseClient.getGrpcClient();
-        return QueryGrpc.newBlockingStub(channel).record(recordRequest);
+        ManagedChannel channel = baseClient.getGrpcClient();
+        QueryOuterClass.QueryRecordResponse queryRecordResponse = QueryGrpc.newBlockingStub(channel).record(recordRequest);
+        channel.shutdown();
+        return queryRecordResponse;
     }
 }

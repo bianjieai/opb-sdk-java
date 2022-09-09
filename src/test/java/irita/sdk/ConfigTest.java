@@ -3,6 +3,7 @@ package irita.sdk;
 import irita.sdk.client.IritaClient;
 import irita.sdk.config.OpbConfig;
 import irita.sdk.exception.IritaSDKException;
+import irita.sdk.key.AlgoEnum;
 import irita.sdk.key.KeyManager;
 import irita.sdk.key.KeyManagerFactory;
 import org.apache.commons.lang3.StringUtils;
@@ -29,7 +30,7 @@ public class ConfigTest {
     public IritaClient getTestClient() {
         Properties properties = ConfigTest.getTestConfig();
         String mnemonic = properties.getProperty("mnemonic");
-        KeyManager km = KeyManagerFactory.createDefault();
+        KeyManager km = KeyManagerFactory.createKeyManger(AlgoEnum.ETH_SECP256K1);
         km.recover(mnemonic);
 
         String nodeUri = properties.getProperty("node_uri");
