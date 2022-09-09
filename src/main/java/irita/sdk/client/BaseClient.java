@@ -78,7 +78,7 @@ public class BaseClient {
     public ResultTx buildAndSend(List<GeneratedMessageV3> msgs, BaseTx baseTx, Account account) throws IOException {
         TxEngine txEngine = getTxEngine();
         byte[] txBytes = txEngine.buildAndSign(msgs, baseTx, account);
-        return rpcClient.broadcastTx(txBytes, baseTx.getMode());
+        return getRpcClient().broadcastTx(txBytes, baseTx.getMode());
     }
 
     public String buildTxHash(List<GeneratedMessageV3> msgs, BaseTx baseTx, Account account) {
@@ -129,23 +129,23 @@ public class BaseClient {
         }
         TxEngine txEngine = getTxEngine();
         byte[] txBytes = txEngine.buildAndSign(msgs, baseTx, account);
-        return rpcClient.simulateTx(txBytes);
+        return getRpcClient().simulateTx(txBytes);
     }
 
     public ResultQueryTx queryTx(String hash) throws IOException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        return rpcClient.queryTx(hash);
+        return getRpcClient().queryTx(hash);
     }
 
     public ResultSearchTxs queryTxs(EventQueryBuilder builder, int page, int size) throws IOException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         if (builder == null) {
             throw new IritaSDKException("EventQueryBuilder can not be null");
         }
-        return rpcClient.queryTxs(builder, page, size);
+        return getRpcClient().queryTxs(builder, page, size);
     }
 
     public BlockDetail queryBlock(String height) throws IOException {
-        ResultBlock resultBlock = rpcClient.queryBlock(height);
-        BlockResult blockResult = rpcClient.queryBlockResult(height);
+        ResultBlock resultBlock = getRpcClient().queryBlock(height);
+        BlockResult blockResult = getRpcClient().queryBlockResult(height);
 
         BlockDetail blockDetail = new BlockDetail();
         blockDetail.setBlockId(resultBlock.getBlockID());
