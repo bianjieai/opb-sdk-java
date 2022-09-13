@@ -128,8 +128,8 @@ https://mvnrepository.com/artifact/io.github.bianjieai
         km.recover(mnemonic);
 
         // projectID: 填你的 projectID
-        String nodeUri="http://47.100.192.234:26657";
-        String grpcAddr="47.100.192.234:9090";
+        String nodeUri="http://testnet.bianjie.ai:26657";
+        String grpcAddr="testnet.bianjie.ai:9090";
         String chainId="testing";
         ClientConfig clientConfig=new ClientConfig(nodeUri,grpcAddr,chainId);
         OpbConfig opbConfig=null;

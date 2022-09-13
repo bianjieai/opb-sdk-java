@@ -3,6 +3,7 @@ package irita.sdk;
 import irita.sdk.client.IritaClient;
 import irita.sdk.config.OpbConfig;
 import irita.sdk.exception.IritaSDKException;
+import irita.sdk.key.AlgoEnum;
 import irita.sdk.key.KeyManager;
 import irita.sdk.key.KeyManagerFactory;
 import org.apache.commons.lang3.StringUtils;

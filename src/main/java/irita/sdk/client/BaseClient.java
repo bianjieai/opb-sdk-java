@@ -3,6 +3,7 @@ package irita.sdk.client;
 import com.google.protobuf.GeneratedMessageV3;
 import com.google.protobuf.InvalidProtocolBufferException;
 import io.grpc.Channel;
+import io.grpc.ManagedChannel;
 import irita.sdk.config.ClientConfig;
 import irita.sdk.config.OpbConfig;
 import irita.sdk.exception.IritaSDKException;
@@ -34,7 +35,7 @@ public class BaseClient {
     private KeyManager km;
 
     private TxEngine txEngine;
-    private Channel grpcClient;
+    private ManagedChannel grpcClient;
     private RpcClient rpcClient;
 
     public BaseClient() {
@@ -44,34 +45,40 @@ public class BaseClient {
         this.clientConfig = clientConfig;
         this.opbConfig = opbConfig;
         this.km = keyManager;
-
         this.txEngine = TxEngineFactory.createTxEngine(km, clientConfig.getChainID());
-        if (opbConfig != null && opbConfig.isEnableTLS()) {
-            X509Certificate[] certificates;
-            certificates = HttpClientGetServerCertificate.getGateWayTlsCertPool(clientConfig.getRpcUri());
-            try {
-                this.grpcClient = GrpcFactory.createGrpcClient(clientConfig, opbConfig, certificates);
-            } catch (IOException e) {
-                throw new IritaSDKException(e.getMessage());
-            }
-        } else {
-            this.grpcClient = GrpcFactory.createGrpcClient(clientConfig, opbConfig);
-        }
-        this.rpcClient = new RpcClient(clientConfig, opbConfig);
+        this.grpcClient = getGrpcClient();
+        this.rpcClient = getRpcClient();
     }
 
     public RpcClient getRpcClient() {
+        if (rpcClient == null){
+            rpcClient = new RpcClient(clientConfig, opbConfig);
+        }
         return rpcClient;
     }
 
-    public Channel getGrpcClient() {
+
+    public ManagedChannel getGrpcClient(){
+        if (grpcClient == null || grpcClient.isShutdown()){
+            if (opbConfig != null && opbConfig.isEnableTLS()) {
+                X509Certificate[] certificates;
+                certificates = HttpClientGetServerCertificate.getGateWayTlsCertPool(clientConfig.getRpcUri());
+                try {
+                    grpcClient = GrpcFactory.createGrpcClient(clientConfig, opbConfig, certificates);
+                } catch (IOException e) {
+                    throw new IritaSDKException(e.getMessage());
+                }
+            } else {
+                grpcClient = GrpcFactory.createGrpcClient(clientConfig, opbConfig);
+            }
+        }
         return grpcClient;
     }
 
     public ResultTx buildAndSend(List<GeneratedMessageV3> msgs, BaseTx baseTx, Account account) throws IOException {
         TxEngine txEngine = getTxEngine();
         byte[] txBytes = txEngine.buildAndSign(msgs, baseTx, account);
-        return rpcClient.broadcastTx(txBytes, baseTx.getMode());
+        return getRpcClient().broadcastTx(txBytes, baseTx.getMode());
     }
 
     public String buildTxHash(List<GeneratedMessageV3> msgs, BaseTx baseTx, Account account) {
@@ -94,11 +101,13 @@ public class BaseClient {
     }
 
     public Account queryAccount(String address) {
+        ManagedChannel channel = getGrpcClient();
         QueryOuterClass.QueryAccountRequest req = QueryOuterClass.QueryAccountRequest
                 .newBuilder()
                 .setAddress(address)
                 .build();
-        QueryOuterClass.QueryAccountResponse resp = QueryGrpc.newBlockingStub(grpcClient).account(req);
+        QueryOuterClass.QueryAccountResponse resp = QueryGrpc.newBlockingStub(channel).account(req);
+        channel.shutdown();
 
         Auth.BaseAccount baseAccount = null;
         try {
@@ -120,23 +129,23 @@ public class BaseClient {
         }
         TxEngine txEngine = getTxEngine();
         byte[] txBytes = txEngine.buildAndSign(msgs, baseTx, account);
-        return rpcClient.simulateTx(txBytes);
+        return getRpcClient().simulateTx(txBytes);
     }
 
     public ResultQueryTx queryTx(String hash) throws IOException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        return rpcClient.queryTx(hash);
+        return getRpcClient().queryTx(hash);
     }
 
     public ResultSearchTxs queryTxs(EventQueryBuilder builder, int page, int size) throws IOException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         if (builder == null) {
             throw new IritaSDKException("EventQueryBuilder can not be null");
         }
-        return rpcClient.queryTxs(builder, page, size);
+        return getRpcClient().queryTxs(builder, page, size);
     }
 
     public BlockDetail queryBlock(String height) throws IOException {
-        ResultBlock resultBlock = rpcClient.queryBlock(height);
-        BlockResult blockResult = rpcClient.queryBlockResult(height);
+        ResultBlock resultBlock = getRpcClient().queryBlock(height);
+        BlockResult blockResult = getRpcClient().queryBlockResult(height);
 
         BlockDetail blockDetail = new BlockDetail();
         blockDetail.setBlockId(resultBlock.getBlockID());

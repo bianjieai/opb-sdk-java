@@ -3,6 +3,7 @@ package irita.sdk.module.wasm;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.GeneratedMessageV3;
 import io.grpc.Channel;
+import io.grpc.ManagedChannel;
 import irita.sdk.client.BaseClient;
 import irita.sdk.constant.enums.EventEnum;
 import irita.sdk.exception.IritaSDKException;
@@ -114,19 +115,20 @@ public class WasmClient {
 
     // return the contract information
     public ContractInfo queryContractInfo(String contractAddress) {
-        Channel channel = baseClient.getGrpcClient();
+        ManagedChannel channel = baseClient.getGrpcClient();
         QueryOuterClass.QueryContractInfoRequest req = QueryOuterClass.QueryContractInfoRequest
                 .newBuilder()
                 .setAddress(contractAddress)
                 .build();
 
         QueryOuterClass.QueryContractInfoResponse resp = QueryGrpc.newBlockingStub(channel).contractInfo(req);
+        channel.shutdown();
         return Convert.toContractInfo(resp);
     }
 
     // execute contract's query method and return the result
     public byte[] queryContract(String address, ContractABI abi) {
-        Channel channel = baseClient.getGrpcClient();
+        ManagedChannel channel = baseClient.getGrpcClient();
         byte[] msgBytes = abi.build();
         QueryOuterClass.QuerySmartContractStateRequest req = QueryOuterClass.QuerySmartContractStateRequest
                 .newBuilder()
@@ -135,18 +137,20 @@ public class WasmClient {
                 .build();
 
         QueryOuterClass.QuerySmartContractStateResponse resp = QueryGrpc.newBlockingStub(channel).smartContractState(req);
+        channel.shutdown();
         return resp.toByteArray();
     }
 
     // export all state data of the contract
     public Map<String, String> exportContractState(String address) {
-        Channel channel = baseClient.getGrpcClient();
+        ManagedChannel channel = baseClient.getGrpcClient();
         QueryOuterClass.QueryAllContractStateRequest req = QueryOuterClass.QueryAllContractStateRequest
                 .newBuilder()
                 .setAddress(address)
                 .build();
 
         QueryOuterClass.QueryAllContractStateResponse resp = QueryGrpc.newBlockingStub(channel).allContractState(req);
+        channel.shutdown();
 
         Map<String, String> map = new HashMap<>();
         List<Types.Model> models = resp.getModelsList();

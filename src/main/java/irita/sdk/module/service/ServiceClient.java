@@ -3,6 +3,7 @@ package irita.sdk.module.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.protobuf.GeneratedMessageV3;
 import io.grpc.Channel;
+import io.grpc.ManagedChannel;
 import irita.sdk.client.BaseClient;
 import irita.sdk.client.ListenChainUtil;
 import irita.sdk.constant.AttributeKey;
@@ -190,61 +191,66 @@ public class ServiceClient {
     }
 
     public Service.ServiceDefinition queryServiceDefinition(String serviceName) {
-        Channel channel = baseClient.getGrpcClient();
+        ManagedChannel channel = baseClient.getGrpcClient();
         QueryOuterClass.QueryDefinitionRequest req = QueryOuterClass.QueryDefinitionRequest
                 .newBuilder()
                 .setServiceName(serviceName)
                 .build();
         QueryOuterClass.QueryDefinitionResponse resp = QueryGrpc.newBlockingStub(channel).definition(req);
+        channel.shutdown();
         return resp == null ? null : resp.getServiceDefinition();
     }
 
 
     public Service.ServiceBinding queryServiceBinding(String serviceName, String provider) {
-        Channel channel = baseClient.getGrpcClient();
+        ManagedChannel channel = baseClient.getGrpcClient();
         QueryOuterClass.QueryBindingRequest req = QueryOuterClass.QueryBindingRequest
                 .newBuilder()
                 .setServiceName(serviceName)
                 .setProvider(provider)
                 .build();
         QueryOuterClass.QueryBindingResponse resp = QueryGrpc.newBlockingStub(channel).binding(req);
+        channel.shutdown();
         return resp == null ? null : resp.getServiceBinding();
     }
 
     public List<Service.ServiceBinding> queryServiceBindings(String serviceName, Pagination.PageRequest page) {
-        Channel channel = baseClient.getGrpcClient();
+        ManagedChannel channel = baseClient.getGrpcClient();
         QueryOuterClass.QueryBindingsRequest req = QueryOuterClass.QueryBindingsRequest
                 .newBuilder()
                 .setServiceName(serviceName)
                 .setPagination(page)
                 .build();
         QueryOuterClass.QueryBindingsResponse resp = QueryGrpc.newBlockingStub(channel).bindings(req);
+        channel.shutdown();
         return resp == null ? null : resp.getServiceBindingsList();
     }
 
     public Service.Request queryServiceRequest(String requestID) {
-        Channel channel = baseClient.getGrpcClient();
+        ManagedChannel channel = baseClient.getGrpcClient();
         QueryOuterClass.QueryRequestRequest req = QueryOuterClass.QueryRequestRequest
                 .newBuilder()
                 .setRequestId(requestID)
                 .build();
         QueryOuterClass.QueryRequestResponse resp = QueryGrpc.newBlockingStub(channel).request(req);
+        channel.shutdown();
         return resp == null ? null : resp.getRequest();
     }
 
     public List<Service.Request> queryServiceRequests(String serviceName, String provider) {
-        Channel channel = baseClient.getGrpcClient();
+        ManagedChannel channel = baseClient.getGrpcClient();
         QueryOuterClass.QueryRequestsRequest req = QueryOuterClass.QueryRequestsRequest
                 .newBuilder()
                 .setServiceName(serviceName)
                 .setProvider(provider)
                 .build();
         QueryOuterClass.QueryRequestsResponse resp = QueryGrpc.newBlockingStub(channel).requests(req);
+        channel.shutdown();
         return resp == null ? null : resp.getRequestsList();
     }
 
     public List<Service.Request> queryRequestsByReqCtx(String reqCtxID, long batchCounter, Pagination.PageRequest page) {
-        Channel channel = baseClient.getGrpcClient();
+        ManagedChannel channel = baseClient.getGrpcClient();
         QueryOuterClass.QueryRequestsByReqCtxRequest req = QueryOuterClass.QueryRequestsByReqCtxRequest
                 .newBuilder()
                 .setRequestContextId(reqCtxID)
@@ -252,21 +258,23 @@ public class ServiceClient {
                 .setPagination(page)
                 .build();
         QueryOuterClass.QueryRequestsByReqCtxResponse resp = QueryGrpc.newBlockingStub(channel).requestsByReqCtx(req);
+        channel.shutdown();
         return resp == null ? null : resp.getRequestsList();
     }
 
     public Service.Response queryServiceResponse(String requestID) {
-        Channel channel = baseClient.getGrpcClient();
+        ManagedChannel channel = baseClient.getGrpcClient();
         QueryOuterClass.QueryResponseRequest req = QueryOuterClass.QueryResponseRequest
                 .newBuilder()
                 .setRequestId(requestID)
                 .build();
         QueryOuterClass.QueryResponseResponse resp = QueryGrpc.newBlockingStub(channel).response(req);
+        channel.shutdown();
         return resp == null ? null : resp.getResponse();
     }
 
     public List<Service.Response> queryServiceResponses(String reqCtxID, long batchCounter, Pagination.PageRequest page) {
-        Channel channel = baseClient.getGrpcClient();
+        ManagedChannel channel = baseClient.getGrpcClient();
         QueryOuterClass.QueryResponsesRequest req = QueryOuterClass.QueryResponsesRequest
                 .newBuilder()
                 .setRequestContextId(reqCtxID)
@@ -274,16 +282,18 @@ public class ServiceClient {
                 .setPagination(page)
                 .build();
         QueryOuterClass.QueryResponsesResponse resp = QueryGrpc.newBlockingStub(channel).responses(req);
+        channel.shutdown();
         return resp == null ? null : resp.getResponsesList();
     }
 
     public Service.RequestContext queryRequestContext(String reqCtxID) {
-        Channel channel = baseClient.getGrpcClient();
+        ManagedChannel channel = baseClient.getGrpcClient();
         QueryOuterClass.QueryRequestContextRequest req = QueryOuterClass.QueryRequestContextRequest
                 .newBuilder()
                 .setRequestContextId(reqCtxID)
                 .build();
         QueryOuterClass.QueryRequestContextResponse resp = QueryGrpc.newBlockingStub(channel).requestContext(req);
+        channel.shutdown();
         return resp == null ? null : resp.getRequestContext();
     }
 
