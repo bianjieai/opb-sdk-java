@@ -1,9 +1,11 @@
 package irita.sdk;
 
+import io.grpc.ManagedChannel;
 import irita.sdk.client.IritaClient;
 import irita.sdk.config.ClientConfig;
 import irita.sdk.config.OpbConfig;
 import irita.sdk.constant.enums.BroadcastMode;
+import irita.sdk.key.AlgoEnum;
 import irita.sdk.key.KeyInfo;
 import irita.sdk.key.KeyManager;
 import irita.sdk.key.KeyManagerFactory;
@@ -14,9 +16,13 @@ import irita.sdk.module.nft.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import proto.cosmos.base.query.v1beta1.Pagination;
+import proto.nft.QueryGrpc;
+import proto.nft.QueryOuterClass;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Random;
 
@@ -25,13 +31,28 @@ import static org.junit.jupiter.api.Assertions.*;
 public class NftTest extends ConfigTest {
     private KeyManager km;
     private NftClient nftClient;
+    private IritaClient client;
     private final BaseTx baseTx = new BaseTx(400000, new Fee("400000", "ugas"), BroadcastMode.Commit);
 
     @BeforeEach
     public void init() {
-        IritaClient client = getTestClient();
-        km = client.getBaseClient().getKm();
+        //更换为自己链上地址的助记词
+        String mnemonic = "open salt kit ensure cannon photo flock tragic judge east canal depart verb glimpse zebra fossil during organ chair useful unaware file surround own";
+        km = KeyManagerFactory.createKeyManger(AlgoEnum.ETH_SECP256K1);
+        km.recover(mnemonic);
+
+        //连接测试网（连接主网请参考README.md）
+        String nodeUri = "http://127.0.0.1:26657";
+        String grpcAddr = "127.0.0.1:9090";
+        String chainId = "2022";
+        ClientConfig clientConfig = new ClientConfig(nodeUri, grpcAddr, chainId);
+        //测试网为null，主网请参考README.md
+        OpbConfig opbConfig = null;
+
+        client = new IritaClient(clientConfig, opbConfig, km);
         nftClient = client.getNftClient();
+        //判断由助记词恢复的是否为预期的链上地址
+        assertEquals("iaa1w4yynxjyqyjkqmap4ug99l40zzhexykxmqf0mt", km.getCurrentKeyInfo().getAddress());
     }
 
     @Test
@@ -131,4 +152,52 @@ public class NftTest extends ConfigTest {
 //            }
 //        }
     }
+
+    /*@Test
+    public void test1() throws IOException {
+        KeyInfo keyInfo = km.getCurrentKeyInfo();
+        for (int i = 0;i<100;i++){
+            String nftID = "nftiduuccxx08"+i;
+            String nftName = "你好呀";
+            String uri = "https://www.baidu.com";
+            String data = "any data";
+            MintNFTRequest mintReq = new MintNFTRequest()
+                    .setDenom("denomid285")
+                    .setId(nftID)
+                    .setName(nftName)
+                    .setUri(uri)
+                    .setData(data)
+                    .setRecipient(keyInfo.getAddress());
+            ResultTx resultTx = nftClient.mintNft(mintReq, baseTx);
+            System.out.println("code:"+resultTx.getCode()+":+"+resultTx.getResult().getHash());
+        }
+
+    }*/
+
+    //denomid285
+    /*@Test
+    public void testQueryOwner(){
+
+        *//*Pagination.PageRequest pageRequest = Pagination.PageRequest.newBuilder()
+                .setOffset(10)
+                .setLimit(10)
+                .build();
+        QueryOwnerResp queryOwnerResp = nftClient.queryOwner("huyuanyuan", "iaa126yqsarr8ccgzfa55vvn420kh22rep50xcjy23", pageRequest);
+        System.out.println(queryOwnerResp.getIdcs().size());*//*
+        KeyInfo keyInfo = km.getCurrentKeyInfo();
+        ManagedChannel channel = client.getBaseClient().getGrpcClient();
+        QueryOuterClass.QueryOwnerRequest.Builder builder = QueryOuterClass.QueryOwnerRequest
+                .newBuilder()
+                .setDenomId(Optional.ofNullable("denomid285").orElse(""))
+                .setOwner(keyInfo.getAddress());
+        Pagination.PageRequest pageRequest = Pagination.PageRequest.newBuilder()
+                //.setKey(ByteString.copyFromUtf8("huyuanyuan10352"))
+                .setOffset(5)
+                .setLimit(5)
+                .build();
+        builder.setPagination(pageRequest);
+        QueryOuterClass.QueryOwnerRequest req = builder.build();
+        QueryOuterClass.QueryOwnerResponse resp = QueryGrpc.newBlockingStub(channel).owner(req);
+        System.out.println(resp.getOwner().getIdCollectionsList());
+    }*/
 }

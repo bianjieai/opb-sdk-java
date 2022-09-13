@@ -153,7 +153,7 @@ public class LocalSubscribeRequestTest {
         List<Events> events = ListenChainUtil.decodeEvent(block);
         List<String> reqIds = getReqIds(events, serviceName, provider);
         List<Tx.MsgRespondService> msgs = checkAgainReqIds(reqIds, serviceName, provider);
-        if (msgs.size() == 0) {
+        if (msgs == null || msgs.size() == 0) {
             msgs = mockRespondMsg(); // because this is unit test
         }
         assertEquals(1, msgs.size());

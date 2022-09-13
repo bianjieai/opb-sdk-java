@@ -172,8 +172,8 @@ public class MtTest {
         String denomID = "259edd57e552854d42bc4a0d98dc7a48fddeae343ad428c9df1d4b09e0ab525a";
         String owner = "iaa12v374npj9r6kf7vtzav4pxn33tj6m44wdx0uxd";
         Pagination.PageRequest pageRequest = Pagination.PageRequest.newBuilder()
-                .setLimit(100)
-                .setOffset(0)
+                .setLimit(2)
+                .setOffset(2)
                 .build();
         QueryOuterClass.QueryBalancesResponse queryBalancesResponse = mtClient.queryBalances(owner, denomID, pageRequest);
         for (Mt.Balance balance : queryBalancesResponse.getBalanceList()) {
