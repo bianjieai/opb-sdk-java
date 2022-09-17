@@ -13,6 +13,8 @@ import irita.sdk.module.feegrant.FeeGrantClient;
 import irita.sdk.module.nft.MintNFTRequest;
 import irita.sdk.module.nft.NftClient;
 import org.junit.jupiter.api.*;
+import proto.cosmos.base.query.v1beta1.Pagination;
+import proto.cosmos.feegrant.v1beta1.QueryOuterClass;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -110,6 +112,32 @@ public class FeeGrantTest extends ConfigTest {
         List<Coin> coins = account.getCoins();
         Optional<Coin> iritaCoin = coins.stream().filter(x -> x.getDenom().equals(tokenDenom)).findFirst();
         return iritaCoin.isPresent() ? iritaCoin.get().getAmount() : "0";
+    }
+
+    @Test
+    @Disabled
+    @Tag("根据授权者和被授权者地址查询是否授权")
+    public void testAllowance(){
+        FeeGrantClient feeGrantClient = iritaClient.getFeeGrantClient();
+        String garenter = km.getCurrentKeyInfo().getAddress();
+        String garentee = "iaa106lcg5m8h3cdawun7c2rrwpj7q3ncfr9k3wxwx";
+        QueryOuterClass.QueryAllowanceResponse response = feeGrantClient.Allowance(garenter,garentee);
+        System.out.println(response.hasAllowance());
+    }
+
+    @Test
+    @Disabled
+    @Tag("根据被授权者地址查询授权者信息")
+    public void  testAllowances(){
+        FeeGrantClient feeGrantClient = iritaClient.getFeeGrantClient();
+        String garentee = "iaa106lcg5m8h3cdawun7c2rrwpj7q3ncfr9k3wxwx";
+        Pagination.PageRequest page = Pagination.PageRequest.newBuilder()
+                .setOffset(0)
+                .setLimit(10)
+                .build();
+        QueryOuterClass.QueryAllowancesResponse response = feeGrantClient.Allowances(garentee,page);
+        System.out.println(response.getAllowancesCount());
+
     }
 }
 
