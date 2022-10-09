@@ -25,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class NftTest extends ConfigTest {
     private KeyManager km;
     private NftClient nftClient;
+    //能量值费用：「创建NFT/MT类别」、「发行NFT/MT」为 40 万能量值（等值人民币：0.1元），其他交易类型为 20 万能量值（等值人民币：0.05元）
     private final BaseTx baseTx = new BaseTx(400000, new Fee("400000", "ugas"), BroadcastMode.Commit);
 
     @BeforeEach
