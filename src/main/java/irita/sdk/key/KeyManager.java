@@ -17,7 +17,8 @@ import java.security.cert.CertificateException;
 public abstract class KeyManager implements Key, MultiKey {
     // this keyPath and hrp just for iris
     private String keyPath = "m/44'/118'/0'/0/0";
-    private String hdPath = "m/44'/118'/0'/0/";
+    private String BIP44Prifix = "m/44'/118'/";
+    private String PartialPath = "0'/0/";
     private String hrp = "iaa";
     private KeyInfo currentKeyInfo;
     protected final KeyDAO keyDAO = new MemoryKeyDAO();
@@ -79,7 +80,7 @@ public abstract class KeyManager implements Key, MultiKey {
     @Override
     public void recover(String mnemonic, int index) {
         byte[] seed = Bip44Utils.getSeed(mnemonic);
-        String keyPath = hdPath + index;
+        String keyPath = BIP44Prifix + PartialPath + index;
         DeterministicKey dk = Bip44Utils.getDeterministicKey(mnemonic, seed, keyPath);
         BigInteger privKey = dk.getPrivKey();
         recover(privKey);
