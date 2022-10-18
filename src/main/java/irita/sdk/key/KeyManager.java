@@ -75,10 +75,12 @@ public abstract class KeyManager implements Key, MultiKey {
         recover(privKey);
     }
 
+    @Override
     public void recover(String mnemonic, int index) {
         byte[] seed = Bip44Utils.getSeed(mnemonic);
+
         String keyPath = getKeyPath() + String.valueOf(index);
-        DeterministicKey dk = Bip44Utils.getDeterministicKey(mnemonic, seed, getKeyPath());
+        DeterministicKey dk = Bip44Utils.getDeterministicKey(mnemonic, seed, keyPath);
         BigInteger privKey = dk.getPrivKey();
         recover(privKey);
     }
