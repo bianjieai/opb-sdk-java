@@ -12,6 +12,8 @@ public interface Key {
 
     void recover(InputStream keystore, String password);
 
+    void recover(String mnemonic, int index);
+
     void recoverFromCA(InputStream caKeystore, String password);
 
     String export(String password);
