@@ -20,7 +20,7 @@ public abstract class KeyManager implements Key, MultiKey {
     private String BIP44Prifix = "m/44'/118'/";
     private String PartialPath = "0'/0/";
     private String hrp = "iaa";
-    private KeyInfo currentKeyInfo;
+    private ThreadLocal<KeyInfo> currentKeyInfo = new ThreadLocal<>();
     protected final KeyDAO keyDAO = new MemoryKeyDAO();
 
     private AlgoEnum algo;
@@ -28,11 +28,11 @@ public abstract class KeyManager implements Key, MultiKey {
     public abstract AlgoEnum getAlgo();
 
     public KeyInfo getCurrentKeyInfo() {
-        return currentKeyInfo;
+        return currentKeyInfo.get();
     }
 
     public void setCurrentKeyInfo(KeyInfo currentKeyInfo) {
-        this.currentKeyInfo = currentKeyInfo;
+        this.currentKeyInfo.set(currentKeyInfo);
     }
 
     public KeyDAO getKeyDAO() {
@@ -137,7 +137,7 @@ public abstract class KeyManager implements Key, MultiKey {
     }
 
     public void setDefaultKeyDao(BigInteger privKey, ECPoint publicKey, String address) {
-        currentKeyInfo = new KeyInfo(address, publicKey, privKey);
-        keyDAO.write(Constant.DEFAULT_USER_NAME, null, currentKeyInfo);
+        setCurrentKeyInfo(new KeyInfo(address, publicKey, privKey));
+        keyDAO.write(Constant.DEFAULT_USER_NAME, null, currentKeyInfo.get());
     }
 }
