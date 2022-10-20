@@ -102,6 +102,15 @@ public abstract class KeyManager implements Key, MultiKey {
     }
 
     @Override
+    public void recover(String name, String password, String mnemonic, int index) {
+        if (keyDAO.has(name)) {
+            throw new IritaSDKException(String.format("name %s has existed", name));
+        }
+        recover(mnemonic, index);
+        keyDAO.write(name, password, getCurrentKeyInfo());
+    }
+
+    @Override
     public void recover(String name, String password, String mnemonic) {
         if (keyDAO.has(name)) {
             throw new IritaSDKException(String.format("name %s has existed", name));
