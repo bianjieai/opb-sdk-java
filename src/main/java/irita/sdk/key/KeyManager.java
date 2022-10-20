@@ -11,7 +11,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.bitcoinj.crypto.DeterministicKey;
 import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPrivateKey;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.math.ec.ECPoint;
 import org.bouncycastle.util.encoders.Hex;
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -30,221 +29,195 @@ import static irita.sdk.crypto.BCryptImpl.decode_base64;
 import static irita.sdk.crypto.BCryptImpl.encode_base64;
 
 public abstract class KeyManager implements Key, MultiKey {
-    // this keyPath and hrp just for iris
-    private String keyPath = "m/44'/118'/0'/0/0";
-    private String BIP44Prifix = "m/44'/118'/";
-    private String PartialPath = "0'/0/";
-    private String hrp = "iaa";
-    private ThreadLocal<KeyInfo> currentKeyInfo = new ThreadLocal<>();
-    protected final KeyDAO keyDAO = new MemoryKeyDAO();
 
-    private AlgoEnum algo;
+	private String hrp = Constant.DEFAULT_HRP;
+	protected final KeyDAO keyDAO = new MemoryKeyDAO();
 
-    public abstract AlgoEnum getAlgo();
+	public abstract AlgoEnum getAlgo();
 
-    public KeyInfo getCurrentKeyInfo() {
-        return currentKeyInfo.get();
-    }
+	protected abstract KeyInfo toKeyInfo(BigInteger privKey);
 
-    public void setCurrentKeyInfo(KeyInfo currentKeyInfo) {
-        this.currentKeyInfo.set(currentKeyInfo);
-    }
+	public KeyInfo getCurrentKeyInfo() {
+		return keyDAO.read(Constant.DEFAULT_USER_NAME, null);
+	}
 
-    public KeyDAO getKeyDAO() {
-        return keyDAO;
-    }
+	public KeyDAO getKeyDAO() {
+		return keyDAO;
+	}
 
-    public String getKeyPath() {
-        return keyPath;
-    }
+	public String getHrp() {
+		return hrp;
+	}
 
-    public void setKeyPath(String keyPath) {
-        this.keyPath = keyPath;
-    }
+	public void setHrp(String hrp) {
+		this.hrp = hrp;
+	}
 
-    public String getHrp() {
-        return hrp;
-    }
+	@Override
+	public String add() throws Exception {
+		return add(Constant.DEFAULT_USER_NAME, null);
+	}
 
-    public void setHrp(String hrp) {
-        this.hrp = hrp;
-    }
+	@Override
+	public String add(String name, String password) throws Exception {
+		String mnemonic = Bip44Utils.generateMnemonic();
+		recover(name, password, mnemonic);
+		return mnemonic;
+	}
 
-    @Override
-    public String add() throws Exception {
-        String mnemonic = Bip44Utils.generateMnemonic();
-        recover(mnemonic);
-        return mnemonic;
-    }
+	@Override
+	public void recover(String mnemonic) {
+		recover(mnemonic, Constant.DEFAULT_INDEX);
+	}
 
-    @Override
-    public String add(String name, String password) throws Exception {
-        String mnemonic = Bip44Utils.generateMnemonic();
-        recover(name, password, mnemonic);
-        return mnemonic;
-    }
+	@Override
+	public void recover(String mnemonic, int index) {
+		recover(Constant.DEFAULT_USER_NAME, null, mnemonic, index);
+	}
 
-    @Override
-    public void recover(String mnemonic) {
-        byte[] seed = Bip44Utils.getSeed(mnemonic);
-        DeterministicKey dk = Bip44Utils.getDeterministicKey(mnemonic, seed, getKeyPath());
-        BigInteger privKey = dk.getPrivKey();
-        recover(privKey);
-    }
+	@Override
+	public void recover(String name, String password, String mnemonic) {
+		recover(name, password, mnemonic, Constant.DEFAULT_INDEX);
+	}
 
-    @Override
-    public void recover(String mnemonic, int index) {
-        byte[] seed = Bip44Utils.getSeed(mnemonic);
-        String keyPath = BIP44Prifix + PartialPath + index;
-        DeterministicKey dk = Bip44Utils.getDeterministicKey(mnemonic, seed, keyPath);
-        BigInteger privKey = dk.getPrivKey();
-        recover(privKey);
-    }
+	@Override
+	public void recover(String name, String password, InputStream keystore) {
+		recover(name, password, toPrivKey(keystore, password));
+	}
 
-    @Override
-    public void recover(String name, String password, String mnemonic, int index) {
-        if (keyDAO.has(name)) {
-            throw new IritaSDKException(String.format("name %s has existed", name));
-        }
-        recover(mnemonic, index);
-        keyDAO.write(name, password, getCurrentKeyInfo());
-    }
+	@Override
+	public void recover(InputStream keystore, String password) {
+		recover(Constant.DEFAULT_USER_NAME, password, keystore);
+	}
 
-    @Override
-    public void recover(String name, String password, String mnemonic) {
-        if (keyDAO.has(name)) {
-            throw new IritaSDKException(String.format("name %s has existed", name));
-        }
-        recover(mnemonic);
-        keyDAO.write(name, password, getCurrentKeyInfo());
-    }
+	@Override
+	public void recoverFromCert(InputStream caKeystore, String password) {
+		try {
+			recoverFromCert(Constant.DEFAULT_USER_NAME, password, caKeystore);
+		} catch (UnrecoverableKeyException | CertificateException | KeyStoreException | IOException | NoSuchAlgorithmException | NoSuchProviderException e) {
+			e.printStackTrace();
+		}
+	}
 
-    @Override
-    public void recover(String name, String password, BigInteger privKey) {
-        if (keyDAO.has(name)) {
-            throw new IritaSDKException(String.format("name %s has existed", name));
-        }
-        recover(privKey);
-        keyDAO.write(name, password, getCurrentKeyInfo());
-    }
+	@Override
+	public void recoverFromCert(String name, String password, InputStream caKeystore) throws CertificateException, UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, NoSuchProviderException, IOException {
+		recover(name, password, caToPrivKey(caKeystore, password));
+	}
 
-    @Override
-    public void recover(String name, InputStream keystore, String password) {
-        if (keyDAO.has(name)) {
-            throw new IritaSDKException(String.format("name %s has existed", name));
-        }
-        recover(keystore, password);
-        keyDAO.write(name, password, getCurrentKeyInfo());
-    }
+	@Override
+	public void recover(String name, String password, String mnemonic, int index) {
+		recover(name, password, toPrivKey(mnemonic, index));
+	}
 
-    @Override
-    public void recover(InputStream keystore, String password) {
-        try {
-            ArmoredInputStream aIS = new ArmoredInputStream(keystore);
-            String[] headers = aIS.getArmorHeaders();
-            Hashtable<String, String> headersTable = new Hashtable<>();
-            for (String headersItem : headers) {
-                String[] itemSplit = headersItem.split(": ");
-                headersTable.put(itemSplit[0], itemSplit[1]);
-            }
-            byte[] encBytes = new byte[77];
-            aIS.read(encBytes);
+	@Override
+	public void recover(BigInteger privKey) {
+		recover(Constant.DEFAULT_USER_NAME, null, privKey);
+	}
 
-            byte[] realSaltByte = Hex.decode(headersTable.get("salt"));
-            String realSaltString = encode_base64(realSaltByte, 16);
-            String salt = PREFIX_SALT + realSaltString;
+	@Override
+	public void recover(String name, String password, BigInteger privKey) {
+		if (!name.equals(Constant.DEFAULT_USER_NAME) && keyDAO.has(name)) {
+			throw new IritaSDKException(String.format("name %s has existed", name));
+		}
+		keyDAO.write(name, password, toKeyInfo(privKey));
+	}
 
-            String keyHash = BCrypt.hashpw(password, salt);
-            byte[] keyHashByte = keyHash.getBytes(StandardCharsets.UTF_8);
-            byte[] keyHashSha256 = HashUtils.sha256(keyHashByte);
 
-            SimpleBox box = new SimpleBox(keyHashSha256);
-            if (!box.open(encBytes).isPresent()) {
-                throw new IritaSDKException("failed decrypt keystore with password");
-            }
-            byte[] privKeyAmino = box.open(encBytes).get();
-            byte[] privKeyTemp = Arrays.copyOfRange(privKeyAmino, 5, privKeyAmino.length);
+	public String export(String password, byte[] priKey) {
+		byte[] prefixAmino = getPrefixAmino(getAlgo().getPrivKeyName());
+		byte[] privKeyAmino;
+		if (priKey.length == 33) { // priKey.length is dynamic maybe 32/33
+			byte[] dest = new byte[priKey.length - 1];
+			System.arraycopy(priKey, 1, dest, 0, dest.length);
+			privKeyAmino = ArrayUtils.addAll(prefixAmino, dest);
+		} else {
+			privKeyAmino = ArrayUtils.addAll(prefixAmino, priKey);
+		}
 
-            BigInteger privKey = new BigInteger(1, privKeyTemp);
-            recover(privKey);
-        } catch (IOException e) {
-            throw new IritaSDKException("recover failed", e);
-        }
-    }
+		String salt = BCrypt.gensalt(LOG_ROUNDS);
+		String keyHash = BCrypt.hashpw(password, salt);
+		byte[] keyHashByte = keyHash.getBytes(StandardCharsets.UTF_8);
+		byte[] keyHashSha256 = HashUtils.sha256(keyHashByte);
 
-    public String export(String password, byte[] priKey) {
-        byte[] prefixAmino = getPrefixAmino(getAlgo().getPrivKeyName());
-        byte[] privKeyAmino;
-        if (priKey.length == 33) { // priKey.length is dynamic maybe 32/33
-            byte[] dest = new byte[priKey.length - 1];
-            System.arraycopy(priKey, 1, dest, 0, dest.length);
-            privKeyAmino = ArrayUtils.addAll(prefixAmino, dest);
-        } else {
-            privKeyAmino = ArrayUtils.addAll(prefixAmino, priKey);
-        }
+		SimpleBox box = new SimpleBox(keyHashSha256);
+		byte[] encBytes = box.seal(privKeyAmino);
 
-        String salt = BCrypt.gensalt(LOG_ROUNDS);
-        String keyHash = BCrypt.hashpw(password, salt);
-        byte[] keyHashByte = keyHash.getBytes(StandardCharsets.UTF_8);
-        byte[] keyHashSha256 = HashUtils.sha256(keyHashByte);
+		ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+		ArmoredOutputStream aOS = new ArmoredOutputStream(byteStream);
+		String realSaltString = salt.substring(REAL_SALT_BEGIN_POS, REAL_SALT_BEGIN_POS + REAL_SALT_BASE64_LEN);
+		byte[] realSaltByte = decode_base64(realSaltString, 16);
 
-        SimpleBox box = new SimpleBox(keyHashSha256);
-        byte[] encBytes = box.seal(privKeyAmino);
+		aOS.setHeader("salt", Hex.toHexString(realSaltByte).toUpperCase());
+		aOS.setHeader("type", getAlgo().getName());
+		aOS.setHeader("kdf", "bcrypt");
+		try {
+			aOS.write(encBytes);
+			aOS.close();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		return byteStream.toString().trim();
+	}
 
-        ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-        ArmoredOutputStream aOS = new ArmoredOutputStream(byteStream);
-        String realSaltString = salt.substring(REAL_SALT_BEGIN_POS, REAL_SALT_BEGIN_POS + REAL_SALT_BASE64_LEN);
-        byte[] realSaltByte = decode_base64(realSaltString, 16);
 
-        aOS.setHeader("salt", Hex.toHexString(realSaltByte).toUpperCase());
-        aOS.setHeader("type", getAlgo().getName());
-        aOS.setHeader("kdf", "bcrypt");
-        try {
-            aOS.write(encBytes);
-            aOS.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return byteStream.toString().trim();
-    }
+	private BigInteger caToPrivKey(InputStream caKeystore, String password) throws KeyStoreException, NoSuchProviderException, IOException, NoSuchAlgorithmException, CertificateException, UnrecoverableKeyException {
+		Security.addProvider(new BouncyCastleProvider());
+		KeyStore ks = KeyStore.getInstance("PKCS12", "BC");
+		ks.load(caKeystore, password.toCharArray());
+		BCECPrivateKey privateKey = (BCECPrivateKey) ks.getKey("signKey", password.toCharArray());
+		return privateKey.getD();
+	}
 
-    @Override
-    public void recoverFromCA(String name, InputStream caKeystore, String password) {
-        if (keyDAO.has(name)) {
-            throw new IritaSDKException(String.format("name %s has existed", name));
-        }
-        recoverFromCA(caKeystore, password);
-        keyDAO.write(name, password, getCurrentKeyInfo());
-    }
+	private BigInteger toPrivKey(String mnemonic, int index) {
+		byte[] seed = Bip44Utils.getSeed(mnemonic);
+		String keyPath = Constant.BIP44_PREFIX + Constant.PARTIAL_PATH + index;
+		DeterministicKey dk = Bip44Utils.getDeterministicKey(mnemonic, seed, keyPath);
+		return dk.getPrivKey();
+	}
 
-    @Override
-    public void recoverFromCA(InputStream caKeystore, String password) {
-        try {
-            Security.addProvider(new BouncyCastleProvider());
-            KeyStore ks = KeyStore.getInstance("PKCS12", "BC");
-            ks.load(caKeystore, password.toCharArray());
-            BCECPrivateKey privateKey = (BCECPrivateKey) ks.getKey("signKey", password.toCharArray());
+	private BigInteger toPrivKey(InputStream keystore, String password) {
+		BigInteger privKey;
+		try {
+			ArmoredInputStream aIS = new ArmoredInputStream(keystore);
+			String[] headers = aIS.getArmorHeaders();
+			Hashtable<String, String> headersTable = new Hashtable<>();
+			for (String headersItem : headers) {
+				String[] itemSplit = headersItem.split(": ");
+				headersTable.put(itemSplit[0], itemSplit[1]);
+			}
+			byte[] encBytes = new byte[77];
+			aIS.read(encBytes);
 
-            recover(privateKey.getD());
-        } catch (UnrecoverableKeyException | CertificateException | KeyStoreException | IOException | NoSuchAlgorithmException | NoSuchProviderException e) {
-            e.printStackTrace();
-        }
-    }
+			byte[] realSaltByte = Hex.decode(headersTable.get("salt"));
+			String realSaltString = encode_base64(realSaltByte, 16);
+			String salt = PREFIX_SALT + realSaltString;
 
-    public void setDefaultKeyDao(BigInteger privKey, ECPoint publicKey, String address) {
-        setCurrentKeyInfo(new KeyInfo(address, publicKey, privKey));
-        keyDAO.write(Constant.DEFAULT_USER_NAME, null, currentKeyInfo.get());
-    }
+			String keyHash = BCrypt.hashpw(password, salt);
+			byte[] keyHashByte = keyHash.getBytes(StandardCharsets.UTF_8);
+			byte[] keyHashSha256 = HashUtils.sha256(keyHashByte);
 
-    public byte[] getPrefixAmino(String algoPrivKeyName) {
-        byte[] hash = HashUtils.sha256(algoPrivKeyName.getBytes(StandardCharsets.UTF_8));
-        int ptr = 0;
-        while (hash[ptr] == 0) ptr++;
-        ptr += 3;
-        while (hash[ptr] == 0) ptr++;
-        byte[] prefix = new byte[5];
-        System.arraycopy(hash, ptr, prefix, 0, 4);
-        prefix[4] = 32;
-        return prefix;
-    }
+			SimpleBox box = new SimpleBox(keyHashSha256);
+			if (!box.open(encBytes).isPresent()) {
+				throw new IritaSDKException("failed decrypt keystore with password");
+			}
+			byte[] privKeyAmino = box.open(encBytes).get();
+			byte[] privKeyTemp = Arrays.copyOfRange(privKeyAmino, 5, privKeyAmino.length);
+			privKey = new BigInteger(1, privKeyTemp);
+		} catch (IOException e) {
+			throw new IritaSDKException("recover failed", e);
+		}
+		return privKey;
+	}
+
+	public byte[] getPrefixAmino(String algoPrivKeyName) {
+		byte[] hash = HashUtils.sha256(algoPrivKeyName.getBytes(StandardCharsets.UTF_8));
+		int ptr = 0;
+		while (hash[ptr] == 0) ptr++;
+		ptr += 3;
+		while (hash[ptr] == 0) ptr++;
+		byte[] prefix = new byte[5];
+		System.arraycopy(hash, ptr, prefix, 0, 4);
+		prefix[4] = 32;
+		return prefix;
+	}
 }

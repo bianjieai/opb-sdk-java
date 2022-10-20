@@ -13,10 +13,10 @@ import java.math.BigInteger;
  */
 public class Secp256k1KeyManger extends KeyManager {
     @Override
-    public void recover(BigInteger privKey) {
+    public KeyInfo toKeyInfo(BigInteger privKey) {
         ECPoint publicKey = SecP256K1Utils.getPublicKeyFromPrivkey(privKey);
         String address = pubKeyToAddress(publicKey);
-        setDefaultKeyDao(privKey, publicKey, address);
+        return new KeyInfo(address,publicKey,privKey);
     }
 
     @Override
