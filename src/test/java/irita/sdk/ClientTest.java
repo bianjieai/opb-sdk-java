@@ -28,6 +28,32 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class ClientTest extends ConfigTest {
     private IritaClient client;
+    public static final String mnemonic = "start vacant crop magnet cricket math quarter pass emotion hidden tray lake rail drift length wreck lock voice type nose whisper this impose test";
+
+    @Test
+    public void threadTest() throws Exception {
+
+        KeyManager km = KeyManagerFactory.createDefault();
+//        String mnemonic=km.add();
+//        System.out.println("助记词："+mnemonic);
+//        System.out.println("地址："+km.getCurrentKeyInfo().getAddress());
+
+        for (int i = 0; i < 20; i++) {
+            int a = i;
+            new Thread(new Runnable() {
+                public void run() {
+                    String name = a + "name";
+                    //打印本地变量
+                    // 通过助记词和index 创建/恢复 链账户
+                    km.recover(name, "", mnemonic, a);
+                    System.out.println(a + "~~~~:" + km.getKeyDAO().read(name,"").getAddress());
+
+                }
+            }, String.valueOf(i)).start();
+        }
+        Thread.sleep(2000);
+
+    }
 
     @BeforeEach
     public void init() {
