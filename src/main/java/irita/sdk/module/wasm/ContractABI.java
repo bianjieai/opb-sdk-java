@@ -1,8 +1,8 @@
 package irita.sdk.module.wasm;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import irita.sdk.exception.IritaSDKException;
+import irita.sdk.util.JsonUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
@@ -26,7 +26,7 @@ public class ContractABI {
             map.put(method, args);
         }
         try {
-            return new ObjectMapper().writeValueAsBytes(map);
+            return JsonUtils.writeValueAsBytes(map);
         } catch (JsonProcessingException e) {
             throw new IritaSDKException(e.getMessage());
         }

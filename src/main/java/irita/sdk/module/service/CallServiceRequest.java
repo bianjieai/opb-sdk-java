@@ -10,7 +10,6 @@ public class CallServiceRequest {
     private String Input;
     private Coin ServiceFeeCap;
     private long Timeout;
-    private boolean SuperMode;
     private boolean Repeated;
     private long RepeatedFrequency;
     private long RepeatedTotal;
@@ -19,71 +18,71 @@ public class CallServiceRequest {
         return ServiceName;
     }
 
-    public void setServiceName(String serviceName) {
+    public CallServiceRequest setServiceName(String serviceName) {
         ServiceName = serviceName;
+        return this;
     }
 
     public List<String> getProviders() {
         return Providers;
     }
 
-    public void setProviders(List<String> providers) {
+    public CallServiceRequest setProviders(List<String> providers) {
         Providers = providers;
+        return this;
     }
 
     public String getInput() {
         return Input;
     }
 
-    public void setInput(String input) {
+    public CallServiceRequest setInput(String input) {
         Input = input;
+        return this;
     }
 
     public Coin getServiceFeeCap() {
         return ServiceFeeCap;
     }
 
-    public void setServiceFeeCap(Coin serviceFeeCap) {
+    public CallServiceRequest setServiceFeeCap(Coin serviceFeeCap) {
         ServiceFeeCap = serviceFeeCap;
+        return this;
     }
 
     public long getTimeout() {
         return Timeout;
     }
 
-    public void setTimeout(long timeout) {
+    public CallServiceRequest setTimeout(long timeout) {
         Timeout = timeout;
-    }
-
-    public boolean isSuperMode() {
-        return SuperMode;
-    }
-
-    public void setSuperMode(boolean superMode) {
-        SuperMode = superMode;
+        return this;
     }
 
     public boolean isRepeated() {
         return Repeated;
     }
 
-    public void setRepeated(boolean repeated) {
+    public CallServiceRequest setRepeated(boolean repeated) {
         Repeated = repeated;
+        return this;
     }
 
     public long getRepeatedFrequency() {
         return RepeatedFrequency;
     }
 
-    public void setRepeatedFrequency(long repeatedFrequency) {
+    public CallServiceRequest setRepeatedFrequency(long repeatedFrequency) {
         RepeatedFrequency = repeatedFrequency;
+        return this;
     }
 
     public long getRepeatedTotal() {
         return RepeatedTotal;
     }
 
-    public void setRepeatedTotal(long repeatedTotal) {
+    public CallServiceRequest setRepeatedTotal(long repeatedTotal) {
         RepeatedTotal = repeatedTotal;
+        return this;
     }
 }

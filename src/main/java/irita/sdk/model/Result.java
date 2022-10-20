@@ -5,6 +5,8 @@ public class Result {
     private Deliver_tx deliver_tx;
     private String hash;
     private String height;
+    private Integer code;
+    private String log;
 
     public void setCheck_tx(Check_tx check_tx) {
         this.check_tx = check_tx;
@@ -38,4 +40,19 @@ public class Result {
         return height;
     }
 
+    public Integer getCode() {
+        return code;
+    }
+
+    public void setCode(Integer code) {
+        this.code = code;
+    }
+
+    public String getLog() {
+        return log;
+    }
+
+    public void setLog(String log) {
+        this.log = log;
+    }
 }

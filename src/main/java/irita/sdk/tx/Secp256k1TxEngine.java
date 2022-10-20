@@ -2,8 +2,6 @@ package irita.sdk.tx;
 
 import com.google.protobuf.Any;
 import com.google.protobuf.ByteString;
-import com.google.protobuf.GeneratedMessageV3;
-import irita.sdk.exception.IritaSDKException;
 import irita.sdk.key.KeyInfo;
 import irita.sdk.key.KeyManager;
 import irita.sdk.model.Account;
@@ -16,9 +14,7 @@ import proto.cosmos.tx.signing.v1beta1.Signing;
 import proto.cosmos.tx.v1beta1.TxOuterClass;
 
 import java.math.BigInteger;
-import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 public class Secp256k1TxEngine implements TxEngine {
     private final KeyManager km;
@@ -30,26 +26,6 @@ public class Secp256k1TxEngine implements TxEngine {
     }
 
     @Override
-    public TxOuterClass.TxBody buildTxBody(List<GeneratedMessageV3> msgs) {
-        return this.buildTxBodyWithMemo(msgs, null);
-    }
-
-    @Override
-    public TxOuterClass.TxBody buildTxBodyWithMemo(List<GeneratedMessageV3> msgs, String memo) {
-        if (msgs.size() == 0) {
-            throw new IritaSDKException("size of msgs should larger than 0");
-        }
-        TxOuterClass.TxBody.Builder builder = TxOuterClass.TxBody.newBuilder();
-        msgs.forEach(msg -> {
-            builder.addMessages(Any.pack(msg, "/"));
-        });
-        return builder
-                .setMemo(Optional.ofNullable(memo).orElse(""))
-                .setTimeoutHeight(0)
-                .build();
-    }
-
-    @Override
     public TxOuterClass.Tx signTx(TxOuterClass.TxBody txBody, BaseTx baseTx, Account account) {
         Objects.requireNonNull(baseTx, "baseTx not be null");
 
@@ -58,19 +34,31 @@ public class Secp256k1TxEngine implements TxEngine {
         ECPoint publicKey = keyInfo.getPublicKey();
         byte[] publicKeyEncoded = publicKey.getEncoded(true);
 
+        long sequence = baseTx.getSequence() != 0 ? baseTx.getSequence() : account.getSequence();
+        long accountNumber = baseTx.getAccountNumber() != 0 ? baseTx.getAccountNumber() : account.getAccountNumber();
+        TxOuterClass.Fee.Builder fee = TxOuterClass.Fee.newBuilder();
+        fee.setGasLimit(baseTx.getGas());
+        fee.addAmount(CoinOuterClass.Coin.newBuilder().setAmount(baseTx.getFee().getAmount()).setDenom(baseTx.getFee().getDenom()));
+        if (baseTx.getFeePayer() != null) {
+            fee.setPayer(baseTx.getFeePayer());
+        }
+        if (baseTx.getFeeGranter() != null) {
+            fee.setGranter(baseTx.getFeeGranter());
+        }
+
         TxOuterClass.AuthInfo ai = TxOuterClass.AuthInfo.newBuilder()
                 .addSignerInfos(
                         TxOuterClass.SignerInfo.newBuilder()
                                 .setPublicKey(Any.pack(Keys.PubKey.newBuilder().setKey(ByteString.copyFrom(publicKeyEncoded)).build(), "/"))
                                 .setModeInfo(TxOuterClass.ModeInfo.newBuilder().setSingle(TxOuterClass.ModeInfo.Single.newBuilder().setMode(Signing.SignMode.SIGN_MODE_DIRECT)))
-                                .setSequence(account.getSequence()))
-                .setFee(TxOuterClass.Fee.newBuilder().setGasLimit(baseTx.getGas()).addAmount(CoinOuterClass.Coin.newBuilder().setAmount(baseTx.getFee().getAmount()).setDenom(baseTx.getFee().getDenom()))).build();
+                                .setSequence(sequence))
+                .setFee(fee).build();
 
 
         TxOuterClass.SignDoc signDoc = TxOuterClass.SignDoc.newBuilder()
                 .setBodyBytes(txBody.toByteString())
                 .setAuthInfoBytes(ai.toByteString())
-                .setAccountNumber(account.getAccountNumber())
+                .setAccountNumber(accountNumber)
                 .setChainId(chainID)
                 .build();
 

@@ -1,5 +1,8 @@
 package irita.sdk.model;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import irita.sdk.exception.IritaSDKException;
+import irita.sdk.util.JsonUtils;
 import org.bouncycastle.util.encoders.Hex;
 
 import java.util.Base64;
@@ -40,6 +43,14 @@ public class JsonRpc {
         rpc.method = method;
         rpc.setParams(params);
         return rpc;
+    }
+
+    public String toJsonStr() {
+        try {
+            return JsonUtils.writeValueAsString(this);
+        } catch (JsonProcessingException e) {
+            throw new IritaSDKException(e.getMessage());
+        }
     }
 
     public String getJsonrpc() {

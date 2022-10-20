@@ -2,15 +2,13 @@ package irita.sdk.module.perm;
 
 import com.google.protobuf.GeneratedMessageV3;
 import io.grpc.Channel;
+import io.grpc.ManagedChannel;
 import irita.sdk.client.BaseClient;
 import irita.sdk.model.Account;
 import irita.sdk.model.BaseTx;
 import irita.sdk.model.ResultTx;
 import irita.sdk.util.AddressUtils;
-import proto.perm.Perm;
-import proto.perm.QueryGrpc;
-import proto.perm.QueryOuterClass;
-import proto.perm.Tx;
+import proto.perm.*;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -77,24 +75,60 @@ public class PermClient {
         return baseClient.buildAndSend(msgs, baseTx, sender);
     }
 
+    public ResultTx blockContract(String contractAddress, BaseTx baseTx) throws IOException {
+        Account sender = baseClient.queryAccount(baseTx);
+
+        Tx.MsgBlockContract msg = Tx.MsgBlockContract
+                .newBuilder()
+                .setContractAddress(contractAddress)
+                .setOperator(sender.getAddress())
+                .build();
+        List<GeneratedMessageV3> msgs = Collections.singletonList(msg);
+        return baseClient.buildAndSend(msgs, baseTx, sender);
+    }
+
+    public ResultTx unblockContract(String contractAddress, BaseTx baseTx) throws IOException {
+        Account sender = baseClient.queryAccount(baseTx);
+
+        Tx.MsgUnblockContract msg = Tx.MsgUnblockContract
+                .newBuilder()
+                .setContractAddress(contractAddress)
+                .setOperator(sender.getAddress())
+                .build();
+        List<GeneratedMessageV3> msgs = Collections.singletonList(msg);
+        return baseClient.buildAndSend(msgs, baseTx, sender);
+    }
+
     public List<Perm.Role> queryRoles(String address) {
         AddressUtils.validAddress(address);
 
-        Channel channel = baseClient.getGrpcClient();
+        ManagedChannel channel = baseClient.getGrpcClient();
         QueryOuterClass.QueryRolesRequest req = QueryOuterClass.QueryRolesRequest
                 .newBuilder()
                 .setAddress(address)
                 .build();
         QueryOuterClass.QueryRolesResponse resp = QueryGrpc.newBlockingStub(channel).roles(req);
+        channel.shutdown();
         return resp.getRolesList();
     }
 
-    public List<String> queryBlacklist() {
-        Channel channel = baseClient.getGrpcClient();
-        QueryOuterClass.QueryBlacklistRequest req = QueryOuterClass.QueryBlacklistRequest
+    public List<String> queryBlockListAccount() {
+        ManagedChannel channel = baseClient.getGrpcClient();
+        QueryOuterClass.QueryBlockListRequest req = QueryOuterClass.QueryBlockListRequest
                 .newBuilder()
                 .build();
-        QueryOuterClass.QueryBlacklistResponse resp = QueryGrpc.newBlockingStub(channel).blacklist(req);
+        QueryOuterClass.QueryBlockListResponse resp = QueryGrpc.newBlockingStub(channel).accountBlockList(req);
+        channel.shutdown();
+        return resp.getAddressesList();
+    }
+
+    public List<String> queryBlockListContract() {
+        ManagedChannel channel = baseClient.getGrpcClient();
+        QueryOuterClass.QueryContractDenyList req = QueryOuterClass.QueryContractDenyList
+                .newBuilder()
+                .build();
+        QueryOuterClass.QueryContractDenyListResponse resp = QueryGrpc.newBlockingStub(channel).contractDenyList(req);
+        channel.shutdown();
         return resp.getAddressesList();
     }
 }

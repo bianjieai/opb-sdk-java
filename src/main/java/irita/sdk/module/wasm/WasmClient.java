@@ -1,9 +1,9 @@
 package irita.sdk.module.wasm;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.GeneratedMessageV3;
 import io.grpc.Channel;
+import io.grpc.ManagedChannel;
 import irita.sdk.client.BaseClient;
 import irita.sdk.constant.enums.EventEnum;
 import irita.sdk.exception.IritaSDKException;
@@ -12,6 +12,7 @@ import irita.sdk.model.BaseTx;
 import irita.sdk.model.Coin;
 import irita.sdk.model.ResultTx;
 import irita.sdk.util.IOUtils;
+import irita.sdk.util.JsonUtils;
 import proto.cosmos.base.v1beta1.CoinOuterClass;
 import proto.cosmwasm.wasm.v1.QueryGrpc;
 import proto.cosmwasm.wasm.v1.QueryOuterClass;
@@ -58,12 +59,11 @@ public class WasmClient {
     // instantiate the contract state
     public String instantiate(InstantiateRequest req, BaseTx baseTx) throws IOException {
         Account account = baseClient.queryAccount(baseTx);
-        ObjectMapper mapper = new ObjectMapper();
         Tx.MsgInstantiateContract.Builder builder = Tx.MsgInstantiateContract.newBuilder()
                 .setSender(account.getAddress())
                 .setAdmin(Optional.of(req).map(InstantiateRequest::getAdmin).orElse(""))
                 .setCodeId(req.getCodeId())
-                .setMsg(ByteString.copyFrom(mapper.writeValueAsString(req.getInitMsg()).getBytes(StandardCharsets.UTF_8)))
+                .setMsg(ByteString.copyFrom(JsonUtils.writeValueAsString(req.getInitMsg()).getBytes(StandardCharsets.UTF_8)))
                 .setLabel(req.getLabel());
 
         if (req.getInitFunds() != null) {
@@ -115,19 +115,20 @@ public class WasmClient {
 
     // return the contract information
     public ContractInfo queryContractInfo(String contractAddress) {
-        Channel channel = baseClient.getGrpcClient();
+        ManagedChannel channel = baseClient.getGrpcClient();
         QueryOuterClass.QueryContractInfoRequest req = QueryOuterClass.QueryContractInfoRequest
                 .newBuilder()
                 .setAddress(contractAddress)
                 .build();
 
         QueryOuterClass.QueryContractInfoResponse resp = QueryGrpc.newBlockingStub(channel).contractInfo(req);
+        channel.shutdown();
         return Convert.toContractInfo(resp);
     }
 
     // execute contract's query method and return the result
     public byte[] queryContract(String address, ContractABI abi) {
-        Channel channel = baseClient.getGrpcClient();
+        ManagedChannel channel = baseClient.getGrpcClient();
         byte[] msgBytes = abi.build();
         QueryOuterClass.QuerySmartContractStateRequest req = QueryOuterClass.QuerySmartContractStateRequest
                 .newBuilder()
@@ -136,18 +137,20 @@ public class WasmClient {
                 .build();
 
         QueryOuterClass.QuerySmartContractStateResponse resp = QueryGrpc.newBlockingStub(channel).smartContractState(req);
+        channel.shutdown();
         return resp.toByteArray();
     }
 
     // export all state data of the contract
     public Map<String, String> exportContractState(String address) {
-        Channel channel = baseClient.getGrpcClient();
+        ManagedChannel channel = baseClient.getGrpcClient();
         QueryOuterClass.QueryAllContractStateRequest req = QueryOuterClass.QueryAllContractStateRequest
                 .newBuilder()
                 .setAddress(address)
                 .build();
 
         QueryOuterClass.QueryAllContractStateResponse resp = QueryGrpc.newBlockingStub(channel).allContractState(req);
+        channel.shutdown();
 
         Map<String, String> map = new HashMap<>();
         List<Types.Model> models = resp.getModelsList();

@@ -14,47 +14,53 @@ public class BindServiceRequest {
         return serviceName;
     }
 
-    public void setServiceName(String serviceName) {
+    public BindServiceRequest setServiceName(String serviceName) {
         this.serviceName = serviceName;
+        return this;
     }
 
     public Coin getDeposit() {
         return deposit;
     }
 
-    public void setDeposit(Coin deposit) {
+    public BindServiceRequest setDeposit(Coin deposit) {
         this.deposit = deposit;
+        return this;
     }
 
     public String getPricing() {
         return pricing;
     }
 
-    public void setPricing(String pricing) {
+    public BindServiceRequest setPricing(String pricing) {
         this.pricing = pricing;
+        return this;
     }
 
     public long getQoS() {
         return qoS;
     }
 
-    public void setQoS(long qoS) {
+    public BindServiceRequest setQoS(long qoS) {
         this.qoS = qoS;
+        return this;
     }
 
     public String getOptions() {
         return options;
     }
 
-    public void setOptions(String options) {
+    public BindServiceRequest setOptions(String options) {
         this.options = options;
+        return this;
     }
 
     public String getProvider() {
         return provider;
     }
 
-    public void setProvider(String provider) {
+    public BindServiceRequest setProvider(String provider) {
         this.provider = provider;
+        return this;
     }
 }

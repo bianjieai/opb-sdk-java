@@ -4,26 +4,17 @@ import irita.sdk.constant.enums.EventEnum;
 
 import java.util.Optional;
 
-public class ResultTx extends RpcBase{
-
+public class ResultTx extends RpcBase {
     private Result result;
 
     public int getCode() {
+        if (result.getCode() != null) { // for sync_tx
+            return result.getCode();
+        }
+
         int checkTxCode = this.getResult().getCheck_tx().getCode();
         int deliverTxCode = this.getResult().getDeliver_tx().getCode();
         return checkTxCode | deliverTxCode;
-    }
-
-    public String getLog() {
-        String checkTxLog = this.getResult().getCheck_tx().getLog();
-        String deliverTxLog = this.getResult().getDeliver_tx().getLog();
-        if (!"[]".equals(checkTxLog)) {
-            return checkTxLog;
-        } else if (!"[]".equals(deliverTxLog)) {
-            return deliverTxLog;
-        } else {
-            return "";
-        }
     }
 
     public String getEventValue(EventEnum eventEnum) {

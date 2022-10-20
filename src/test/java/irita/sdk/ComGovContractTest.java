@@ -32,29 +32,17 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 @Disabled
-public class ComGovContractTest {
+public class ComGovContractTest extends ConfigTest {
     private CommunityGovClient comGovClient;
     private WasmClient wasmClient;
-    private BaseTx txBaseTx = new BaseTx(200000, new Fee("200000", "uirita"), BroadcastMode.Commit);
+    private final BaseTx txBaseTx = new BaseTx(200000, new Fee("200000", "ugas"), BroadcastMode.Commit);
 
 
     @BeforeEach
     public void init() {
-        Properties properties = Config.getTestConfig();
-        String mnemonic = properties.getProperty("mnemonic");
-        KeyManager km = KeyManagerFactory.createDefault();
-        km.recover(mnemonic);
-
-        String nodeUri = properties.getProperty("node_uri");
-        String grpcAddr = properties.getProperty("grpc_addr");
-        String chainId = properties.getProperty("chain_id");
-        ClientConfig clientConfig = new ClientConfig(nodeUri, grpcAddr, chainId);
-        OpbConfig opbConfig = null;
-
-        IritaClient client = new IritaClient(clientConfig, opbConfig, km);
+        IritaClient client = getTestClient();
         wasmClient = client.getWasmClient();
         comGovClient = client.getComGovClient();
-        assertEquals(properties.getProperty("address"), km.getCurrentKeyInfo().getAddress());
     }
 
     // it is ignore unless you want to new community_governance contract to block-chain.
@@ -63,7 +51,7 @@ public class ComGovContractTest {
         // store contract
         StoreRequest storeReq = new StoreRequest();
         storeReq.setWasmFile("src/test/resources/community_governance.wasm");
-        BaseTx baseTx = new BaseTx(2378678, new Fee("2378678", "uirita"), BroadcastMode.Commit);
+        BaseTx baseTx = new BaseTx(2378678, new Fee("2378678", "ugas"), BroadcastMode.Commit);
 
         String codeId = wasmClient.store(storeReq, baseTx);
         assertTrue(StringUtils.isNotEmpty(codeId));
@@ -153,7 +141,7 @@ public class ComGovContractTest {
         KeyManager km = KeyManagerFactory.createDefault();
         km.recover(mnemonic);
 
-        Properties properties = Config.getTestConfig();
+        Properties properties = ConfigTest.getTestConfig();
         String nodeUri = properties.getProperty("node_uri");
         String grpcAddr = properties.getProperty("grpc_addr");
         String chainId = properties.getProperty("chain_id");

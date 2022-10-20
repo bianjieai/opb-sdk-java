@@ -10,6 +10,8 @@ public interface Key {
 
     void recover(BigInteger privKey);
 
+    void recover(String name, String password, String mnemonic, int index);
+
     void recover(InputStream keystore, String password);
 
     void recover(String mnemonic, int index);

@@ -2,6 +2,7 @@ package irita.sdk.module.tibc;
 
 import com.google.protobuf.GeneratedMessageV3;
 import io.grpc.Channel;
+import io.grpc.ManagedChannel;
 import irita.sdk.client.BaseClient;
 import irita.sdk.model.Account;
 import irita.sdk.model.BaseTx;
@@ -43,8 +44,9 @@ public class TibcClient {
                 .setSourceChain(sourceChain)
                 .setSequence(sequence)
                 .build();
-        Channel channel = baseClient.getGrpcClient();
+        ManagedChannel channel = baseClient.getGrpcClient();
         QueryOuterClass.QueryPacketCommitmentResponse resp = QueryGrpc.newBlockingStub(channel).packetCommitment(req);
+        channel.shutdown();
         return resp;
     }
 }

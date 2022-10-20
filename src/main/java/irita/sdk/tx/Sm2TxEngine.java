@@ -32,26 +32,6 @@ public class Sm2TxEngine implements TxEngine {
     }
 
     @Override
-    public TxOuterClass.TxBody buildTxBody(List<GeneratedMessageV3> msgs) {
-        return this.buildTxBodyWithMemo(msgs, null);
-    }
-
-    @Override
-    public TxOuterClass.TxBody buildTxBodyWithMemo(List<GeneratedMessageV3> msgs, String memo) {
-        if (msgs.size() == 0) {
-            throw new IritaSDKException("size of msgs should larger than 0");
-        }
-        TxOuterClass.TxBody.Builder builder = TxOuterClass.TxBody.newBuilder();
-        msgs.forEach(msg -> {
-            builder.addMessages(Any.pack(msg, "/"));
-        });
-        return builder
-                .setMemo(Optional.ofNullable(memo).orElse(""))
-                .setTimeoutHeight(0)
-                .build();
-    }
-
-    @Override
     public TxOuterClass.Tx signTx(TxOuterClass.TxBody txBody, BaseTx baseTx, Account account) {
         if (baseTx == null) {
             throw new IritaSDKException("baseTx not be null");
@@ -62,19 +42,31 @@ public class Sm2TxEngine implements TxEngine {
         ECPoint publicKey = keyInfo.getPublicKey();
         byte[] publicKeyEncoded = publicKey.getEncoded(true);
 
+        long sequence = baseTx.getSequence() != 0 ? baseTx.getSequence() : account.getSequence();
+        long accountNumber = baseTx.getAccountNumber() != 0 ? baseTx.getAccountNumber() : account.getAccountNumber();
+        TxOuterClass.Fee.Builder fee = TxOuterClass.Fee.newBuilder();
+        fee.setGasLimit(baseTx.getGas());
+        fee.addAmount(CoinOuterClass.Coin.newBuilder().setAmount(baseTx.getFee().getAmount()).setDenom(baseTx.getFee().getDenom()));
+        if (baseTx.getFeePayer() != null) {
+            fee.setPayer(baseTx.getFeePayer());
+        }
+        if (baseTx.getFeeGranter() != null) {
+            fee.setGranter(baseTx.getFeeGranter());
+        }
+
         TxOuterClass.AuthInfo ai = TxOuterClass.AuthInfo.newBuilder()
                 .addSignerInfos(
                         TxOuterClass.SignerInfo.newBuilder()
                                 .setPublicKey(Any.pack(Keys.PubKey.newBuilder().setKey(ByteString.copyFrom(publicKeyEncoded)).build(), "/"))
                                 .setModeInfo(TxOuterClass.ModeInfo.newBuilder().setSingle(TxOuterClass.ModeInfo.Single.newBuilder().setMode(Signing.SignMode.SIGN_MODE_DIRECT)))
-                                .setSequence(account.getSequence()))
-                .setFee(TxOuterClass.Fee.newBuilder().setGasLimit(baseTx.getGas()).addAmount(CoinOuterClass.Coin.newBuilder().setAmount(baseTx.getFee().getAmount()).setDenom(baseTx.getFee().getDenom()))).build();
+                                .setSequence(sequence))
+                .setFee(fee).build();
 
 
         TxOuterClass.SignDoc signDoc = TxOuterClass.SignDoc.newBuilder()
                 .setBodyBytes(txBody.toByteString())
                 .setAuthInfoBytes(ai.toByteString())
-                .setAccountNumber(account.getAccountNumber())
+                .setAccountNumber(accountNumber)
                 .setChainId(chainID)
                 .build();
 

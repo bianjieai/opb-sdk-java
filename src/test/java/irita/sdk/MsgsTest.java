@@ -25,14 +25,12 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MsgsTest {
-    private KeyManager km;
-    private NftClient nftClient;
     private BaseClient baseClient;
-    private BaseTx baseTx = new BaseTx(200000, new Fee("300000", "uirita"), BroadcastMode.Commit);
+    private final BaseTx baseTx = new BaseTx(200000, new Fee("300000", "ugas"), BroadcastMode.Commit);
 
     @BeforeEach
     public void init() {
-        Properties properties = Config.getTestConfig();
+        Properties properties = ConfigTest.getTestConfig();
         String mnemonic = properties.getProperty("mnemonic");
         KeyManager km = KeyManagerFactory.createDefault();
         km.recover(mnemonic);
@@ -44,7 +42,7 @@ public class MsgsTest {
         OpbConfig opbConfig = null;
 
         IritaClient iritaClient = new IritaClient(clientConfig, opbConfig, km);
-        nftClient = iritaClient.getNftClient();
+        NftClient nftClient = iritaClient.getNftClient();
         baseClient = iritaClient.getBaseClient();
         assertEquals(properties.getProperty("address"), km.getCurrentKeyInfo().getAddress());
     }

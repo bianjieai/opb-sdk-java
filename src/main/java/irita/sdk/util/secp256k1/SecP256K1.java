@@ -6,12 +6,10 @@ import irita.sdk.util.sm2.SM2Cipher;
 import org.bouncycastle.asn1.*;
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
 import org.bouncycastle.crypto.CipherParameters;
-import org.bouncycastle.crypto.CryptoException;
 import org.bouncycastle.crypto.InvalidCipherTextException;
 import org.bouncycastle.crypto.engines.SM2Engine;
 import org.bouncycastle.crypto.engines.SM2Engine.Mode;
 import org.bouncycastle.crypto.params.*;
-import org.bouncycastle.crypto.signers.ECDSASigner;
 import org.bouncycastle.crypto.signers.SM2Signer;
 import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPrivateKey;
 import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPublicKey;
@@ -23,7 +21,6 @@ import java.math.BigInteger;
 import java.security.*;
 import java.security.spec.ECFieldFp;
 import java.security.spec.EllipticCurve;
-import java.util.Base64;
 
 public class SecP256K1 extends GMBaseUtils {
     //////////////////////////////////////////////////////////////////////////////////////
@@ -43,6 +40,8 @@ public class SecP256K1 extends GMBaseUtils {
     public static final ECPoint G_POINT = CURVE.createPoint(SecP256K1_ECC_GX, SecP256K1_ECC_GY);
     public static final ECDomainParameters DOMAIN_PARAMS = new ECDomainParameters(CURVE, G_POINT,
             SecP256K1_ECC_N, SecP256K1_ECC_H);
+    public static final ECDomainParameters ETH_DOMAIN_PARAMS = new ECDomainParameters(CURVE, G_POINT,
+            SecP256K1_ECC_N, SecP256K1_ECC_P);
     public static final int CURVE_LEN = BCECUtils.getCurveLength(DOMAIN_PARAMS);
     //////////////////////////////////////////////////////////////////////////////////////
 

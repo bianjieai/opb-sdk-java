@@ -2,7 +2,7 @@ package irita.sdk.module.nft;
 
 
 import com.google.protobuf.GeneratedMessageV3;
-import io.grpc.Channel;
+import io.grpc.ManagedChannel;
 import irita.sdk.client.BaseClient;
 import irita.sdk.model.Account;
 import irita.sdk.model.BaseTx;
@@ -36,7 +36,25 @@ public class NftClient {
                 .setId(req.getId())
                 .setName(req.getName())
                 .setSchema(req.getSchema())
+                .setSymbol(req.getSymbol())
+                .setMintRestricted(req.isMintRestricted())
+                .setUpdateRestricted(req.isUpdateRestricted())
+                .setUri(req.getUri())
+                .setUriHash(req.getUriHash())
+                .setData(req.getData())
                 .setSender(account.getAddress())
+                .build();
+        List<GeneratedMessageV3> msgs = Collections.singletonList(msg);
+        return baseClient.buildAndSend(msgs, baseTx, account);
+    }
+
+    public ResultTx transferDenom(TransferDenomRequest req, BaseTx baseTx) throws IOException {
+        Account account = baseClient.queryAccount(baseTx);
+        Tx.MsgTransferDenom msg = Tx.MsgTransferDenom
+                .newBuilder()
+                .setId(req.getId())
+                .setSender(account.getAddress())
+                .setRecipient(req.getRecipient())
                 .build();
         List<GeneratedMessageV3> msgs = Collections.singletonList(msg);
         return baseClient.buildAndSend(msgs, baseTx, account);
@@ -50,16 +68,15 @@ public class NftClient {
                 .setId(req.getId())
                 .setName(req.getName())
                 .setUri(req.getUri())
+                .setUriHash(req.getUriHash())
                 .setData(req.getData())
                 .setSender(account.getAddress());
 
-        if (StringUtils.isNotEmpty(req.getRecipient())) {
-            String recipient = req.getRecipient();
-            AddressUtils.validAddress(recipient);
-            builder.setRecipient(recipient);
-        } else {
-            builder.setRecipient(account.getAddress());
+        if (StringUtils.isEmpty(req.getRecipient())) {
+            throw new IllegalArgumentException("Recipient is null");
         }
+        AddressUtils.validAddress(req.getRecipient());
+        builder.setRecipient(req.getRecipient());
         Tx.MsgMintNFT msg = builder.build();
         List<GeneratedMessageV3> msgs = Collections.singletonList(msg);
         return baseClient.buildAndSend(msgs, baseTx, account);
@@ -75,6 +92,9 @@ public class NftClient {
         if (StringUtils.isEmpty(req.getName())) {
             req.setName(DO_NOT_MODIFY);
         }
+        if (StringUtils.isEmpty(req.getUriHash())) {
+            req.setUriHash(DO_NOT_MODIFY);
+        }
 
         Account account = baseClient.queryAccount(baseTx);
         Tx.MsgEditNFT msg = Tx.MsgEditNFT
@@ -83,6 +103,7 @@ public class NftClient {
                 .setId(req.getId())
                 .setName(req.getName())
                 .setUri(req.getUri())
+                .setUriHash(req.getUriHash())
                 .setData(req.getData())
                 .setSender(account.getAddress())
                 .build();
@@ -100,6 +121,9 @@ public class NftClient {
         if (StringUtils.isEmpty(req.getName())) {
             req.setName(DO_NOT_MODIFY);
         }
+        if (StringUtils.isEmpty(req.getUriHash())) {
+            req.setUriHash(DO_NOT_MODIFY);
+        }
 
         Account account = baseClient.queryAccount(baseTx);
         Tx.MsgTransferNFT.Builder builder = Tx.MsgTransferNFT
@@ -109,13 +133,14 @@ public class NftClient {
                 .setUri(req.getUri())
                 .setData(req.getData())
                 .setName(req.getName())
+                .setUriHash(req.getUriHash())
                 .setSender(account.getAddress());
 
-        if (StringUtils.isNotEmpty(req.getRecipient())) {
-            String recipient = req.getRecipient();
-            AddressUtils.validAddress(recipient);
-            builder.setRecipient(recipient);
+        if (StringUtils.isEmpty(req.getRecipient())) {
+            throw new IllegalArgumentException("Recipient is null");
         }
+        AddressUtils.validAddress(req.getRecipient());
+        builder.setRecipient(req.getRecipient());
         Tx.MsgTransferNFT msg = builder.build();
         List<GeneratedMessageV3> msgs = Collections.singletonList(msg);
         return baseClient.buildAndSend(msgs, baseTx, account);
@@ -135,7 +160,7 @@ public class NftClient {
 
 
     public long querySupply(String denomID, String owner) {
-        Channel channel = baseClient.getGrpcClient();
+        ManagedChannel channel = baseClient.getGrpcClient();
         QueryOuterClass.QuerySupplyRequest req = QueryOuterClass.QuerySupplyRequest
                 .newBuilder()
                 .setDenomId(denomID)
@@ -143,59 +168,79 @@ public class NftClient {
                 .build();
 
         QueryOuterClass.QuerySupplyResponse resp = QueryGrpc.newBlockingStub(channel).supply(req);
+        channel.shutdown();
         return resp.getAmount();
     }
 
-    public QueryOwnerResp queryOwner(String denomID, String owner) {
-        Channel channel = baseClient.getGrpcClient();
-        QueryOuterClass.QueryOwnerRequest req = QueryOuterClass.QueryOwnerRequest
+    public QueryOwnerResp queryOwner(String denomID, String owner, Pagination.PageRequest page) {
+        ManagedChannel channel = baseClient.getGrpcClient();
+        QueryOuterClass.QueryOwnerRequest.Builder builder = QueryOuterClass.QueryOwnerRequest
                 .newBuilder()
                 .setDenomId(Optional.ofNullable(denomID).orElse(""))
-                .setOwner(owner)
-                .build();
+                .setOwner(owner);
 
+        if (page == null) {
+            page = Pagination.PageRequest.newBuilder()
+                    .setOffset(0)
+                    .setLimit(100)
+                    .build();
+        }
+        builder.setPagination(page);
+        QueryOuterClass.QueryOwnerRequest req = builder.build();
         QueryOuterClass.QueryOwnerResponse resp = QueryGrpc.newBlockingStub(channel).owner(req);
+        channel.shutdown();
         return Convert.toQueryOwnerResp(resp.getOwner());
     }
 
     public QueryCollectionResp queryCollection(String denomID, Pagination.PageRequest page) {
-        Channel channel = baseClient.getGrpcClient();
+        ManagedChannel channel = baseClient.getGrpcClient();
         QueryOuterClass.QueryCollectionRequest.Builder builder = QueryOuterClass.QueryCollectionRequest
                 .newBuilder()
                 .setDenomId(denomID);
-        if (page != null) {
-            builder.setPagination(page);
+        if (page == null) {
+            page = Pagination.PageRequest.newBuilder()
+                    .setOffset(0)
+                    .setLimit(100)
+                    .build();
         }
+        builder.setPagination(page);
         QueryOuterClass.QueryCollectionRequest req = builder.build();
 
         QueryOuterClass.QueryCollectionResponse resp = QueryGrpc.newBlockingStub(channel).collection(req);
+        channel.shutdown();
         return Convert.toQueryCollectionResp(resp.getCollection());
     }
 
     public QueryDenomResp queryDenom(String denomID) {
-        Channel channel = baseClient.getGrpcClient();
+        ManagedChannel channel = baseClient.getGrpcClient();
         QueryOuterClass.QueryDenomRequest req = QueryOuterClass.QueryDenomRequest
                 .newBuilder()
                 .setDenomId(denomID)
                 .build();
         QueryOuterClass.QueryDenomResponse resp = QueryGrpc.newBlockingStub(channel).denom(req);
+        channel.shutdown();
         return Convert.toQueryDenomResp(resp.getDenom());
     }
 
     public List<QueryDenomResp> queryDenoms(Pagination.PageRequest page) {
-        Channel channel = baseClient.getGrpcClient();
+        ManagedChannel channel = baseClient.getGrpcClient();
         QueryOuterClass.QueryDenomsRequest.Builder builder = QueryOuterClass.QueryDenomsRequest.newBuilder();
-        if (page != null) {
-            builder.setPagination(page);
+        if (page == null) {
+            page = Pagination.PageRequest.newBuilder()
+                    .setOffset(0)
+                    .setLimit(100)
+                    .build();
         }
+        builder.setPagination(page);
         QueryOuterClass.QueryDenomsRequest req = builder.build();
 
         QueryOuterClass.QueryDenomsResponse resp = QueryGrpc.newBlockingStub(channel).denoms(req);
+        channel.shutdown();
         return Convert.toListQueryDenomResp(resp.getDenomsList());
     }
 
     public QueryNFTResp queryNFT(String denomID, String nftID) {
-        Channel channel = baseClient.getGrpcClient();
+        ManagedChannel channel = baseClient.getGrpcClient();
         QueryOuterClass.QueryNFTRequest req = QueryOuterClass.QueryNFTRequest
                 .newBuilder()
                 .setDenomId(denomID)
@@ -203,6 +248,7 @@ public class NftClient {
                 .build();
 
         QueryOuterClass.QueryNFTResponse resp = QueryGrpc.newBlockingStub(channel).nFT(req);
+        channel.shutdown();
         return Convert.toQueryNFTResp(resp.getNft());
     }
 
@@ -235,7 +281,7 @@ public class NftClient {
             }
 
             QueryCollectionResp res = new QueryCollectionResp();
-            res.setDenom(new QueryDenomResp(denom.getId(), denom.getName(), denom.getSchema(), denom.getCreator()));
+            res.setDenom(new QueryDenomResp(denom.getId(), denom.getName(), denom.getSchema(), denom.getSymbol(), denom.getMintRestricted(), denom.getUpdateRestricted(), denom.getUri(), denom.getUriHash(), denom.getData(), denom.getCreator()));
             res.setNfts(nfts);
             return res;
         }
@@ -246,6 +292,12 @@ public class NftClient {
             res.setName(denom.getName());
             res.setSchema(denom.getSchema());
             res.setCreator(denom.getCreator());
+            res.setSymbol(denom.getSymbol());
+            res.setUri(denom.getUri());
+            res.setUriHash(denom.getUriHash());
+            res.setData(denom.getData());
+            res.setMintRestricted(denom.getMintRestricted());
+            res.setUpdateRestricted(denom.getUpdateRestricted());
             return res;
         }
 
@@ -263,6 +315,7 @@ public class NftClient {
             res.setId(baseNFT.getId());
             res.setName(baseNFT.getName());
             res.setUri(baseNFT.getUri());
+            res.setUriHash(baseNFT.getUriHash());
             res.setData(baseNFT.getData());
             res.setOwner(baseNFT.getOwner());
             return res;

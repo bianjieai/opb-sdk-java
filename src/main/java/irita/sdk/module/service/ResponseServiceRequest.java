@@ -9,23 +9,26 @@ public class ResponseServiceRequest {
         return requestId;
     }
 
-    public void setRequestId(String requestId) {
+    public ResponseServiceRequest setRequestId(String requestId) {
         this.requestId = requestId;
+        return this;
     }
 
     public String getOutput() {
         return output;
     }
 
-    public void setOutput(String output) {
+    public ResponseServiceRequest setOutput(String output) {
         this.output = output;
+        return this;
     }
 
     public String getResult() {
         return result;
     }
 
-    public void setResult(String result) {
+    public ResponseServiceRequest setResult(String result) {
         this.result = result;
+        return this;
     }
 }

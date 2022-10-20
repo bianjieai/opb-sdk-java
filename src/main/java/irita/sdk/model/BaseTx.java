@@ -11,6 +11,10 @@ public class BaseTx {
     private Fee fee;
     private String memo;
     private BroadcastMode mode;
+    private long accountNumber;
+    private long sequence;
+    private String feeGranter;
+    private String feePayer;
 
     public BaseTx() {
     }
@@ -21,6 +25,14 @@ public class BaseTx {
         this.mode = mode;
     }
 
+    public BaseTx(int gas, Fee fee, BroadcastMode mode, long accountNumber, long sequence) {
+        this.gas = gas;
+        this.fee = fee;
+        this.mode = mode;
+        this.accountNumber = accountNumber;
+        this.sequence = sequence;
+    }
+
     public BaseTx(String from, String password, int gas, Fee fee, String memo, BroadcastMode mode) {
         this.from = from;
         this.password = password;
@@ -28,6 +40,17 @@ public class BaseTx {
         this.fee = fee;
         this.memo = memo;
         this.mode = mode;
+    }
+
+    public BaseTx(String from, String password, int gas, Fee fee, String memo, BroadcastMode mode, long accountNumber, long sequence) {
+        this.from = from;
+        this.password = password;
+        this.gas = gas;
+        this.fee = fee;
+        this.memo = memo;
+        this.mode = mode;
+        this.accountNumber = accountNumber;
+        this.sequence = sequence;
     }
 
     public String getFrom() {
@@ -79,6 +102,42 @@ public class BaseTx {
 
     public BaseTx setMode(BroadcastMode mode) {
         this.mode = mode;
+        return this;
+    }
+
+    public long getAccountNumber() {
+        return accountNumber;
+    }
+
+    public BaseTx setAccountNumber(long accountNumber) {
+        this.accountNumber = accountNumber;
+        return this;
+    }
+
+    public long getSequence() {
+        return sequence;
+    }
+
+    public BaseTx setSequence(long sequence) {
+        this.sequence = sequence;
+        return this;
+    }
+
+    public String getFeeGranter() {
+        return feeGranter;
+    }
+
+    public BaseTx setFeeGranter(String feeGranter) {
+        this.feeGranter = feeGranter;
+        return this;
+    }
+
+    public String getFeePayer() {
+        return feePayer;
+    }
+
+    public BaseTx setFeePayer(String feePayer) {
+        this.feePayer = feePayer;
         return this;
     }
 }

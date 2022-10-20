@@ -4,7 +4,6 @@ import irita.sdk.client.IritaClient;
 import irita.sdk.config.ClientConfig;
 import irita.sdk.config.OpbConfig;
 import irita.sdk.constant.enums.BroadcastMode;
-import irita.sdk.key.AlgoEnum;
 import irita.sdk.key.KeyManager;
 import irita.sdk.key.KeyManagerFactory;
 import irita.sdk.model.BaseTx;
@@ -25,28 +24,14 @@ import java.util.Properties;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class RecordTest {
-    private KeyManager km;
+public class RecordTest extends ConfigTest {
     private RecordClient recordClient;
-    private IritaClient client;
-    private BaseTx baseTx = new BaseTx(200000, new Fee("300000", "uirita"), BroadcastMode.Commit);
+    private final BaseTx baseTx = new BaseTx(200000, new Fee("300000", "ugas"), BroadcastMode.Commit);
 
     @BeforeEach
     public void init() {
-        Properties properties = Config.getTestConfig();
-        String mnemonic = properties.getProperty("mnemonic");
-        km = KeyManagerFactory.createDefault();
-        km.recover(mnemonic);
-
-        String nodeUri = properties.getProperty("node_uri");
-        String grpcAddr = properties.getProperty("grpc_addr");
-        String chainId = properties.getProperty("chain_id");
-        ClientConfig clientConfig = new ClientConfig(nodeUri, grpcAddr, chainId);
-        OpbConfig opbConfig = null;
-
-        client = new IritaClient(clientConfig, opbConfig, km);
+        IritaClient client = getTestClient();
         recordClient = client.getRecordClient();
-        assertEquals(properties.getProperty("address"), km.getCurrentKeyInfo().getAddress());
     }
 
     @Test

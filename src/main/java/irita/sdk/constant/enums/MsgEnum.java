@@ -1,13 +1,20 @@
 package irita.sdk.constant.enums;
 
 import irita.sdk.exception.IritaSDKException;
+import irita.sdk.exception.UnknownMsgException;
+import proto.cosmos.feegrant.v1beta1.Tx;
 
 public enum MsgEnum {
     //tibc
     MSG_NFT_TRANSFER("tibc.apps.nft_transfer.v1.MsgNftTransfer", proto.tibc.apps.nft_transfer.v1.Tx.MsgNftTransfer.class),
+    MSG_TIBC_UPDATE_CLIENT("tibc.core.client.v1.MsgUpdateClient", proto.tibc.core.client.v1.Tx.MsgUpdateClient.class),
+    MSG_TIBC_ACKNOWLEDGEMENT("tibc.core.packet.v1.MsgAcknowledgement", proto.tibc.core.packet.v1.Tx.MsgAcknowledgement.class),
+    MSG_TIBC_CLEAN_PACKET("tibc.core.packet.v1.MsgCleanPacket", proto.tibc.core.packet.v1.Tx.MsgCleanPacket.class),
+    MSG_TIBC_RECV_CLEAN_PACKET("tibc.core.packet.v1.MsgRecvCleanPacket", proto.tibc.core.packet.v1.Tx.MsgRecvCleanPacket.class),
     //bank
     Msg_Send("cosmos.bank.v1beta1.MsgSend", proto.cosmos.bank.v1beta1.Tx.MsgSend.class),
     Msg_Multi_Send("cosmos.bank.v1beta1.MsgMultiSend", proto.cosmos.bank.v1beta1.Tx.MsgMultiSend.class),
+    Msg_Ethereum_Tx("ethermint.evm.v1.MsgEthereumTx",proto.ethermint.evm.v1.Tx.MsgEthereumTx.class),
     //staking
 //    MSG_DELEGATE("cosmos.staking.v1beta1.MsgDelegate", proto.cosmos.MsgDelegate.class),
 //    MSG_UNDELEGATE("cosmos.staking.v1beta1.MsgUndelegate", .class),
@@ -23,10 +30,18 @@ public enum MsgEnum {
 //    MSG_SWAP_ORDER("irismod.coinswap.MsgSwapOrder", .class),
     //nft
     MSG_ISSUE_DENOM("irismod.nft.MsgIssueDenom", proto.nft.Tx.MsgIssueDenom.class),
+    MSG_TRANSFER_DENOM("irismod.nft.MsgTransferDenom", proto.nft.Tx.MsgTransferDenom.class),
     MSG_TRANSFER_NFT("irismod.nft.MsgTransferNFT", proto.nft.Tx.MsgTransferNFT.class),
-    MSG_EDIT_NFT("irismod.nft.MsgEditNFT", proto.nft.Tx.MsgTransferNFT.class),
+    MSG_EDIT_NFT("irismod.nft.MsgEditNFT", proto.nft.Tx.MsgEditNFT.class),
     MSG_MINT_NFT("irismod.nft.MsgMintNFT", proto.nft.Tx.MsgMintNFT.class),
     MSG_BURN_NFT("irismod.nft.MsgBurnNFT", proto.nft.Tx.MsgBurnNFT.class),
+    //mt
+    MSG_MT_ISSUE_DENOM("irismod.mt.MsgIssueDenom", proto.mt.Tx.MsgIssueDenom.class),
+    MSG_MT_TRANSFER_DENOM("irismod.mt.MsgTransferDenom", proto.mt.Tx.MsgTransferDenom.class),
+    MSG_MT_TRANSFER_MT("irismod.mt.MsgTransferMT", proto.mt.Tx.MsgTransferMT.class),
+    MSG_MT_EDIT_MT("irismod.mt.MsgEditMT", proto.mt.Tx.MsgEditMT.class),
+    MSG_MT_MINT_MT("irismod.mt.MsgMintMT", proto.mt.Tx.MsgMintMT.class),
+    MSG_MT_BURN_MT("irismod.mt.MsgBurnMT", proto.mt.Tx.MsgBurnMT.class),
     //token
 //    MSG_ISSUE_TOKEN("irismod.token.MsgIssueToken", proto.nft.Tx.MsgIssueToken.class),
 //    MSG_EDIT_TOKEN("irismod.token.MsgEditToken", proto.nft.Tx.MsgEditToken.class),
@@ -44,7 +59,7 @@ public enum MsgEnum {
     //record
     MSG_CREATE_RECORD("irismod.record.MsgCreateRecord", proto.record.Tx.MsgCreateRecord.class),
     // service
-    MSG_DEFINE_SERVICE("irismod.record.MsgCreateRecord", proto.service.Tx.MsgDefineService.class),
+    MSG_DEFINE_SERVICE("irismod.record.MsgDefineService", proto.service.Tx.MsgDefineService.class),
     MSG_BIND_SERVICE("irismod.service.MsgBindService", proto.service.Tx.MsgBindService.class),
     MSG_CALL_SERVICE("irismod.service.MsgCallService", proto.service.Tx.MsgCallService.class),
     MSG_RESPOND_SERVICE("irismod.service.MsgRespondService", proto.service.Tx.MsgRespondService.class),
@@ -57,11 +72,30 @@ public enum MsgEnum {
     // identity
     MSG_CREATE_IDENTITY("iritamod.identity.MsgCreateIdentity", proto.identity.Tx.MsgCreateIdentity.class),
     MSG_UPDATE_IDENTITY("iritamod.identity.MsgUpdateIdentity", proto.identity.Tx.MsgUpdateIdentity.class),
+    //feegrant
+    MSG_GRANT_ALLOWANCE("cosmos.feegrant.v1beta1.MsgGrantAllowance", proto.cosmos.feegrant.v1beta1.Tx.MsgGrantAllowance.class),
+    MSG_REVOKE_ALLOWANCE("cosmos.feegrant.v1beta1.MsgRevokeAllowance",proto.cosmos.feegrant.v1beta1.Tx.MsgRevokeAllowance.class),
     // perm
     MSG_ASSIGN_ROLES("iritamod.perm.MsgAssignRoles", proto.perm.Tx.MsgAssignRoles.class),
     MSG_UNASSIGN_ROLES("iritamod.perm.MsgUnassignRoles", proto.perm.Tx.MsgUnassignRoles.class),
     MSG_BLOCK_ACCOUNT("iritamod.perm.MsgBlockAccount", proto.perm.Tx.MsgBlockAccount.class),
     MSG_UNBLOCK_ACCOUNT("iritamod.perm.MsgUnblockAccount", proto.perm.Tx.MsgUnblockAccount.class),
+    MSG_BLOCK_CONTRACT("iritamod.perm.MsgBlockContract", proto.perm.Tx.MsgBlockContract.class),
+    MSG_UNBLOCK_CONTRACT("iritamod.perm.MsgUnblockContract", proto.perm.Tx.MsgUnblockContract.class),
+    // wasm
+    MSG_EXECUTE_CONTRACT("cosmwasm.wasm.v1.MsgExecuteContract", proto.cosmwasm.wasm.v1.Tx.MsgExecuteContract.class),
+    MSG_INSTANTIATE_CONTRACT("cosmwasm.wasm.v1.MsgInstantiateContract", proto.cosmwasm.wasm.v1.Tx.MsgInstantiateContract.class),
+    MSG_STORE_CODE("cosmwasm.wasm.v1.MsgStoreCode", proto.cosmwasm.wasm.v1.Tx.MsgStoreCode.class),
+    MSG_MIGRATE_CONTRACT("cosmwasm.wasm.v1.MsgMigrateContract", proto.cosmwasm.wasm.v1.Tx.MsgMigrateContract.class),
+
+    //OPB
+    MSG_MINT("iritamod.opb.MsgMint", proto.opb.Tx.MsgMint.class),
+    MSG_RECLAIM("iritamod.opb.MsgReclaim", proto.opb.Tx.MsgReclaim.class),
+    //evm
+    MSG_ETHERMINT_TX("ethermint.evm.v1.MsgEthereumTx", proto.ethermint.evm.v1.Tx.MsgEthereumTx.class),
+    MSG_LEGACY_TX("ethermint.evm.v1.LegacyTx", proto.ethermint.evm.v1.Tx.LegacyTx.class),
+    MSG_ACCESS_LIST_TX("ethermint.evm.v1.AccessListTx", proto.ethermint.evm.v1.Tx.AccessListTx.class),
+    MSG_DYNAMIC_FEE_TX("ethermint.evm.v1.DynamicFeeTx", proto.ethermint.evm.v1.Tx.DynamicFeeTx.class),
 
     ;
 
@@ -88,6 +122,6 @@ public enum MsgEnum {
                 return msgEnum.className;
             }
         }
-        throw new IritaSDKException(String.format("not support this typUrl %s", typeUrl));
+        throw new UnknownMsgException(typeUrl);
     }
 }
