@@ -20,7 +20,9 @@ import proto.nft.Tx;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -28,6 +30,31 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class ClientTest extends ConfigTest {
     private IritaClient client;
+    public static final String mnemonic = "start vacant crop magnet cricket math quarter pass emotion hidden tray lake rail drift length wreck lock voice type nose whisper this impose test";
+
+    @Test
+    public void threadTest() throws Exception {
+
+        KeyManager km=KeyManagerFactory.createDefault();
+
+        Map<String,String> countMap = new HashMap<>();
+
+        for (int i = 0; i < 100; i++) {
+            int a = i;
+            new Thread(new Runnable() {
+                public void run() {
+                    //打印本地变量
+                    // 通过助记词和index 创建/恢复 链账户
+                    km.recover(mnemonic,a);
+//                    System.out.println(a+"~~~~:"+km.getCurrentKeyInfo().getAddress());
+                    countMap.put(km.getCurrentKeyInfo().getAddress(),"");
+                }
+            },String.valueOf(i)).start();
+        }
+        Thread.sleep(3000);
+        System.out.println(countMap.size());
+
+    }
 
     @BeforeEach
     public void init() {
