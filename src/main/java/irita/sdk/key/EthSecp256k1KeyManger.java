@@ -13,13 +13,22 @@ import java.math.BigInteger;
 import static org.bitcoinj.core.ECKey.CURVE;
 
 public class EthSecp256k1KeyManger extends KeyManager{
+
+    public EthSecp256k1KeyManger() {
+        super();
+    }
+
+    public EthSecp256k1KeyManger(KeyDAO keyDAO) {
+        super(keyDAO);
+    }
+
     @Override
-    public void recover(BigInteger privKey) {
+    public KeyInfo toKeyInfo(BigInteger privKey) {
         ECKey ecKey = ECKey.fromPrivate(privKey);
         String pubKey = ecKey.getPublicKeyAsHex();
         ECPoint publicKey = CURVE.getCurve().decodePoint(Hex.decode(pubKey));
         String address = pubKeyToAddress(publicKey);
-        setDefaultKeyDao(privKey, publicKey, address);
+        return new KeyInfo(address,publicKey,privKey);
     }
 
     @Override

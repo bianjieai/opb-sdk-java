@@ -9,12 +9,20 @@ import org.bouncycastle.math.ec.ECPoint;
 import java.math.BigInteger;
 
 public class Sm2KeyManager extends KeyManager {
+
+    public Sm2KeyManager() {
+        super();
+    }
+
+    public Sm2KeyManager(KeyDAO keyDAO) {
+        super(keyDAO);
+    }
+
     @Override
-    public void recover(BigInteger privKey) {
+    public KeyInfo toKeyInfo(BigInteger privKey) {
         ECPoint publicKey = SM2Utils.getPublicKeyFromPrivkey(privKey);
         String address = pubKeyToAddress(publicKey);
-
-        setDefaultKeyDao(privKey, publicKey, address);
+        return new KeyInfo(address,publicKey,privKey);
     }
 
     @Override
