@@ -20,6 +20,11 @@ public class SM2Utils {
         return publicKey.getQ();
     }
 
+    public static ECPoint getPublicKeyFromHex(String xHex,String yHex) {
+        ECPublicKeyParameters publicKey = BCECUtils.createECPublicKeyParameters(xHex, yHex, SM2.CURVE, SM2.DOMAIN_PARAMS);
+        return publicKey.getQ();
+    }
+
     public static byte[] sign(BigInteger privkey, byte[] signdoc) throws CryptoException {
         ECPrivateKeyParameters privkeyParameters = BCECUtils.createECPrivateKeyParameters(privkey, SM2.DOMAIN_PARAMS);
         return SM2.sign(privkeyParameters, "1234567812345678".getBytes(), signdoc);
