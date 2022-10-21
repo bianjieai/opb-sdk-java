@@ -87,7 +87,7 @@ public class Sm2KeyManagerTest {
     public void recoverFromCAKeystore() throws Exception {
         FileInputStream input = new FileInputStream("src/test/resources/ca.JKS");
         KeyManager km = KeyManagerFactory.createDefault();
-        km.recoverFromCA(input, "123456");
+        km.recoverFromCert(input, "123456");
 
         assertEquals("iaa1sul8jyesxq5nuwstyj5lzzsdc2sedeehl365qk", km.getCurrentKeyInfo().getAddress());
     }

@@ -16,7 +16,7 @@ public interface Key {
 
     void recover(String mnemonic, int index);
 
-    void recoverFromCA(InputStream caKeystore, String password);
+    void recoverFromCert(InputStream caKeystore, String password);
 
     String export(String password);
 }
