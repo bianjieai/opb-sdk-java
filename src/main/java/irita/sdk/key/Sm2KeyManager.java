@@ -10,6 +10,14 @@ import java.math.BigInteger;
 
 public class Sm2KeyManager extends KeyManager {
 
+    public Sm2KeyManager() {
+        super();
+    }
+
+    public Sm2KeyManager(KeyDAO keyDAO) {
+        super(keyDAO);
+    }
+
     @Override
     public KeyInfo toKeyInfo(BigInteger privKey) {
         ECPoint publicKey = SM2Utils.getPublicKeyFromPrivkey(privKey);

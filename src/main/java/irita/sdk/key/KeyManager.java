@@ -31,7 +31,19 @@ import static irita.sdk.crypto.BCryptImpl.encode_base64;
 public abstract class KeyManager implements Key, MultiKey {
 
 	private String hrp = Constant.DEFAULT_HRP;
-	protected final KeyDAO keyDAO = new MemoryKeyDAO();
+	protected KeyDAO keyDAO;
+
+	public KeyManager() {
+		this.keyDAO = new MemoryKeyDAO();
+	}
+
+	public KeyManager(KeyDAO keyDAO){
+		if (keyDAO != null) {
+			this.keyDAO = keyDAO;
+		} else {
+			this.keyDAO = new MemoryKeyDAO();
+		}
+	}
 
 	public abstract AlgoEnum getAlgo();
 

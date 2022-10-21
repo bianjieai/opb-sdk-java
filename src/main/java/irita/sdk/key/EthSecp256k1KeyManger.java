@@ -14,6 +14,14 @@ import static org.bitcoinj.core.ECKey.CURVE;
 
 public class EthSecp256k1KeyManger extends KeyManager{
 
+    public EthSecp256k1KeyManger() {
+        super();
+    }
+
+    public EthSecp256k1KeyManger(KeyDAO keyDAO) {
+        super(keyDAO);
+    }
+
     @Override
     public KeyInfo toKeyInfo(BigInteger privKey) {
         ECKey ecKey = ECKey.fromPrivate(privKey);
