@@ -3,15 +3,12 @@ package irita.sdk;
 import com.google.protobuf.GeneratedMessageV3;
 import irita.sdk.client.BaseClient;
 import irita.sdk.client.IritaClient;
-import irita.sdk.config.ClientConfig;
-import irita.sdk.config.OpbConfig;
 import irita.sdk.constant.enums.BroadcastMode;
-import irita.sdk.key.KeyManager;
-import irita.sdk.key.KeyManagerFactory;
 import irita.sdk.model.*;
 import irita.sdk.model.block.BlockDetail;
 import irita.sdk.model.tx.Condition;
 import irita.sdk.model.tx.EventQueryBuilder;
+import irita.sdk.util.KeyUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -20,9 +17,7 @@ import proto.nft.Tx;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -86,7 +81,23 @@ public class ClientTest extends ConfigTest {
 
     @Test
     @Disabled
-    public void queryBlock() throws IOException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+    // TODO need to add adaption for evm tx
+    public void queryTxFeePayer() throws IOException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        String hash = "555609240B69E10A25A31194D8F795718DB5697C82EDD43F140F6AA687D93DE1";//tibc
+        ResultQueryTx resultQueryTx = client.getBaseClient().queryTx(hash);
+        assertNotNull(resultQueryTx);
+
+        String granter = resultQueryTx.getTx().getAuthInfo().getFee().getGranter();
+        String payer = resultQueryTx.getTx().getAuthInfo().getFee().getPayer();
+        String txSigner = KeyUtils.parseAddrFromPubKeyAny(resultQueryTx.getTx().getAuthInfo().getSignerInfos(0).getPublicKey());
+        assertEquals(txSigner,"iaa1ytemz2xqq2s73ut3ys8mcd6zca2564a5lfhtm3");
+        // granter/payer/txSigner优先级按序排列
+        System.out.println("付钱的人是："+ (!"".equals(granter)?granter:(!"".equals(payer)?payer:txSigner)));
+    }
+
+    @Test
+    @Disabled
+    public void queryBlock() throws IOException {
         BlockDetail blockDetail = client.getBaseClient().queryBlock("33105");
         assertNotNull(blockDetail);
     }

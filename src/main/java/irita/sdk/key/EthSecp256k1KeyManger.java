@@ -32,6 +32,12 @@ public class EthSecp256k1KeyManger extends KeyManager{
     }
 
     @Override
+    public String toAddr(byte[] publicKey) {
+        ECPoint pubKey = CURVE.getCurve().decodePoint(Hex.decode(publicKey));
+        return pubKeyToAddress(pubKey);
+    }
+
+    @Override
     public String export(String password) {
         return null;
     }
@@ -58,7 +64,7 @@ public class EthSecp256k1KeyManger extends KeyManager{
         byte[] pub = new byte[64];
         System.arraycopy(uncompressedPubKey, 1, pub, 0, 64);
         byte[] address = Keys.getAddress(pub);
-        String addressResult = null;
+        String addressResult;
         try {
             byte[] bytes = convertBits(address, 8, 5, true);
             addressResult = Bech32.encode(Bech32.Encoding.BECH32,getHrp(), bytes);

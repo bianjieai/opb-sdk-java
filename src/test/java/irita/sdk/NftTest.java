@@ -85,6 +85,7 @@ public class NftTest extends ConfigTest {
                 .setUri(newUri)
                 .setData(newData);
         resultTx = nftClient.editNft(editReq, baseTx);
+        System.out.println(resultTx.getResult().getHash());
         assertNotNull(resultTx.getResult().getHash());
 
         QueryNFTResp nft = nftClient.queryNFT(denomID, nftID);

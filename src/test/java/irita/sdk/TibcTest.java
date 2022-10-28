@@ -28,7 +28,7 @@ public class TibcTest {
     @BeforeEach
     public void init() {
         String mnemonic = "genre stamp head slam drop chuckle patrol mushroom staff range bomb accuse donor bounce main ancient home guide account floor label trigger wife doctor";
-        KeyManager km = KeyManagerFactory.createKeyManger(AlgoEnum.SECP256K1);
+        KeyManager km = KeyManagerFactory.createKeyManager(AlgoEnum.SECP256K1);
         km.recover(mnemonic);
         String nodeUri = "http://localhost:46657";
         String grpcAddr = "http://localhost:9092";

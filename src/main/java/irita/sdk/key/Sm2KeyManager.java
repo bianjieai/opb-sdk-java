@@ -4,6 +4,7 @@ import irita.sdk.exception.IritaSDKException;
 import irita.sdk.util.Bech32Utils;
 import irita.sdk.util.HashUtils;
 import irita.sdk.util.SM2Utils;
+import irita.sdk.util.sm2.SM2;
 import org.bouncycastle.math.ec.ECPoint;
 
 import java.math.BigInteger;
@@ -23,6 +24,12 @@ public class Sm2KeyManager extends KeyManager {
         ECPoint publicKey = SM2Utils.getPublicKeyFromPrivkey(privKey);
         String address = pubKeyToAddress(publicKey);
         return new KeyInfo(address,publicKey,privKey);
+    }
+
+    @Override
+    public String toAddr(byte[] publicKey) {
+        ECPoint pubKey = SM2.CURVE.decodePoint(publicKey);
+        return pubKeyToAddress(pubKey);
     }
 
     @Override
@@ -46,7 +53,7 @@ public class Sm2KeyManager extends KeyManager {
         return AlgoEnum.SM2;
     }
 
-    private String pubKeyToAddress(ECPoint publicKey) {
+    public String pubKeyToAddress(ECPoint publicKey) {
         byte[] encoded = publicKey.getEncoded(true);
         byte[] hash = HashUtils.sha256(encoded);
         byte[] pre20 = new byte[20];

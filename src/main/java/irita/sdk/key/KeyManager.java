@@ -47,7 +47,10 @@ public abstract class KeyManager implements Key, MultiKey {
 
 	public abstract AlgoEnum getAlgo();
 
-	protected abstract KeyInfo toKeyInfo(BigInteger privKey);
+	public abstract KeyInfo toKeyInfo(BigInteger privKey);
+
+	@Override
+	public abstract String toAddr(byte[] publicKey);
 
 	public KeyInfo getCurrentKeyInfo() {
 		return keyDAO.read(Constant.DEFAULT_USER_NAME, null);
@@ -224,9 +227,13 @@ public abstract class KeyManager implements Key, MultiKey {
 	public byte[] getPrefixAmino(String algoPrivKeyName) {
 		byte[] hash = HashUtils.sha256(algoPrivKeyName.getBytes(StandardCharsets.UTF_8));
 		int ptr = 0;
-		while (hash[ptr] == 0) ptr++;
+		while (hash[ptr] == 0) {
+			ptr++;
+		}
 		ptr += 3;
-		while (hash[ptr] == 0) ptr++;
+		while (hash[ptr] == 0) {
+			ptr++;
+		}
 		byte[] prefix = new byte[5];
 		System.arraycopy(hash, ptr, prefix, 0, 4);
 		prefix[4] = 32;
