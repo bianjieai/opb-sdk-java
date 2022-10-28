@@ -19,4 +19,6 @@ public interface Key {
     void recoverFromCert(InputStream caKeystore, String password);
 
     String export(String password);
+
+    String toAddr(byte[] publicKey);
 }

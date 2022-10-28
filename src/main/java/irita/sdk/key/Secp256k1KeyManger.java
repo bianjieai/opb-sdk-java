@@ -4,6 +4,7 @@ import irita.sdk.exception.IritaSDKException;
 import irita.sdk.util.Bech32Utils;
 import irita.sdk.util.HashUtils;
 import irita.sdk.util.SecP256K1Utils;
+import irita.sdk.util.secp256k1.SecP256K1;
 import org.bouncycastle.math.ec.ECPoint;
 
 import java.math.BigInteger;
@@ -25,6 +26,12 @@ public class Secp256k1KeyManger extends KeyManager {
 		ECPoint publicKey = SecP256K1Utils.getPublicKeyFromPrivkey(privKey);
 		String address = pubKeyToAddress(publicKey);
 		return new KeyInfo(address, publicKey, privKey);
+	}
+
+	@Override
+	public String toAddr(byte[] publicKey) {
+		ECPoint pubkey = SecP256K1.CURVE.decodePoint(publicKey);
+		return pubKeyToAddress(pubkey);
 	}
 
 	@Override

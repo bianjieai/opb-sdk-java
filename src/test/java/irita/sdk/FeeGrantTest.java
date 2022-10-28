@@ -61,7 +61,7 @@ public class FeeGrantTest extends ConfigTest {
     public void testFeeGrant() throws IOException {
         // 注意这个需要使用被赋予代付的地址(iaa106lcg5m8h3cdawun7c2rrwpj7q3ncfr9k3wxwx)的助记词初始化 client
         String mnemonic = "require trip wage figure garage reunion neutral cave because scorpion inject hover blouse dress skin oven garlic virus exist purpose boy convince become inform";
-        km = KeyManagerFactory.createKeyManger(AlgoEnum.SM2);
+        km = KeyManagerFactory.createKeyManager(AlgoEnum.SM2);
         km.recover(mnemonic);
 
         // 新的一个客户端

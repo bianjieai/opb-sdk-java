@@ -35,7 +35,7 @@ public class ETHSecp256k1Test {
     public void init() {
         //更换为自己链上地址的助记词
         String mnemonic = "debris minute night puzzle angry gorilla radio negative beef throw invest three badge setup used earth base bottom drill security shell ugly decorate leaf";
-        KeyManager km = KeyManagerFactory.createKeyManger(AlgoEnum.ETH_SECP256K1);
+        KeyManager km = KeyManagerFactory.createKeyManager(AlgoEnum.ETH_SECP256K1);
         km.recover(mnemonic);
 
 
@@ -64,10 +64,10 @@ public class ETHSecp256k1Test {
         String denomName = "denomname" + new Random().nextInt(1000);
         String schema = "no shcema";
 
-        /**
-         * issue denom (build 、sign、broadcast)
-         * 以 NFT 模块的 issue denom 交易为例，通过 baseClient build->sign->broadcast 发送交易
-         * 其他模块交易也可以以这种方式实现
+        /*
+          issue denom (build 、sign、broadcast)
+          以 NFT 模块的 issue denom 交易为例，通过 baseClient build->sign->broadcast 发送交易
+          其他模块交易也可以以这种方式实现
          */
         BaseClient baseClient = client.getBaseClient();
         /*baseTx.setFeeGranter("iaa17y3qs2zuanr93nk844x0t7e6ktchwygnc8fr0g");
@@ -100,7 +100,7 @@ public class ETHSecp256k1Test {
         assertNotNull(denom);
         assertEquals(denomID, denom.getId());
 
-        /**
+        /*
          * mint nfts in one tx
          * 在一笔交易中可以有多个msg，下面的例子是在一笔交易中 mint 多个 nft
          */
