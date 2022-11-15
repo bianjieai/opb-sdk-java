@@ -1,6 +1,7 @@
 package irita.sdk.model.block;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import irita.sdk.model.tx.Events;
 import irita.sdk.model.tx.TxResult;
 
 import java.util.List;
@@ -12,7 +13,7 @@ public class BlockResult {
     @JsonProperty(value = "begin_block_events")
     private String beginBlockEvents;
     @JsonProperty(value = "end_block_events")
-    private String endBlockEvents;
+    private List<Events> endBlockEvents;
     @JsonProperty(value = "validator_updates")
     private String validatorUpdates;
     @JsonProperty(value = "consensus_param_updates")
@@ -42,11 +43,11 @@ public class BlockResult {
         this.beginBlockEvents = beginBlockEvents;
     }
 
-    public String getEndBlockEvents() {
+    public List<Events> getEndBlockEvents() {
         return endBlockEvents;
     }
 
-    public void setEndBlockEvents(String endBlockEvents) {
+    public void setEndBlockEvents(List<Events> endBlockEvents) {
         this.endBlockEvents = endBlockEvents;
     }
 

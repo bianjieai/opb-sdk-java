@@ -117,7 +117,7 @@ public class ClientTest extends ConfigTest {
 	@Test
 	@Disabled
 	public void queryBlock() throws IOException {
-		BlockDetail blockDetail = client.getBaseClient().queryBlock("33105");
+		BlockDetail blockDetail = client.getBaseClient().queryBlock("10254529");
 		assertNotNull(blockDetail);
 	}
 }
