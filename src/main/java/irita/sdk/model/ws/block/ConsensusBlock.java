@@ -2,7 +2,7 @@ package irita.sdk.model.ws.block;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Block {
+public class ConsensusBlock {
 
     @JsonProperty(value = "max_bytes")
     private String maxBytes;
