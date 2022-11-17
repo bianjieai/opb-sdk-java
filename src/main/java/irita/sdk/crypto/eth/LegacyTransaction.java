@@ -68,7 +68,7 @@ public class LegacyTransaction {
         this.gasLimit = legacyTx.getGas();
         this.to = Optional.of(Address.fromHexString(legacyTx.getTo()));
         this.value = Wei.of(Long.parseLong(legacyTx.getValue()));
-        this.signature = getSignature(Numeric.toBigInt(legacyTx.getR().toByteArray()), Numeric.toBigInt(legacyTx.getS().toByteArray()), new Byte("0"), getCurveOrder(curveOrder));
+        this.signature = getSignature(Numeric.toBigInt(legacyTx.getR().toByteArray()), Numeric.toBigInt(legacyTx.getS().toByteArray()), new Byte((byte) (legacyTx.getV().toByteArray()[0]-27)+""), getCurveOrder(curveOrder));
         this.payload =Bytes.wrap(legacyTx.getData().toByteArray());
         this.sender =null;
         this.chainId =Optional.empty();
