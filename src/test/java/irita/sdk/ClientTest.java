@@ -85,7 +85,7 @@ public class ClientTest extends ConfigTest {
 	@Test
 	@Disabled
 	public void queryTxFeePayer() throws IOException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-		String hash = "1308492A88B0F2E09D4DFF8E9483EDE462EC293405B1A94272291808D0E382B2";//
+		String hash = "58D4EE5B6B9B3BBDBE2D90B2D790F3A00BFB416A12A7230BE9D3F53C58DA9BD5";//
 		ResultQueryTx resultQueryTx = client.getBaseClient().queryTx(hash);
 		assertNotNull(resultQueryTx);
 
