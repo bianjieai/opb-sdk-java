@@ -5,9 +5,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import proto.cosmos.crypto.sm2.Keys;
 
 import java.util.NoSuchElementException;
-import java.util.function.BiFunction;
 import java.util.function.Function;
-import java.util.stream.Stream;
 
 /**
  * @author : ori
@@ -53,6 +51,23 @@ public enum KeyEnum {
 	SECP256K1_PRIV_KEY("/cosmos.crypto.secp256k1.PrivKey", proto.cosmos.crypto.secp256k1.Keys.PrivKey.class, AlgoEnum.SECP256K1, o -> {
 		try {
 			return o.unpack(proto.cosmos.crypto.secp256k1.Keys.PrivKey.class).getKey().toByteArray();
+		} catch (InvalidProtocolBufferException e) {
+			e.printStackTrace();
+			return new byte[]{};
+		}
+	}),
+
+	ETH_SECP256K1_PUB_KEY("/ethermint.crypto.v1.ethsecp256k1.PubKey", proto.ethermint.crypto.ethsecp256k1.Keys.PubKey.class, AlgoEnum.ETH_SECP256K1, o -> {
+		try {
+			return o.unpack(proto.ethermint.crypto.ethsecp256k1.Keys.PubKey.class).getKey().toByteArray();
+		} catch (InvalidProtocolBufferException e) {
+			e.printStackTrace();
+			return new byte[]{};
+		}
+	}),
+	ETH_SECP256K1_PRIV_KEY("/ethermint.crypto.v1.ethsecp256k1.PrivKey", proto.ethermint.crypto.ethsecp256k1.Keys.PrivKey.class, AlgoEnum.ETH_SECP256K1, o -> {
+		try {
+			return o.unpack(proto.ethermint.crypto.ethsecp256k1.Keys.PrivKey.class).getKey().toByteArray();
 		} catch (InvalidProtocolBufferException e) {
 			e.printStackTrace();
 			return new byte[]{};

@@ -2,15 +2,15 @@ package irita.sdk.model.ws.block;
 
 public class ConsensusParamUpdates {
 
-    private Block block;
+    private ConsensusBlock block;
     private Evidence evidence;
     private Validator validator;
 
-    public void setBlock(Block block) {
+    public void setBlock(ConsensusBlock block) {
         this.block = block;
     }
 
-    public Block getBlock() {
+    public ConsensusBlock getBlock() {
         return block;
     }
 

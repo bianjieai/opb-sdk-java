@@ -11,7 +11,7 @@ public class BlockResult {
     @JsonProperty(value = "txs_results")
     private List<TxResult> txsResults;
     @JsonProperty(value = "begin_block_events")
-    private String beginBlockEvents;
+    private List<Events> beginBlockEvents;
     @JsonProperty(value = "end_block_events")
     private List<Events> endBlockEvents;
     @JsonProperty(value = "validator_updates")
@@ -35,11 +35,11 @@ public class BlockResult {
         this.txsResults = txsResults;
     }
 
-    public String getBeginBlockEvents() {
+    public List<Events> getBeginBlockEvents() {
         return beginBlockEvents;
     }
 
-    public void setBeginBlockEvents(String beginBlockEvents) {
+    public void setBeginBlockEvents(List<Events> beginBlockEvents) {
         this.beginBlockEvents = beginBlockEvents;
     }
 
