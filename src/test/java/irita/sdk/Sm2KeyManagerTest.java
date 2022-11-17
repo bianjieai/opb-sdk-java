@@ -31,7 +31,7 @@ public class Sm2KeyManagerTest {
     @Test
     public void recoverFromPrivateKey() {
         BigInteger privKey = new BigInteger("3c49175daf981965679bf88d2690e22144424e16c84e9d397ddb58b63603eeec", 16);
-        KeyManager km = KeyManagerFactory.createKeyManger(AlgoEnum.SM2);
+        KeyManager km = KeyManagerFactory.createKeyManager(AlgoEnum.SM2);
         km.recover(privKey);
 
         KeyInfo keyInfo = km.getCurrentKeyInfo();

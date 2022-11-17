@@ -1,5 +1,6 @@
 package irita.sdk.key;
 
+import com.google.protobuf.Any;
 import irita.sdk.exception.IritaSDKException;
 
 /**
@@ -52,10 +53,10 @@ public class KeyManagerFactory {
 	/**
 	 * create KeyManager with given algo
 	 *
-	 * @param algo
-	 * @return
+	 * @param algo {@link irita.sdk.key.AlgoEnum}
+	 * @return {@link KeyManager}
 	 */
-	public static KeyManager createKeyManger(AlgoEnum algo) {
+	public static KeyManager createKeyManager(AlgoEnum algo) {
 		KeyManager keyManager;
 		synchronized (KeyManagerFactory.class) {
 			keyManager = getInstance()
@@ -69,6 +70,6 @@ public class KeyManagerFactory {
 	 * @return a KeyManager with default algo `SM2`
 	 */
 	public static KeyManager createDefault() {
-		return createKeyManger(AlgoEnum.SM2);
+		return createKeyManager(AlgoEnum.SM2);
 	}
 }

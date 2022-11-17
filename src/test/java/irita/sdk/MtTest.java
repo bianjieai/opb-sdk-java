@@ -14,12 +14,10 @@ import irita.sdk.model.ResultTx;
 import irita.sdk.module.mt.MsgAddIssueMTRequest;
 import irita.sdk.module.mt.MsgMintMTRequest;
 import irita.sdk.module.mt.MtClient;
-import irita.sdk.module.nft.NftClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import proto.cosmos.base.query.v1beta1.Pagination;
-import proto.cosmos.tx.v1beta1.TxOuterClass;
 import proto.mt.Mt;
 import proto.mt.QueryOuterClass;
 
@@ -40,7 +38,7 @@ public class MtTest {
     public void init() {
         //更换为自己链上地址的助记词
         String mnemonic = "open salt kit ensure cannon photo flock tragic judge east canal depart verb glimpse zebra fossil during organ chair useful unaware file surround own";
-        km = KeyManagerFactory.createKeyManger(AlgoEnum.ETH_SECP256K1);
+        km = KeyManagerFactory.createKeyManager(AlgoEnum.ETH_SECP256K1);
         km.recover(mnemonic);
 
         //连接测试网（连接主网请参考README.md）

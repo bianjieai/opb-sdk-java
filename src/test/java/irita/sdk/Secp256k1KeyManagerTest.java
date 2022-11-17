@@ -18,7 +18,7 @@ public class Secp256k1KeyManagerTest {
     @Test
     public void recoverFromMnemonic() {
         String mnemonic = "opera vivid pride shallow brick crew found resist decade neck expect apple chalk belt sick author know try tank detail tree impact hand best";
-        KeyManager km = KeyManagerFactory.createKeyManger(AlgoEnum.SECP256K1);
+        KeyManager km = KeyManagerFactory.createKeyManager(AlgoEnum.SECP256K1);
         km.recover(mnemonic);
 
         KeyInfo keyInfo = km.getCurrentKeyInfo();
@@ -29,7 +29,7 @@ public class Secp256k1KeyManagerTest {
     @Test
     public void recoverFromPrivateKey() {
         BigInteger privKey = new BigInteger("3c49175daf981965679bf88d2690e22144424e16c84e9d397ddb58b63603eeec", 16);
-        KeyManager km = KeyManagerFactory.createKeyManger(AlgoEnum.SECP256K1);
+        KeyManager km = KeyManagerFactory.createKeyManager(AlgoEnum.SECP256K1);
         km.recover(privKey);
 
         KeyInfo keyInfo = km.getCurrentKeyInfo();
@@ -40,7 +40,7 @@ public class Secp256k1KeyManagerTest {
     @Test
     public void export() {
         BigInteger privKey = new BigInteger("3c49175daf981965679bf88d2690e22144424e16c84e9d397ddb58b63603eeec", 16);
-        KeyManager km = KeyManagerFactory.createKeyManger(AlgoEnum.SECP256K1);
+        KeyManager km = KeyManagerFactory.createKeyManager(AlgoEnum.SECP256K1);
         km.recover(privKey);
 
         String keystore = km.export("1234567890");
@@ -61,7 +61,7 @@ public class Secp256k1KeyManagerTest {
                 "-----END TENDERMINT PRIVATE KEY-----";
 
         InputStream input = new ByteArrayInputStream(keystore.getBytes(StandardCharsets.UTF_8));
-        KeyManager km = KeyManagerFactory.createKeyManger(AlgoEnum.SECP256K1);
+        KeyManager km = KeyManagerFactory.createKeyManager(AlgoEnum.SECP256K1);
         km.recover(input, "1234567890");
 
         KeyInfo keyInfo = km.getCurrentKeyInfo();
