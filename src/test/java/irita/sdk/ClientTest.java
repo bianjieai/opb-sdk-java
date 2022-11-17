@@ -4,6 +4,7 @@ import com.google.protobuf.GeneratedMessageV3;
 import irita.sdk.client.BaseClient;
 import irita.sdk.client.IritaClient;
 import irita.sdk.constant.enums.BroadcastMode;
+import irita.sdk.crypto.eth.LegacyTransaction;
 import irita.sdk.model.*;
 import irita.sdk.model.block.BlockDetail;
 import irita.sdk.model.tx.Condition;
@@ -85,32 +86,24 @@ public class ClientTest extends ConfigTest {
 	@Test
 	@Disabled
 	public void queryTxFeePayer() throws IOException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-		String hash = "1308492A88B0F2E09D4DFF8E9483EDE462EC293405B1A94272291808D0E382B2";//
+		String hash = "7C47C95BE8F8794E89D2104313411193D8270F94147ED08E354C74704140A00B";//
 		ResultQueryTx resultQueryTx = client.getBaseClient().queryTx(hash);
 		assertNotNull(resultQueryTx);
-
 		// 判断是否是智能合约交易
 		if (resultQueryTx.getTx().getBody().getMsgs().get(0) instanceof proto.ethermint.evm.v1.Tx.MsgEthereumTx) {
-			// 从交易结果中解析交易的签名者，并根据以下逻辑过滤出签名者信息
-			String senderAddr = resultQueryTx.getResult().getEvents().stream()
-					.filter(e -> e.getType().equals("message"))
-					.map(Events::getAttributes)
-					.reduce((attributes, attributes2) -> {
-						attributes.addAll(attributes2);
-						return attributes;
-					})
-					.orElse(Collections.emptyList())
-					.stream()
-					.filter(attribute -> "sender".equals(attribute.getKey()) && attribute.getValue().startsWith("0x"))
-					.map(attribute -> Bech32Utils.hexToBech32("iaa", Numeric.cleanHexPrefix(attribute.getValue())))
-					.distinct().findFirst().orElse("");
-			System.out.println("付钱的人是：" + senderAddr);
+			List<GeneratedMessageV3> messageList = resultQueryTx.getTx().getBody().getMsgs();
+			for (GeneratedMessageV3 generatedMessageV3 : messageList) {
+				proto.ethermint.evm.v1.Tx.MsgEthereumTx msgEthereumTx = proto.ethermint.evm.v1.Tx.MsgEthereumTx.parseFrom(generatedMessageV3.toByteString());
+				proto.ethermint.evm.v1.Tx.LegacyTx legacyTx = proto.ethermint.evm.v1.Tx.LegacyTx.parseFrom(msgEthereumTx.getData().getValue());
+				LegacyTransaction legacyTransaction = new LegacyTransaction(legacyTx);
+				String addr = legacyTransaction.getSender();
+				System.out.println("付钱的人是："+ addr);
+			}
 			return;
 		}
 		String granter = resultQueryTx.getTx().getAuthInfo().getFee().getGranter();
 		String payer = resultQueryTx.getTx().getAuthInfo().getFee().getPayer();
 		String txSigner = KeyUtils.parseAddrFromPubKeyAny(resultQueryTx.getTx().getAuthInfo().getSignerInfos(0).getPublicKey());
-		// granter/payer/txSigner优先级按序排列
 		System.out.println("付钱的人是：" + (!"".equals(granter) ? granter : (!"".equals(payer) ? payer : txSigner)));
 	}
 
