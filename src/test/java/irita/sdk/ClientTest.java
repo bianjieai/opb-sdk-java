@@ -1,6 +1,10 @@
 package irita.sdk;
 
 import com.google.protobuf.GeneratedMessageV3;
+import irita.sdk.model.tx.Events;
+import irita.sdk.util.Bech32Utils;
+import irita.sdk.util.KeyUtils;
+import org.web3j.utils.Numeric;
 import irita.sdk.client.BaseClient;
 import irita.sdk.client.IritaClient;
 import irita.sdk.constant.enums.BroadcastMode;
@@ -8,13 +12,9 @@ import irita.sdk.model.*;
 import irita.sdk.model.block.BlockDetail;
 import irita.sdk.model.tx.Condition;
 import irita.sdk.model.tx.EventQueryBuilder;
-import irita.sdk.model.tx.Events;
-import irita.sdk.util.Bech32Utils;
-import irita.sdk.util.KeyUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.web3j.utils.Numeric;
 import proto.nft.Tx;
 
 import java.io.IOException;
@@ -119,5 +119,14 @@ public class ClientTest extends ConfigTest {
 	public void queryBlock() throws IOException {
 		BlockDetail blockDetail = client.getBaseClient().queryBlock("10254529");
 		assertNotNull(blockDetail);
+	}
+
+	@Test
+	@Disabled
+	public void subscribeBlock() {
+		client.getBaseClient().getRpcClient().subscribeNewBlock(EventQueryBuilder.newEventQueryBuilder(), newBlockBean -> {
+			System.out.println("当前块高是:"+newBlockBean.getResult().getData().getValue().getBlock().getHeader().getHeight());
+		});
+		while (true);
 	}
 }
