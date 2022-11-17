@@ -33,7 +33,7 @@ public class EthSecp256k1KeyManger extends KeyManager{
 
     @Override
     public String toAddr(byte[] publicKey) {
-        ECPoint pubKey = CURVE.getCurve().decodePoint(Hex.decode(publicKey));
+        ECPoint pubKey = CURVE.getCurve().decodePoint(publicKey);
         return pubKeyToAddress(pubKey);
     }
 
