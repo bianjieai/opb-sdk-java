@@ -27,7 +27,7 @@ import java.util.Random;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class ComputilityCenterTest {
+public class RPCHeaderTest {
 
     private KeyManager km;
     private IritaClient client;
