@@ -50,8 +50,8 @@ public class RpcClient implements WsEvent {
         this.wsAddr = clientConfig.getWsAddr();
 
         // need set projectKey
-        if (opbConfig != null && StringUtils.isNotEmpty(opbConfig.getProjectKey())) {
-            this.httpUtils = new HttpUtils(opbConfig.getProjectKey());
+        if (opbConfig != null) {
+            this.httpUtils = new HttpUtils(opbConfig.getProjectKey(),opbConfig.getHeader());
         } else {
             this.httpUtils = new HttpUtils();
         }
