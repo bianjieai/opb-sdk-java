@@ -11,7 +11,6 @@ public class GrpcBSNInterceptor implements ClientInterceptor {
     private final Metadata.Key<String> PROJECT_KEY_HEADER = Metadata.Key.of("projectKeyHeader", Metadata.ASCII_STRING_MARSHALLER);
     private final Metadata.Key<String> CHAIN_ACCOUNT_ADDRESS_HEADER = Metadata.Key.of("chainAccountAddressHeader", Metadata.ASCII_STRING_MARSHALLER);
 
-
     public GrpcBSNInterceptor(OpbConfig opbConfig) {
         this.opbConfig = opbConfig;
     }
@@ -25,6 +24,11 @@ public class GrpcBSNInterceptor implements ClientInterceptor {
                     headers.put(PROJECT_ID_HEADER, Optional.ofNullable(opbConfig.getProjectID()).orElse(""));
                     headers.put(PROJECT_KEY_HEADER, Optional.ofNullable(opbConfig.getProjectKey()).orElse(""));
                     headers.put(CHAIN_ACCOUNT_ADDRESS_HEADER, Optional.ofNullable(opbConfig.getChainAccountAddr()).orElse(""));
+                    if (opbConfig.getHeader() != null){
+                        for (String key : opbConfig.getHeader().keySet()){
+                            headers.put(Metadata.Key.of(key, Metadata.ASCII_STRING_MARSHALLER), Optional.ofNullable(opbConfig.getHeader().get(key)).orElse(""));
+                        }
+                    }
                 }
                 super.start(new ForwardingClientCallListener.SimpleForwardingClientCallListener<RespT>(responseListener) {
                     @Override
