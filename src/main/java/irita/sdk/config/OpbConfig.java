@@ -2,12 +2,13 @@ package irita.sdk.config;
 
 import io.grpc.netty.shaded.io.netty.handler.ssl.SslProvider;
 
+import java.util.Map;
+
 public class OpbConfig {
     private  String projectID;
     private  String projectKey;
     private  String chainAccountAddr;
-    private  String apiKey;
-    private  String apiChainType;
+    private Map<String,String> header;
 
     private boolean enableTLS;
     private SslProvider sslProvider;
@@ -18,9 +19,8 @@ public class OpbConfig {
         this.chainAccountAddr = chainAccountAddr;
     }
 
-    public OpbConfig(String apiKey, String apiChainType) {
-        this.apiKey = apiKey;
-        this.apiChainType = apiChainType;
+    public OpbConfig(Map<String,String> header) {
+        this.header = header;
     }
 
     public String getProjectID() {
@@ -55,11 +55,11 @@ public class OpbConfig {
         this.sslProvider = sslProvider;
     }
 
-    public String getApiKey() {
-        return apiKey;
+    public Map<String, String> getHeader() {
+        return header;
     }
 
-    public String getApiChainType() {
-        return apiChainType;
+    public void setHeader(Map<String, String> header) {
+        this.header = header;
     }
 }

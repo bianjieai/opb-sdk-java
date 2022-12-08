@@ -19,6 +19,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
 
@@ -40,7 +42,10 @@ public class computilityCenterTest {
         String nodeUri = properties.getProperty("node_uri");
         String grpcAddr = properties.getProperty("grpc_addr");
         String chainId = properties.getProperty("chain_id");
-        OpbConfig opbConfig = new OpbConfig(properties.getProperty("api_key"),properties.getProperty("api_chain_type"));
+        Map<String,String> header = new HashMap<String,String>();
+        header.put("x-api-key",properties.getProperty("api_key"));
+        header.put("x-api-chain-type",properties.getProperty("api_chain_type"));
+        OpbConfig opbConfig = new OpbConfig(header);
         opbConfig.setRequireTransportSecurity(false);
         ClientConfig clientConfig = new ClientConfig(nodeUri, grpcAddr, chainId);
 
@@ -59,7 +64,7 @@ public class computilityCenterTest {
 
     @Test
     public void testNft() throws IOException {
-        QueryDenomResp denom = client.getNftClient().queryDenom("denomid251");
+        QueryDenomResp denom = client.getNftClient().queryDenom("denomid506");
         System.out.println(denom.getName());
     }
 
@@ -81,7 +86,7 @@ public class computilityCenterTest {
         System.out.println(resultTx.getResult().getDeliver_tx().getLog());
 
         KeyInfo keyInfo = km.getCurrentKeyInfo();
-        String nftID = "nftid08001";
+        String nftID = "nftid080034";
         String nftName = "你好呀";
         String uri = "https://www.baidu.com";
         String data = "any data";
