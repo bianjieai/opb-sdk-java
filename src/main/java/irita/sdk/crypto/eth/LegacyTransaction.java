@@ -9,6 +9,7 @@ import org.apache.tuweni.units.bigints.UInt256;
 import org.bouncycastle.asn1.sec.SECNamedCurves;
 import org.bouncycastle.asn1.x9.X9ECParameters;
 import org.bouncycastle.crypto.params.ECDomainParameters;
+import org.jetbrains.annotations.NotNull;
 import org.web3j.utils.Numeric;
 import proto.ethermint.evm.v1.Tx;
 
@@ -17,6 +18,8 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static irita.sdk.constant.Constant.IRITA_EVM_CHAIN_ID;
+import static irita.sdk.constant.Constant.IRITA_EVM_CHAIN_ID_MUL;
 
 public class LegacyTransaction {
 
@@ -68,12 +71,30 @@ public class LegacyTransaction {
         this.gasLimit = legacyTx.getGas();
         this.to = Optional.of(Address.fromHexString(legacyTx.getTo()));
         this.value = Wei.of(Long.parseLong(legacyTx.getValue()));
-        this.signature = getSignature(Numeric.toBigInt(legacyTx.getR().toByteArray()), Numeric.toBigInt(legacyTx.getS().toByteArray()), new Byte((byte) (legacyTx.getV().toByteArray()[0]-27)+""), getCurveOrder(curveOrder));
+        this.signature = getSignature(Numeric.toBigInt(legacyTx.getR().toByteArray()), Numeric.toBigInt(legacyTx.getS().toByteArray()), getV(legacyTx), getCurveOrder(curveOrder));
         this.payload =Bytes.wrap(legacyTx.getData().toByteArray());
         this.sender =null;
-        this.chainId =Optional.empty();
+        this.chainId = getChainId(legacyTx.getV().toByteArray());
         this.v =Optional.of(Numeric.toBigInt(legacyTx.getV().toByteArray()));
         this.maxPriorityFeePerGas = Optional.empty();
+    }
+
+    @NotNull
+    private Optional<BigInteger> getChainId(byte[] vb) {
+        BigInteger v = new BigInteger(vb);
+        if (v.compareTo(new BigInteger(IRITA_EVM_CHAIN_ID).multiply(new BigInteger(IRITA_EVM_CHAIN_ID_MUL))) > 0) {
+            return Optional.of(new BigInteger(IRITA_EVM_CHAIN_ID));
+        }
+        return Optional.empty();
+    }
+
+    private byte getV(Tx.LegacyTx legacyTx) {
+        BigInteger v = new BigInteger(legacyTx.getV().toByteArray());
+        if (v.compareTo(new BigInteger(IRITA_EVM_CHAIN_ID).multiply(new BigInteger(IRITA_EVM_CHAIN_ID_MUL))) > 0) {
+            v = v.subtract(new BigInteger(IRITA_EVM_CHAIN_ID).multiply(new BigInteger(IRITA_EVM_CHAIN_ID_MUL))).subtract(new BigInteger("8"));
+        }
+        v = v.subtract(new BigInteger("27"));
+        return v.toByteArray()[0];
     }
 
 
