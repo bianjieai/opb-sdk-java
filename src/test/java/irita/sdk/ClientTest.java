@@ -107,9 +107,11 @@ public class ClientTest extends ConfigTest {
 						legacyTransaction = new LegacyTransaction(legacyTx);
 						break;
 					case ACCESS_LIST_TX:
-						proto.ethermint.evm.v1.Tx.AccessListTx accessListTx = proto.ethermint.evm.v1.Tx.AccessListTx.parseFrom(msgEthereumTx.getData().getValue());
-						legacyTransaction = new LegacyTransaction(accessListTx);
-						break;
+						// AccessListTx需要测试后方可
+//						proto.ethermint.evm.v1.Tx.AccessListTx accessListTx = proto.ethermint.evm.v1.Tx.AccessListTx.parseFrom(msgEthereumTx.getData().getValue());
+//						legacyTransaction = new LegacyTransaction(accessListTx);
+						System.out.println("ACCESS_LIST_TX type is temporarily not supported");
+						return;
 					default:
 						System.out.println("Transaction Type not exist");
 						return;
