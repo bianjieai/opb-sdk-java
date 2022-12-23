@@ -136,7 +136,9 @@ public class LegacyTransaction {
         if (v.compareTo(new BigInteger(IRITA_EVM_CHAIN_ID).multiply(new BigInteger(IRITA_EVM_CHAIN_ID_MUL))) > 0) {
             v = v.subtract(new BigInteger(IRITA_EVM_CHAIN_ID).multiply(new BigInteger(IRITA_EVM_CHAIN_ID_MUL))).subtract(new BigInteger("8"));
         }
-        v = v.subtract(new BigInteger("27"));
+        if (v.compareTo(BigInteger.valueOf(27L)) >= 0){
+            v = v.subtract(new BigInteger("27"));
+        }
         return v.toByteArray()[0];
     }
 

@@ -6,7 +6,7 @@
 
     <groupId>io.github.bianjieai</groupId>
     <artifactId>opb-sdk</artifactId>
-    <version>0.1.14-rc2</version>
+    <version>0.1.14-rc3</version>
     <url>https://github.com/bianjieai/opb-sdk-java</url>
     <name>opb-sdk</name>
     <licenses>
@@ -336,6 +336,14 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>11</source>
+                    <target>11</target>
+                </configuration>
             </plugin>
         </plugins>
     </build>
