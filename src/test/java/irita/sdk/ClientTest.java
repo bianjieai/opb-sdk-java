@@ -23,6 +23,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.List;
 
+import static irita.sdk.constant.Constant.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -86,7 +87,7 @@ public class ClientTest extends ConfigTest {
 	@Test
 	@Disabled
 	public void queryTxFeePayer() throws IOException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-		String hash = "7C47C95BE8F8794E89D2104313411193D8270F94147ED08E354C74704140A00B";//
+		String hash = "20AA3CCE20FA2DA71ACED7F5B81D42C4440297F2E6F8297372CC6246AE5E270B";//
 		ResultQueryTx resultQueryTx = client.getBaseClient().queryTx(hash);
 		assertNotNull(resultQueryTx);
 		// 判断是否是智能合约交易
@@ -94,10 +95,27 @@ public class ClientTest extends ConfigTest {
 			List<GeneratedMessageV3> messageList = resultQueryTx.getTx().getBody().getMsgs();
 			for (GeneratedMessageV3 generatedMessageV3 : messageList) {
 				proto.ethermint.evm.v1.Tx.MsgEthereumTx msgEthereumTx = proto.ethermint.evm.v1.Tx.MsgEthereumTx.parseFrom(generatedMessageV3.toByteString());
-				proto.ethermint.evm.v1.Tx.LegacyTx legacyTx = proto.ethermint.evm.v1.Tx.LegacyTx.parseFrom(msgEthereumTx.getData().getValue());
-				LegacyTransaction legacyTransaction = new LegacyTransaction(legacyTx);
-				String addr = legacyTransaction.getSender();
-				System.out.println("付钱的人是："+ addr);
+				System.out.println(msgEthereumTx.getData().getTypeUrl());
+				LegacyTransaction legacyTransaction;
+				switch (msgEthereumTx.getData().getTypeUrl()){
+					case DYNAMIC_FEE_TX:
+						proto.ethermint.evm.v1.Tx.DynamicFeeTx dynamicFeeTx = proto.ethermint.evm.v1.Tx.DynamicFeeTx.parseFrom(msgEthereumTx.getData().getValue());
+						legacyTransaction = new LegacyTransaction(dynamicFeeTx);
+						break;
+					case LEGACY_TX:
+						proto.ethermint.evm.v1.Tx.LegacyTx legacyTx = proto.ethermint.evm.v1.Tx.LegacyTx.parseFrom(msgEthereumTx.getData().getValue());
+						legacyTransaction = new LegacyTransaction(legacyTx);
+						break;
+					case ACCESS_LIST_TX:
+						proto.ethermint.evm.v1.Tx.AccessListTx accessListTx = proto.ethermint.evm.v1.Tx.AccessListTx.parseFrom(msgEthereumTx.getData().getValue());
+						legacyTransaction = new LegacyTransaction(accessListTx);
+						break;
+					default:
+						System.out.println("Transaction Type not exist");
+						return;
+				}
+
+				System.out.println("付钱的人是："+ legacyTransaction.getSender());
 			}
 			return;
 		}

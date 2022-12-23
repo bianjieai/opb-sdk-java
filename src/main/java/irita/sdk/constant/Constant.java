@@ -13,4 +13,8 @@ public class Constant {
 
 	public static final String IRITA_EVM_CHAIN_ID = "1223";
 	public static final String IRITA_EVM_CHAIN_ID_MUL = "2";
+
+	public static final String DYNAMIC_FEE_TX = "/ethermint.evm.v1.DynamicFeeTx";
+	public static final String LEGACY_TX = "/ethermint.evm.v1.LegacyTx";
+	public static final String ACCESS_LIST_TX = "/ethermint.evm.v1.AccessListTx";
 }

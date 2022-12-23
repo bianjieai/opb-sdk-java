@@ -189,7 +189,7 @@ public class NftClient {
         QueryOuterClass.QueryOwnerRequest req = builder.build();
         QueryOuterClass.QueryOwnerResponse resp = QueryGrpc.newBlockingStub(channel).owner(req);
         channel.shutdown();
-        return Convert.toQueryOwnerResp(resp.getOwner());
+        return Convert.toQueryOwnerResp(resp);
     }
 
     public QueryCollectionResp queryCollection(String denomID, Pagination.PageRequest page) {
@@ -208,7 +208,7 @@ public class NftClient {
 
         QueryOuterClass.QueryCollectionResponse resp = QueryGrpc.newBlockingStub(channel).collection(req);
         channel.shutdown();
-        return Convert.toQueryCollectionResp(resp.getCollection());
+        return Convert.toQueryCollectionResp(resp);
     }
 
     public QueryDenomResp queryDenom(String denomID) {
@@ -253,9 +253,9 @@ public class NftClient {
     }
 
     private static class Convert {
-        public static QueryOwnerResp toQueryOwnerResp(Nft.Owner owner) {
-            String address = owner.getAddress();
-            List<Nft.IDCollection> idCollectionsList = owner.getIdCollectionsList();
+        public static QueryOwnerResp toQueryOwnerResp(QueryOuterClass.QueryOwnerResponse queryOwnerResponse) {
+            String address = queryOwnerResponse.getOwner().getAddress();
+            List<Nft.IDCollection> idCollectionsList = queryOwnerResponse.getOwner().getIdCollectionsList();
 
             List<IDC> idcs = new ArrayList<>();
             for (Nft.IDCollection idc : idCollectionsList) {
@@ -263,16 +263,17 @@ public class NftClient {
                 List<String> tokenIDs = new ArrayList<>(idc.getTokenIdsList());
                 idcs.add(new IDC(denomId, tokenIDs));
             }
-
             QueryOwnerResp res = new QueryOwnerResp();
             res.setAddress(address);
             res.setIdcs(idcs);
+            res.setNextKey(queryOwnerResponse.getPagination().getNextKey().toStringUtf8());
+            res.setTotal(queryOwnerResponse.getPagination().getTotal());
             return res;
         }
 
-        public static QueryCollectionResp toQueryCollectionResp(Nft.Collection collection) {
-            Nft.Denom denom = collection.getDenom();
-            List<Nft.BaseNFT> nftList = collection.getNftsList();
+        public static QueryCollectionResp toQueryCollectionResp(QueryOuterClass.QueryCollectionResponse response) {
+            Nft.Denom denom = response.getCollection().getDenom();
+            List<Nft.BaseNFT> nftList = response.getCollection().getNftsList();
 
             List<QueryNFTResp> nfts = new ArrayList<>();
             for (Nft.BaseNFT baseNFT : nftList) {
@@ -283,6 +284,8 @@ public class NftClient {
             QueryCollectionResp res = new QueryCollectionResp();
             res.setDenom(new QueryDenomResp(denom.getId(), denom.getName(), denom.getSchema(), denom.getSymbol(), denom.getMintRestricted(), denom.getUpdateRestricted(), denom.getUri(), denom.getUriHash(), denom.getData(), denom.getCreator()));
             res.setNfts(nfts);
+            res.setNextKey(response.getPagination().getNextKey().toStringUtf8());
+            res.setTotal(response.getPagination().getTotal());
             return res;
         }
 
