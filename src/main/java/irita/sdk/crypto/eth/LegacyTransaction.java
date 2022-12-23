@@ -284,7 +284,7 @@ public class LegacyTransaction {
                 encode(
                         rlpOutput -> {
                             rlpOutput.startList();
-                            rlpOutput.writeBigIntegerScalar(chainId.get());
+                            rlpOutput.writeBigIntegerScalar(chainId.orElseThrow());
                             rlpOutput.writeLongScalar(nonce);
                             rlpOutput.writeUInt256Scalar(maxPriorityFeePerGas);
                             rlpOutput.writeUInt256Scalar(maxFeePerGas);
