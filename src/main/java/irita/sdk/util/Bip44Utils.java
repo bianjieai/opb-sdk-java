@@ -52,6 +52,7 @@ public class Bip44Utils {
     public static byte[] getSeed(String mnemonic) {
         List<String> words = mnemonicToWords(mnemonic);
         assert words.size() != 0;
+        assert words.size() == 12 || words.size() == 24;
         return MnemonicCode.toSeed(words, "");
     }
 
