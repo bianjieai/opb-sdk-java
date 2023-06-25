@@ -9,6 +9,7 @@ public class GrpcBSNInterceptor implements ClientInterceptor {
     private final OpbConfig opbConfig;
     private final Metadata.Key<String> PROJECT_ID_HEADER = Metadata.Key.of("projectIdHeader", Metadata.ASCII_STRING_MARSHALLER);
     private final Metadata.Key<String> PROJECT_KEY_HEADER = Metadata.Key.of("projectKeyHeader", Metadata.ASCII_STRING_MARSHALLER);
+    private final Metadata.Key<String> API_PROJECT_KEY_HEADER = Metadata.Key.of("x-api-key", Metadata.ASCII_STRING_MARSHALLER);
     private final Metadata.Key<String> CHAIN_ACCOUNT_ADDRESS_HEADER = Metadata.Key.of("chainAccountAddressHeader", Metadata.ASCII_STRING_MARSHALLER);
 
     public GrpcBSNInterceptor(OpbConfig opbConfig) {
@@ -23,6 +24,7 @@ public class GrpcBSNInterceptor implements ClientInterceptor {
                 if (opbConfig != null) {
                     headers.put(PROJECT_ID_HEADER, Optional.ofNullable(opbConfig.getProjectID()).orElse(""));
                     headers.put(PROJECT_KEY_HEADER, Optional.ofNullable(opbConfig.getProjectKey()).orElse(""));
+                    headers.put(API_PROJECT_KEY_HEADER, Optional.ofNullable(opbConfig.getProjectKey()).orElse(""));
                     headers.put(CHAIN_ACCOUNT_ADDRESS_HEADER, Optional.ofNullable(opbConfig.getChainAccountAddr()).orElse(""));
                     if (opbConfig.getHeader() != null){
                         for (String key : opbConfig.getHeader().keySet()){
