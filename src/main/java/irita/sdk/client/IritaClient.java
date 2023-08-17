@@ -5,6 +5,7 @@ import irita.sdk.config.OpbConfig;
 import irita.sdk.key.KeyManager;
 import irita.sdk.module.bank.BankClient;
 import irita.sdk.module.community_gov.CommunityGovClient;
+import irita.sdk.module.evm.EvmClient;
 import irita.sdk.module.feegrant.FeeGrantClient;
 import irita.sdk.module.identity.IdentityClient;
 import irita.sdk.module.mt.MtClient;
@@ -28,6 +29,7 @@ public class IritaClient {
     private ServiceClient serviceClient;
     private FeeGrantClient feeGrantClient;
     private MtClient mtClient;
+    private EvmClient evmClient;
 
     private IritaClient() {
     }
@@ -46,6 +48,7 @@ public class IritaClient {
         this.serviceClient = new ServiceClient(baseClient);
         this.feeGrantClient = new FeeGrantClient(baseClient);
         this.mtClient = new MtClient(baseClient);
+        this.evmClient = new EvmClient(baseClient);
     }
 
     public BaseClient getBaseClient() {
@@ -153,5 +156,13 @@ public class IritaClient {
 
     public void setMtClient(MtClient mtClient) {
         this.mtClient = mtClient;
+    }
+
+    public EvmClient getEvmClient() {
+        return evmClient;
+    }
+
+    public void setEvmClient(EvmClient evmClient) {
+        this.evmClient = evmClient;
     }
 }

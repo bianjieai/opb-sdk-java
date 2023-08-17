@@ -96,6 +96,7 @@ public enum MsgEnum {
     MSG_LEGACY_TX("ethermint.evm.v1.LegacyTx", proto.ethermint.evm.v1.Tx.LegacyTx.class),
     MSG_ACCESS_LIST_TX("ethermint.evm.v1.AccessListTx", proto.ethermint.evm.v1.Tx.AccessListTx.class),
     MSG_DYNAMIC_FEE_TX("ethermint.evm.v1.DynamicFeeTx", proto.ethermint.evm.v1.Tx.DynamicFeeTx.class),
+    MSG_EXTENSION_OPTIONS_ETHERMINT_TX("ethermint.evm.v1.ExtensionOptionsEthereumTx", proto.ethermint.evm.v1.Tx.ExtensionOptionsEthereumTx.class),
 
     ;
 
