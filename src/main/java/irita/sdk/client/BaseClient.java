@@ -1,10 +1,7 @@
 package irita.sdk.client;
 
-import com.google.protobuf.Any;
-import com.google.protobuf.ByteString;
 import com.google.protobuf.GeneratedMessageV3;
 import com.google.protobuf.InvalidProtocolBufferException;
-import io.grpc.Channel;
 import io.grpc.ManagedChannel;
 import irita.sdk.config.ClientConfig;
 import irita.sdk.config.OpbConfig;
@@ -26,11 +23,6 @@ import org.bouncycastle.util.encoders.Hex;
 import proto.cosmos.auth.v1beta1.Auth;
 import proto.cosmos.auth.v1beta1.QueryGrpc;
 import proto.cosmos.auth.v1beta1.QueryOuterClass;
-import proto.cosmos.base.v1beta1.CoinOuterClass;
-import proto.cosmos.tx.signing.v1beta1.Signing;
-import proto.cosmos.tx.v1beta1.TxOuterClass;
-import proto.ethermint.crypto.ethsecp256k1.Keys;
-import proto.ethermint.evm.v1.Tx;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
