@@ -96,7 +96,7 @@ public class LegacyTransaction {
         this.maxPriorityFeePerGas = Optional.empty();
     }
 
-    public LegacyTransaction(Tx.LegacyTx legacyTx) {
+    public  LegacyTransaction(Tx.LegacyTx legacyTx) {
         this.transactionType = TransactionType.FRONTIER;
         this.nonce = legacyTx.getNonce();
         this.gasPrice =  Optional.of(Wei.of(Long.parseLong(legacyTx.getGasPrice())));
@@ -232,22 +232,6 @@ public class LegacyTransaction {
         return dataHash;
     }
 
-    /*public SECPSignature sign(final KeyPair keyPair){
-        Bytes32 dataHash = decodeTransaction();
-        final ECDSASigner signer = new ECDSASigner(new HMacDSAKCalculator(new SHA256Digest()));
-        X9ECParameters params = SECNamedCurves.getByName("secp256k1");
-        ECDomainParameters curve =new ECDomainParameters(params.getCurve(), params.getG(), params.getN(), params.getH());
-
-        final ECPrivateKeyParameters privKey =
-                new ECPrivateKeyParameters(
-                        keyPair.getPrivateKey().getEncodedBytes().toUnsignedBigInteger(), curve);
-        signer.init(true, privKey);
-
-        final BigInteger[] components = signer.generateSignature(dataHash.toArrayUnsafe());
-        signature = getInstance().normaliseSignature(components[0], components[1], keyPair.getPublicKey(), dataHash);
-        return signature;
-    }*/
-
     private Bytes32 getOrComputeSenderRecoveryHash() {
         if (hashNoSignature == null) {
             hashNoSignature =
@@ -271,8 +255,6 @@ public class LegacyTransaction {
         if (transactionType.requiresChainId()) {
             checkArgument(chainId.isPresent(), "Transaction type %s requires chainId", transactionType);
         }
-        /*final Bytes preimage = frontierPreimage(nonce, gasPrice, gasLimit, to, value, payload, chainId);
-        return Hash.keccak256(preimage);*/
         final Bytes preimage;
         switch (transactionType) {
             case FRONTIER:
@@ -434,22 +416,6 @@ public class LegacyTransaction {
         rlpOutput.writeBytes(to.map(Bytes::copy).orElse(Bytes.EMPTY));
         rlpOutput.writeUInt256Scalar(value);
         rlpOutput.writeBytes(payload);
-    /*
-    Access List encoding should look like this
-    where hex strings represent raw bytes
-    [
-      [
-        "0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae",
-        [
-          "0x0000000000000000000000000000000000000000000000000000000000000003",
-          "0x0000000000000000000000000000000000000000000000000000000000000007"
-        ]
-      ],
-      [
-        "0xbb9bc244d798123fde783fcc1c72d3bb8c189413",
-        []
-      ]
-    ] */
         writeAccessList(rlpOutput, Optional.of(accessList));
     }
 

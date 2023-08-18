@@ -5,29 +5,15 @@ import io.grpc.ManagedChannel;
 import io.grpc.stub.CallStreamObserver;
 import irita.sdk.client.BaseClient;
 import irita.sdk.constant.enums.BroadcastMode;
-import irita.sdk.crypto.eth.Hash;
 import irita.sdk.crypto.eth.LegacyTransaction;
-import irita.sdk.model.Account;
-import irita.sdk.model.BaseTx;
 import irita.sdk.model.ResultTx;
-import irita.sdk.util.HashUtils;
-import irita.sdk.util.MsgParser;
-import org.apache.commons.codec.Decoder;
-import org.bouncycastle.util.encoders.Hex;
-import org.web3j.crypto.RawTransaction;
-import org.web3j.crypto.SignedRawTransaction;
-import org.web3j.crypto.TransactionDecoder;
-import org.web3j.crypto.TransactionEncoder;
-import org.web3j.rlp.RlpDecoder;
-import org.web3j.rlp.RlpList;
+import org.web3j.crypto.*;
 import org.web3j.utils.Numeric;
 import proto.cosmos.base.v1beta1.CoinOuterClass;
 import proto.cosmos.tx.v1beta1.TxOuterClass;
-import proto.ethermint.evm.v1.MsgGrpc;
 import proto.ethermint.evm.v1.Tx;
 
 import java.io.IOException;
-import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 
@@ -41,26 +27,22 @@ public class EvmClient {
     public ResultTx EthereumTx(String msg,String payer,String denom) throws IOException {
         RawTransaction transaction = TransactionDecoder.decode(msg);
         SignedRawTransaction signedRawTransaction = (SignedRawTransaction) transaction;
+        byte[] data = Numeric.hexStringToByteArray(transaction.getData());
         proto.ethermint.evm.v1.Tx.LegacyTx legacyTx = proto.ethermint.evm.v1.Tx.LegacyTx.newBuilder()
-                .setData(ByteString.copyFrom(transaction.getData().getBytes()))
+                .setData(ByteString.copyFrom(data))
                 .setGas(transaction.getGasLimit().intValue())
                 .setNonce(transaction.getNonce().intValue())
                 .setGasPrice(transaction.getGasPrice().toString())
                 .setTo(transaction.getTo())
                 .setValue(transaction.getValue()+"")
-                //.setGasPrice(8+"")
                 .setR(ByteString.copyFrom(signedRawTransaction.getSignatureData().getR()))
                 .setS(ByteString.copyFrom(signedRawTransaction.getSignatureData().getS()))
                 .setV(ByteString.copyFrom(signedRawTransaction.getSignatureData().getV()))
                 .build();
-        LegacyTransaction legacyTransaction = new LegacyTransaction(legacyTx);
-        System.out.println(legacyTransaction.getSender());
         Tx.MsgEthereumTx tx = Tx.MsgEthereumTx.newBuilder()
                 .setData(Any.pack(legacyTx,""))
                 .setSize(msg.length())
-                //.setFrom(legacyTransaction.getSender())
-                //.setHash(HashUtils.sha256(legacyTx.toByteArray()).toString())
-                //.setFeePayer(payer)
+                .setFeePayer(payer)
                 .build();
         List<GeneratedMessageV3> msgs = Collections.singletonList(tx);
         Tx.ExtensionOptionsEthereumTx extensionOptionsEthereumTx = Tx.ExtensionOptionsEthereumTx.newBuilder().build();
