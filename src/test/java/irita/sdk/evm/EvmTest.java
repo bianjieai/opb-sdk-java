@@ -64,7 +64,7 @@ public class EvmTest {
      * * npx solc Counter.sol -abi -bin -o ./
      * * web3j generate solidity --abiFile=Counter_sol_Counter.abi --outputDir=.\bin\ --package=evm
      */
-    //根据只能合约编译为java版本代码，调用合约
+    //根据智能合约编译为java版本代码，调用合约
     @Test
     public void testEvmWithContract() throws Exception {
         String nodeUri = "http://127.0.0.1:26657";
