@@ -2,10 +2,10 @@ package irita.sdk.client;
 
 import com.google.protobuf.GeneratedMessageV3;
 import com.google.protobuf.InvalidProtocolBufferException;
-import io.grpc.Channel;
 import io.grpc.ManagedChannel;
 import irita.sdk.config.ClientConfig;
 import irita.sdk.config.OpbConfig;
+import irita.sdk.constant.enums.BroadcastMode;
 import irita.sdk.exception.IritaSDKException;
 import irita.sdk.key.KeyInfo;
 import irita.sdk.key.KeyManager;
@@ -79,6 +79,10 @@ public class BaseClient {
         TxEngine txEngine = getTxEngine();
         byte[] txBytes = txEngine.buildAndSign(msgs, baseTx, account);
         return getRpcClient().broadcastTx(txBytes, baseTx.getMode());
+    }
+
+    public ResultTx buildAndSendEvm(byte[] txBytes, BroadcastMode mode) throws IOException {
+        return getRpcClient().broadcastTx(txBytes, mode);
     }
 
     public String buildTxHash(List<GeneratedMessageV3> msgs, BaseTx baseTx, Account account) {

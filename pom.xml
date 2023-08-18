@@ -6,7 +6,7 @@
 
     <groupId>io.github.bianjieai</groupId>
     <artifactId>opb-sdk</artifactId>
-    <version>0.1.14</version>
+    <version>0.1.15</version>
     <url>https://github.com/bianjieai/opb-sdk-java</url>
     <name>opb-sdk</name>
     <licenses>
@@ -176,12 +176,32 @@
         </dependency>
         <dependency>
             <groupId>org.web3j</groupId>
-            <artifactId>crypto</artifactId>
-            <version>5.0.0</version>
+            <artifactId>core</artifactId>
+            <version>4.10.2</version>
             <exclusions>
                 <exclusion>
-                    <artifactId>bcprov-jdk15on</artifactId>
-                    <groupId>org.bouncycastle</groupId>
+                    <groupId>com.squareup.okhttp3</groupId>
+                    <artifactId>okhttp</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.jetbrains.kotlin</groupId>
+                    <artifactId>kotlin-stdlib-jdk8</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-databind</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.java-websocket</groupId>
+                    <artifactId>Java-WebSocket</artifactId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>slf4j-api</artifactId>
+                    <groupId>org.slf4j</groupId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.java-websocket</groupId>
+                    <artifactId>Java-WebSocket</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -194,6 +214,12 @@
             <groupId>org.java-websocket</groupId>
             <artifactId>Java-WebSocket</artifactId>
             <version>1.5.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.8.11.6</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 

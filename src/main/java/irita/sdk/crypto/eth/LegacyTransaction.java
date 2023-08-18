@@ -1,6 +1,7 @@
 package irita.sdk.crypto.eth;
 
 
+import com.google.protobuf.ByteString;
 import irita.sdk.util.Bech32Utils;
 import org.apache.tuweni.bytes.Bytes;
 import org.apache.tuweni.bytes.Bytes32;
@@ -8,13 +9,22 @@ import org.apache.tuweni.bytes.MutableBytes;
 import org.apache.tuweni.units.bigints.UInt256;
 import org.bouncycastle.asn1.sec.SECNamedCurves;
 import org.bouncycastle.asn1.x9.X9ECParameters;
+import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.params.ECDomainParameters;
+import org.bouncycastle.crypto.params.ECPrivateKeyParameters;
+import org.bouncycastle.crypto.signers.ECDSASigner;
+import org.bouncycastle.crypto.signers.HMacDSAKCalculator;
 import org.jetbrains.annotations.NotNull;
+import org.web3j.crypto.RawTransaction;
+import org.web3j.crypto.Sign;
+import org.web3j.crypto.SignedRawTransaction;
+import org.web3j.rlp.*;
 import org.web3j.utils.Numeric;
 import proto.ethermint.evm.v1.Evm;
 import proto.ethermint.evm.v1.Tx;
 
 import java.math.BigInteger;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -26,6 +36,7 @@ import static irita.sdk.constant.Constant.IRITA_EVM_CHAIN_ID_MUL;
 
 public class LegacyTransaction {
 
+    private static RlpList rlpList;
     public  BigInteger curveOrder;
 
     private long nonce;
@@ -56,6 +67,8 @@ public class LegacyTransaction {
 
     private TransactionType transactionType;
     private Optional<List<AccessListEntry>> maybeAccessList;
+    protected Optional<List<AccessListEntry>> accessList = Optional.empty();
+
 
     private final SignatureAlgorithm instance = null;
 
@@ -67,7 +80,23 @@ public class LegacyTransaction {
         return SignatureAlgorithmType.DEFAULT_SIGNATURE_ALGORITHM_TYPE.get();
     }
 
-    public LegacyTransaction(Tx.LegacyTx legacyTx) {
+    public LegacyTransaction(long nonce,String gasPrice,long gasLimit,String to,String value,String data,BigInteger chainId) {
+        this.transactionType = TransactionType.FRONTIER;
+        this.nonce = nonce;
+        this.gasPrice =  Optional.of(Wei.of(Long.parseLong(gasPrice)));
+        this.maxFeePerGas =  Optional.empty();
+        this.gasLimit = gasLimit;
+        this.to = Optional.of(Address.fromHexString(to));
+        this.value = Wei.of(Long.parseLong(value));
+        //this.signature = getSignature(Numeric.toBigInt(legacyTx.getR().toByteArray()), Numeric.toBigInt(legacyTx.getS().toByteArray()), getV(legacyTx.getV().toByteArray()), getCurveOrder(curveOrder));
+        this.payload =Bytes.wrap(data.getBytes());
+        this.sender =null;
+        this.chainId = Optional.of(chainId);
+        //this.v =Optional.of(Numeric.toBigInt(legacyTx.getV().toByteArray()));
+        this.maxPriorityFeePerGas = Optional.empty();
+    }
+
+    public  LegacyTransaction(Tx.LegacyTx legacyTx) {
         this.transactionType = TransactionType.FRONTIER;
         this.nonce = legacyTx.getNonce();
         this.gasPrice =  Optional.of(Wei.of(Long.parseLong(legacyTx.getGasPrice())));
@@ -186,6 +215,23 @@ public class LegacyTransaction {
         return Bech32Utils.hexToBech32("iaa",Numeric.cleanHexPrefix(addr));
     }
 
+
+    public Bytes32 decodeTransaction(){
+        Bytes32 dataHash = computeSenderRecoveryHash(
+                transactionType,
+                nonce,
+                gasPrice.orElse(null),
+                maxPriorityFeePerGas.orElse(null),
+                maxFeePerGas.orElse(null),
+                gasLimit,
+                to,
+                value,
+                payload,
+                accessList,
+                chainId);
+        return dataHash;
+    }
+
     private Bytes32 getOrComputeSenderRecoveryHash() {
         if (hashNoSignature == null) {
             hashNoSignature =
@@ -209,8 +255,6 @@ public class LegacyTransaction {
         if (transactionType.requiresChainId()) {
             checkArgument(chainId.isPresent(), "Transaction type %s requires chainId", transactionType);
         }
-        /*final Bytes preimage = frontierPreimage(nonce, gasPrice, gasLimit, to, value, payload, chainId);
-        return Hash.keccak256(preimage);*/
         final Bytes preimage;
         switch (transactionType) {
             case FRONTIER:
@@ -372,22 +416,63 @@ public class LegacyTransaction {
         rlpOutput.writeBytes(to.map(Bytes::copy).orElse(Bytes.EMPTY));
         rlpOutput.writeUInt256Scalar(value);
         rlpOutput.writeBytes(payload);
-    /*
-    Access List encoding should look like this
-    where hex strings represent raw bytes
-    [
-      [
-        "0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae",
-        [
-          "0x0000000000000000000000000000000000000000000000000000000000000003",
-          "0x0000000000000000000000000000000000000000000000000000000000000007"
-        ]
-      ],
-      [
-        "0xbb9bc244d798123fde783fcc1c72d3bb8c189413",
-        []
-      ]
-    ] */
         writeAccessList(rlpOutput, Optional.of(accessList));
     }
+
+    public static LegacyTransaction decodeLegacyTransaction(String hexTransaction) {
+        byte[] transaction = Numeric.hexStringToByteArray(hexTransaction);
+        rlpList = RlpDecoder.decode(transaction);
+        RlpList values = (RlpList)rlpList.getValues().get(0);
+        BigInteger nonce = ((RlpString)values.getValues().get(0)).asPositiveBigInteger();
+        BigInteger gasPrice = ((RlpString)values.getValues().get(1)).asPositiveBigInteger();
+        BigInteger gasLimit = ((RlpString)values.getValues().get(2)).asPositiveBigInteger();
+        String to = ((RlpString)values.getValues().get(3)).asString();
+        BigInteger value = ((RlpString)values.getValues().get(4)).asPositiveBigInteger();
+        String data = ((RlpString)values.getValues().get(5)).asString();
+        Tx.LegacyTx legacyTx = Tx.LegacyTx.newBuilder()
+                .setData(ByteString.copyFrom(data.getBytes()))
+                .setGas(gasLimit.intValue())
+                .setNonce(nonce.intValue())
+                .setGasPrice(gasPrice.toString())
+                .setTo(to)
+                .setValue(value+"")
+                //.setGasPrice(8+"")
+                .setR(ByteString.copyFrom(((RlpString)values.getValues().get(7)).getBytes()))
+                .setS(ByteString.copyFrom(((RlpString)values.getValues().get(8)).getBytes()))
+                .setV(ByteString.copyFrom(((RlpString)values.getValues().get(6)).getBytes()))
+                .build();
+        return new LegacyTransaction(legacyTx);
+    }
+
+    public static byte[] encode(SECPSignature signatureData,long nonce,String gasPrice,long gasLimit,String to,String value,String data){
+        List<RlpType> result = new ArrayList<>();
+
+        result.add(RlpString.create(nonce));
+
+        result.add(RlpString.create(gasPrice));
+        result.add(RlpString.create(gasLimit));
+
+        // an empty to address (contract creation) should not be encoded as a numeric 0 value
+        if (to != null && to.length() > 0) {
+            // addresses that start with zeros should be encoded with the zeros included, not
+            // as numeric values
+            result.add(RlpString.create(Numeric.hexStringToByteArray(to)));
+        } else {
+            result.add(RlpString.create(""));
+        }
+
+        result.add(RlpString.create(value));
+
+        // value field will already be hex encoded, so we need to convert into binary first
+        byte[] data2 = Numeric.hexStringToByteArray(data);
+        result.add(RlpString.create(data2));
+        if (signatureData != null) {
+            result.add(RlpString.create(org.web3j.utils.Bytes.trimLeadingZeroes(new byte[0])));
+            result.add(RlpString.create(org.web3j.utils.Bytes.trimLeadingZeroes(signatureData.getR().toByteArray())));
+            result.add(RlpString.create(org.web3j.utils.Bytes.trimLeadingZeroes(signatureData.getS().toByteArray())));
+        }
+        RlpList rlpList = new RlpList(result);
+       return RlpEncoder.encode(rlpList);
+    }
+
 }
