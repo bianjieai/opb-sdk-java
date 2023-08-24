@@ -4,7 +4,6 @@ import com.google.protobuf.GeneratedMessageV3;
 import irita.sdk.client.BaseClient;
 import irita.sdk.client.IritaClient;
 import irita.sdk.constant.enums.BroadcastMode;
-import irita.sdk.crypto.eth.LegacyTransaction;
 import irita.sdk.model.*;
 import irita.sdk.model.block.BlockDetail;
 import irita.sdk.model.tx.Condition;
@@ -15,7 +14,6 @@ import irita.sdk.util.KeyUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.web3j.utils.Numeric;
 import proto.nft.Tx;
 
 import java.io.IOException;
@@ -84,7 +82,7 @@ public class ClientTest extends ConfigTest {
 		assertNotNull(resultSearchTxs);
 	}
 
-	@Test
+	/*@Test
 	@Disabled
 	public void queryTxFeePayer() throws IOException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
 		String hash = "20AA3CCE20FA2DA71ACED7F5B81D42C4440297F2E6F8297372CC6246AE5E270B";//
@@ -126,7 +124,7 @@ public class ClientTest extends ConfigTest {
 		String txSigner = KeyUtils.parseAddrFromPubKeyAny(resultQueryTx.getTx().getAuthInfo().getSignerInfos(0).getPublicKey());
 		System.out.println("付钱的人是：" + (!"".equals(granter) ? granter : (!"".equals(payer) ? payer : txSigner)));
 	}
-
+*/
 	@Test
 	@Disabled
 	public void queryBlock() throws IOException {

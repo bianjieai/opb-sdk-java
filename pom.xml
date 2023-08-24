@@ -6,7 +6,7 @@
 
     <groupId>io.github.bianjieai</groupId>
     <artifactId>opb-sdk</artifactId>
-    <version>0.1.15-rc</version>
+    <version>0.1.15-jdk8</version>
     <url>https://github.com/bianjieai/opb-sdk-java</url>
     <name>opb-sdk</name>
     <licenses>
@@ -70,39 +70,16 @@
                     <artifactId>jcip-annotations</artifactId>
                     <groupId>net.jcip</groupId>
                 </exclusion>
+                <exclusion>
+                    <groupId>com.google.errorprone</groupId>
+                    <artifactId>error_prone_annotations</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>3.12.0</version>
-        </dependency>
-        <dependency>
-            <groupId>net.java.dev.jna</groupId>
-            <artifactId>jna</artifactId>
-            <version>5.8.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.tuweni</groupId>
-            <artifactId>tuweni-bytes</artifactId>
-            <version>2.0.0</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>error_prone_annotations</artifactId>
-                    <groupId>com.google.errorprone</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.tuweni</groupId>
-            <artifactId>tuweni-units</artifactId>
-            <version>2.0.0</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>guava</artifactId>
-                    <groupId>com.google.guava</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <dependency>
@@ -113,6 +90,10 @@
                 <exclusion>
                     <artifactId>animal-sniffer-annotations</artifactId>
                     <groupId>org.codehaus.mojo</groupId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.google.errorprone</groupId>
+                    <artifactId>error_prone_annotations</artifactId>
                 </exclusion>
                 <exclusion>
                     <artifactId>guava</artifactId>
@@ -126,12 +107,12 @@
             <version>1.35.0</version>
             <exclusions>
                 <exclusion>
-                    <artifactId>guava</artifactId>
-                    <groupId>com.google.guava</groupId>
-                </exclusion>
-                <exclusion>
                     <artifactId>animal-sniffer-annotations</artifactId>
                     <groupId>org.codehaus.mojo</groupId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.google.errorprone</groupId>
+                    <artifactId>error_prone_annotations</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -146,8 +127,8 @@
                     <groupId>org.codehaus.mojo</groupId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>guava</artifactId>
-                    <groupId>com.google.guava</groupId>
+                    <groupId>com.google.errorprone</groupId>
+                    <artifactId>error_prone_annotations</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -177,8 +158,12 @@
         <dependency>
             <groupId>org.web3j</groupId>
             <artifactId>core</artifactId>
-            <version>4.10.2</version>
+            <version>4.9.8</version>
             <exclusions>
+                <exclusion>
+                    <artifactId>bcprov-jdk15on</artifactId>
+                    <groupId>org.bouncycastle</groupId>
+                </exclusion>
                 <exclusion>
                     <groupId>com.squareup.okhttp3</groupId>
                     <artifactId>okhttp</artifactId>
@@ -367,8 +352,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>11</source>
-                    <target>11</target>
+                    <source>8</source>
+                    <target>8</target>
                 </configuration>
             </plugin>
         </plugins>

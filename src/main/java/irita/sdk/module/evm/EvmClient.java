@@ -5,7 +5,6 @@ import io.grpc.ManagedChannel;
 import io.grpc.stub.CallStreamObserver;
 import irita.sdk.client.BaseClient;
 import irita.sdk.constant.enums.BroadcastMode;
-import irita.sdk.crypto.eth.LegacyTransaction;
 import irita.sdk.model.ResultTx;
 import org.web3j.crypto.*;
 import org.web3j.utils.Numeric;
